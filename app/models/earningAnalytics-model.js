@@ -25,11 +25,11 @@ const EarningAnalyticsSchema = new mongoose.Schema({
     topVehicle: {
         type: mongoose.Schema.ObjectId,
         ref: 'Vehicle'
-    },
-    dateRange: {
-        startDate: { type: Date, required: true },
-        endDate: { type: Date, required: true },
     }
+    // dateRange: {
+    //     startDate: { type: Date, required: true },
+    //     endDate: { type: Date, required: true },
+    // }
 }, { timeseries: true });
 
 const EarningAnalytics = mongoose.model('EarningAnalytics', EarningAnalyticsSchema);
