@@ -43,7 +43,7 @@ subscriptionCtlr.show = async(req, res) => {
 
 subscriptionCtlr.list = async(req, res) => {
     try {
-        const subscription = Subscription.find({ user: req.userId });
+        const subscription = await Subscription.find({ user: req.userId });
         if(!subscription) {
             return res.status(404).json({ error: 'record not found' });
         }
@@ -85,7 +85,6 @@ subscriptionCtlr.remove = async(req, res) => {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
     }
-
 }
 
 module.exports = subscriptionCtlr;

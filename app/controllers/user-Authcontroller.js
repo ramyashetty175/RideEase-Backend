@@ -1,6 +1,7 @@
 const User = require('../models/user-Authmodel');
 const { UserRegisterValidation, UserLoginValidation } = require('../validations/user-Authvalidations');
 const bcryptjs = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const usersCtlr = {};
 
@@ -31,7 +32,6 @@ usersCtlr.register = async(req, res) => {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!' });
     }
-
 }
 
 usersCtlr.login = async(req, res) => {
@@ -45,7 +45,7 @@ usersCtlr.login = async(req, res) => {
         if(!user) {
             return res.status(401).json({ error: 'user not found' });
         }
-        const passwordMatch = await bcryptjs.compare(value.password, );
+        const passwordMatch = await bcryptjs.compare(value.password, user.password);
         if(!passwordMatch) {
             return res.status(404).json({ error: 'Invalid email/password' });
         }
@@ -53,6 +53,7 @@ usersCtlr.login = async(req, res) => {
         const token = jwt.sign(tokenData, process.env.JWT_SECRET, {expiredIn: '7d'});
         res.json({ token: token });
     } catch(err) {
+        console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
     }
 }
@@ -87,4 +88,4 @@ usersCtlr.remove = async(req, res) => {
     }
 }
 
-model.exports = usersCtlr;
+module.exports = usersCtlr;

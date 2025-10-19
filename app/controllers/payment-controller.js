@@ -11,7 +11,7 @@ paymentCtlr.create = async(req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const booking = await Booking.findOne({ _id: value.booking, user: req.userId });
+        const booking = await Booking.findOne({ booking: value.booking, user: req.userId });
         if(!booking) {
             return res.status(404).json({ error: 'Booking not found' });
         }
@@ -35,8 +35,9 @@ paymentCtlr.create = async(req, res) => {
 }
 
 paymentCtlr.show = async(req, res) => {
+    const id = req.params.id;
     try {
-        const payment = await Payment.find({ user: req.userId });
+        const payment = await Payment.findOne({ _id: id, user: req.userId });
         if(!payment) {
             return res.status(404).json({ error: 'record not found' });
         }
@@ -49,7 +50,16 @@ paymentCtlr.show = async(req, res) => {
 }
 
 paymentCtlr.list = async(req, res) => {
-    const id = req.params.id;
+    try {
+        const payment = await Payment.find({ user: req.userId });
+        if(!payment) {
+           res.status(404).json({ error: 'record not found' });
+        }
+        res.json(payment);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
 }
 
 paymentCtlr.update = async(req, res) => {
@@ -62,7 +72,7 @@ paymentCtlr.update = async(req, res) => {
     try {
         const payment = await Payment.findOneAndUpdate({ _id: id, user: req.userId }, value, { new: true });
         if(!payment) {
-            return res.status().json({ error: 'record not found' });
+            return res.status(404).json({ error: 'record not found' });
         }
         res.json(payment);
     } catch(err) {

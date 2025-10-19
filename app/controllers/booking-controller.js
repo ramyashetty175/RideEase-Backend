@@ -10,9 +10,9 @@ bookingsCtlr.create = async(req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const existingBooking = await Booking.findOne({});
+        const existingBooking = await Booking.findOne({ vehicle: value.vehicle, startDate: value.startDate, user: req.userId });
         if(existingBooking) {
-            return res.status().json({ error: 'Vehicle is not available for the selected dates' });
+            return res.status(400).json({ error: 'Vehicle is not available for the selected dates' });
         }
         const booking = new Booking();
         booking.user = req.userId;
