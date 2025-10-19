@@ -2,16 +2,16 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const app = express();
-const port = process.env.PORT || 3010;
-app.use(cors());
 app.use(express.json());
+app.use(cors());
+const port = process.env.PORT || 3010;
 
 const configureDB = require('./config/db');
 configureDB();
 
 const authenticateUser = require('./app/middlewares/authenticateUser');
 const authorizeUser = require('./app/middlewares/authorizeUser');
-const usersCtlr = require('../User-Authentication/app/controllers/user-Authcontroller');
+const usersCtlr = require('./app/controllers/user-Authcontroller');
 const vehiclesCtlr = require('./app/controllers/vehicle-controller');
 const bookingsCtlr = require('./app/controllers/booking-controller');
 const paymentCtlr = require('./app/controllers/payment-controller');

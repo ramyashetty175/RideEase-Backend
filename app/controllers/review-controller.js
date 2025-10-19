@@ -10,6 +10,10 @@ reviewCtlr.create = async(req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
+        const existingReview = await Review.findOne({ rating: value.rating, user: req.userId });
+        if(existingReview) {
+           res.status(400).json({ error: 'Review already given by user' });
+        }
         const review = new Review();
         review.user = req.userId;
         review.vehicle = value.vehicle;
