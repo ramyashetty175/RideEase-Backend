@@ -6,8 +6,8 @@ const UserAuthenSchema = new mongoose.Schema({
     password: String,
     newPassword: String,
     loginCount: {
-       type: Number,
-       default: 0
+      type: Number,
+      default: 0
     },
     role: {
       type: String,
