@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const authenticateUser = (req, res, next) => {
     const token = req.headers['authorization'];
     if(!token) {
-        res.status(401).json({ error: 'token not provided' });
+        return res.status(401).json({ error: 'token not provided' });
     }
     try {
         let tokenData = jwt.verify(token, process.env.JWT_SECRET);
@@ -11,7 +11,7 @@ const authenticateUser = (req, res, next) => {
         req.role = tokenData.role;
         next();
     } catch(err) {
-        res.status(500).json({ error: ''})
+        res.status(500).json({ error: err.message })
     }
 }
 

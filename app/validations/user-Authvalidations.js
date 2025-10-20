@@ -18,7 +18,6 @@ const UserRegisterValidation = Joi.object({
 })
 
 const UserLoginValidation = Joi.object({
-    username: Joi.string().trim().min(5).max(10).required(),
     email: Joi.string().email().trim().lowercase().required(),
     password: passwordComplexity(complexityOptions).required()
 })
