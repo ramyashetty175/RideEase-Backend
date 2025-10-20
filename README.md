@@ -1,1 +1,1 @@
-#RideEase
+#RideEase - Vehicle Rental App
