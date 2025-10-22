@@ -28,7 +28,7 @@ app.get('/users', authenticateUser, authorizeUser(['admin', 'owner']), usersCtlr
 app.delete('/users/:id', authenticateUser, authorizeUser(['admin']), usersCtlr.remove);
 app.get('/users/account', authenticateUser, usersCtlr.account);
 // Vehicle
-app.post('/api/vehicles', authenticateUser, vehiclesCtlr.create);
+app.post('/api/vehicles', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesCtlr.create);
 app.get('/api/vehicles/:id', authenticateUser, vehiclesCtlr.show);
 app.get('/api/vehicles', authenticateUser, vehiclesCtlr.list);
 app.put('/api/vehicles/:id', authenticateUser, vehiclesCtlr.update);

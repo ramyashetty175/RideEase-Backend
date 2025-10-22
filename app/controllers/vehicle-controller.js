@@ -12,7 +12,7 @@ vehiclesCtlr.create = async(req, res) => {
     try {
         const vehicleInDB = await Vehicle.findOne({ registrationNumber: value.registrationNumber, owner: req.userId });
         if(vehicleInDB) {
-            return res.status(400).json({ error: 'vehicle already exist' });
+            return res.status(400).json({ error: 'vehicle already exist' }); 
         }
         const vehicle = new Vehicle();
         vehicle.owner = req.userId;
@@ -39,7 +39,7 @@ vehiclesCtlr.create = async(req, res) => {
 vehiclesCtlr.show = async(req, res) => {
     const id = req.params.id;
     try {
-        const vehicle = await Vehicle.findOne({ id: _id, owner: req.userId });
+        const vehicle = await Vehicle.findOne({ _id: id, owner: req.userId });
         if(!vehicle) {
             return res.status(404).json({ error: 'record not found' });
         }

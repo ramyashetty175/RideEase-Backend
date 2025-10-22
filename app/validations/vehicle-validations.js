@@ -5,7 +5,7 @@ const VehicleValidation = Joi.object({
     vehicleName: Joi.string().trim().required(),
     brand: Joi.string().trim().required(),
     type: Joi.string().trim().required(),
-    registrationNumber: Joi.number().required(),
+    registrationNumber: Joi.string().trim().required(),
     fuelType: Joi.string().trim().required(),
     transmission: Joi.string().trim().required(),
     seats: Joi.number().min(1).required(),

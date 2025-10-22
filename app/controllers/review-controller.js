@@ -74,6 +74,7 @@ reviewCtlr.update = async(req, res) => {
 }
 
 reviewCtlr.remove = async(req, res) => {
+    const id = req.params.id;
     try {
         const review = await Review.findOneAndDelete({ _id: id, user: req.userId });
         if(!review) {
