@@ -3,7 +3,7 @@ const VehicleValidation = require('../validations/vehicle-validations');
 
 const vehiclesCtlr = {};
 
-vehiclesCtlr.create = async(req, res) => {
+vehiclesCtlr.create = async (req, res) => {
     const body = req.body;
     const { error, value } = VehicleValidation.validate(body, { abortEarly: false });
     if(error) {
@@ -36,7 +36,7 @@ vehiclesCtlr.create = async(req, res) => {
     }
 }
 
-vehiclesCtlr.show = async(req, res) => {
+vehiclesCtlr.show = async (req, res) => {
     const id = req.params.id;
     try {
         const vehicle = await Vehicle.findOne({ _id: id, owner: req.userId });
@@ -50,7 +50,7 @@ vehiclesCtlr.show = async(req, res) => {
     }
 }
 
-vehiclesCtlr.list = async(req, res) => {
+vehiclesCtlr.list = async (req, res) => {
     try {
         const vehicle = await Vehicle.find({ owner: req.userId });
         res.json(vehicle);
@@ -60,7 +60,7 @@ vehiclesCtlr.list = async(req, res) => {
     }
 }
 
-vehiclesCtlr.update = async(req, res) => {
+vehiclesCtlr.update = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
      const{ error, value } = VehicleValidation.validate(body);
@@ -79,7 +79,7 @@ vehiclesCtlr.update = async(req, res) => {
     }
 }
 
-vehiclesCtlr.remove = async(req, res) => {
+vehiclesCtlr.remove = async (req, res) => {
     const id = req.params.id;
     try {
         const vehicle = await Vehicle.findOneAndDelete({ _id: id, owner: req.userId });
