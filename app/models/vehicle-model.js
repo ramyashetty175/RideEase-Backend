@@ -15,6 +15,10 @@ const VehicleSchema = new mongoose.Schema({
         type: String,
         unique: true
     },
+    license: {
+        type: String, 
+        required: true
+    },
     fuelType: {
         type: String,
         enum: ["Petrol", "Diesel", "Electric"]
