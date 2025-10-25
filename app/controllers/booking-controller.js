@@ -21,9 +21,9 @@ bookingsCtlr.create = async(req, res) => {
         booking.endDate = value.endDate;
         booking.pickupLocation = value.pickupLocation;
         booking.returnLocation = value.returnLocation;
-        booking.totalAmount = totalAmount;
-        booking.paymentStatus = "pending";
-        booking.bookingStatus = "pending";
+        booking.totalAmount = value.totalAmount;
+        booking.paymentStatus = value.paymentStatus;
+        booking.bookingStatus = value.bookingStatus;
         await booking.save();
         res.status(201).json(booking);
     } catch(err) {
