@@ -65,9 +65,9 @@ vehiclesCtlr.update = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
      const{ error, value } = VehicleValidation.validate(body);
-        if(error) {
-            return res.status(400).json({ error: error.details });
-        }
+    if(error) {
+        return res.status(400).json({ error: error.details });
+    }
     try {
         const vehicle = await Vehicle.findOneAndUpdate({ _id: id, owner: req.userId }, value, { new: true });
         if(!vehicle) {
@@ -83,7 +83,7 @@ vehiclesCtlr.update = async (req, res) => {
 vehiclesCtlr.remove = async (req, res) => {
     const id = req.params.id;
     try {
-        const vehicle = await Vehicle.findOneAndDelete({ _id: id, owner: req.userId });
+        const vehicle = await Vehicle.findOneAndDelete({ _id: id });
         if(!vehicle) {
             return res.status(404).json({ error: 'record not found' });
         }

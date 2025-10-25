@@ -11,7 +11,7 @@ const VehicleValidation = Joi.object({
     seats: Joi.number().min(1).required(),
     pricePerDay: Joi.number().required(),
     location: Joi.string().required(),
-    images: Joi.string(),
+    images: Joi.array().ordered(Joi.string().required()),
     availabilityStatus: Joi.string().trim(),
     averageRating: Joi.number()
 })
