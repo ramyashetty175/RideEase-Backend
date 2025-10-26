@@ -10,6 +10,10 @@ subscriptionCtlr.create = async(req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
+        const existSubscription = await Subscription.findOne({ user: req.userId });
+        if(existSubscription) {
+            return res.status(400).json({ error: 'record alreday exist' });
+        }
         const subscription = new Subscription();
         subscription.user = req.userId;
         subscription.planType = value.planType;

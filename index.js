@@ -49,14 +49,14 @@ app.delete('/api/payments/:id', authenticateUser, paymentCtlr.remove);
 app.post('/api/reviews', authenticateUser, reviewCtlr.create);
 app.get('/api/reviews/:id', authenticateUser, reviewCtlr.show);
 app.get('/api/reviews', authenticateUser, reviewCtlr.list);
-app.put('/api/reviews', authenticateUser, reviewCtlr.update);
-app.delete('/api/reviews', authenticateUser, reviewCtlr.remove);
+app.put('/api/reviews/:id', authenticateUser, reviewCtlr.update);
+app.delete('/api/reviews/:id', authenticateUser, reviewCtlr.remove);
 // subscription 
-app.post('/api/subscription', authenticateUser, subscriptionCtlr.create);
-app.get('/api/subscription/:id', authenticateUser, subscriptionCtlr.show);
-app.get('/api/subscription', authenticateUser, subscriptionCtlr.list);
-app.put('/api/subscription', authenticateUser, subscriptionCtlr.update);
-app.delete('/api/subscription', authenticateUser, subscriptionCtlr.remove);
+app.post('/api/subscriptions', authenticateUser, subscriptionCtlr.create);
+app.get('/api/subscriptions/:id', authenticateUser, subscriptionCtlr.show);
+app.get('/api/subscriptions', authenticateUser, subscriptionCtlr.list);
+app.put('/api/subscriptions/:id', authenticateUser, subscriptionCtlr.update);
+app.delete('/api/subscriptions/:id', authenticateUser, subscriptionCtlr.remove);
 // EarningAnalytics
 app.post('/api/earningsAnalytics', authenticateUser, earningAnalyticsCtlr.create);
 app.get('/api/earningsAnalytics/:id', authenticateUser, earningAnalyticsCtlr.show);
@@ -67,4 +67,3 @@ app.delete('/api/earningsAnalytics/:id', authenticateUser, earningAnalyticsCtlr.
 app.listen(port, () => {
     console.log('server is running on port', port);
 })
-
