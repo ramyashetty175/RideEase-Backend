@@ -12,17 +12,17 @@ subscriptionCtlr.create = async(req, res) => {
     try {
         const existSubscription = await Subscription.findOne({ user: req.userId });
         if(existSubscription) {
-            return res.status(400).json({ error: 'record alreday exist' });
+            return res.status(400).json({ error: 'record already exist' });
         }
         const subscription = new Subscription();
-        subscription.user = req.userId;
+        subscription.user = req.userId; 
         subscription.planType = value.planType;
         subscription.price = value.price;
-        subscription.startDate = value.startDate;
+        subscription.startDate = value.startDate; 
         subscription.endDate = value.endDate;
         subscription.isActive = value.isActive;
         subscription.features = value.features;
-        subscription.paymentStatus = value.paymentStatus;
+        subscription.paymentStatus = value.paymentStatus; 
         await subscription.save();
         res.status(201).json(subscription);
     } catch(err) {

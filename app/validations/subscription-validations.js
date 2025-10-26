@@ -6,8 +6,8 @@ const SubscriptionValidation = Joi.object({
     price: Joi.number().min(0).required(),
     startDate: Joi.date().required(),
     endDate: Joi.date().required(),
-    isActive: Joi.array().required(),
-    features: Joi.array().required(),
+    isActive: Joi.string().required(),
+    features: Joi.array().ordered(Joi.string().required()),
     paymentStatus: Joi.string().trim()
 })
 
