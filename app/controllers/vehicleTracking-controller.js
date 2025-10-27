@@ -18,6 +18,7 @@ vehiclesTrackingCtlr.create = async (req, res) => {
         vehicletracking.longitude = value.longitude;
         vehicletracking.speed = value.speed;
         vehicletracking.status = value.status;
+        await vehicletracking.save();
         res.status(201).json(vehicletracking);
     } catch(err) {
         console.log(err);
@@ -60,10 +61,8 @@ vehiclesTrackingCtlr.update = async (req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const vehicleTracking = await VehicleTracking.findOne({ user: req.userId });
-        const vehicletracking = new VehicleTracking();
-        await vehicletracking.save();
-        res.status(201).json(vehicletracking);
+        const vehicletracking = await VehicleTracking.findOne({ _id: id, user: req.userId }, value, { new: true });
+        res.json(vehicletracking);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });

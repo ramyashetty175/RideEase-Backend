@@ -83,7 +83,7 @@ vehiclesCtlr.update = async (req, res) => {
 vehiclesCtlr.remove = async (req, res) => {
     const id = req.params.id;
     try {
-        const vehicle = await Vehicle.findOneAndDelete({ _id: id });
+        const vehicle = await Vehicle.findOneAndDelete({ _id: id, user: req.userId });
         if(!vehicle) {
             return res.status(404).json({ error: 'record not found' });
         }
