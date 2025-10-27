@@ -11,7 +11,14 @@ vehiclesTrackingCtlr.create = async (req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-    
+        const existvehicleTracking = await VehicleTracking({ user: req.userId });
+        const vehicletracking = new VehicleTracking();
+        vehicletracking.vehicleId = value.vehicleId;
+        vehicletracking.latitude = value.latitude;
+        vehicletracking.longitude = value.longitude;
+        vehicletracking.speed = value.speed;
+        vehicletracking.status = value.status;
+        res.status(201).json(vehicletracking);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -66,7 +73,11 @@ vehiclesTrackingCtlr.update = async (req, res) => {
 vehiclesTrackingCtlr.remove = async (req, res) => {
     const id = req.params.id;
     try {
-
+        const vehicletracking = await VehicleTracking({ _id: id, user: req.userId });
+        if(!vehicletracking) {
+            res.status(404).json({ error: 'record not found' });
+        }
+        res.json(vehicletracking);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
