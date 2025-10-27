@@ -48,8 +48,15 @@ vehiclesTrackingCtlr.show = async (req, res) => {
 vehiclesTrackingCtlr.update = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
+    const { error, value } = VehicleTrackingValidation.validate(body);
+    if(error) {
+        return res.status(400).json({ error: error.details });
+    }
     try {
-
+        const vehicleTracking = await VehicleTracking.findOne({ user: req.userId });
+        const vehicletracking = new VehicleTracking();
+        await vehicletracking.save();
+        res.status(201).json(vehicletracking);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
