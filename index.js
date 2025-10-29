@@ -16,8 +16,12 @@ const vehiclesCtlr = require('./app/controllers/vehicle-controller');
 const bookingsCtlr = require('./app/controllers/booking-controller');
 const paymentCtlr = require('./app/controllers/payment-controller');
 const reviewCtlr = require('./app/controllers/review-controller');
+const bookingCancellationCtlr = require('./app/controllers/booking-cancellation-controller');
+const vehicleTrackingCtlr = require('./app/controllers/vehicleTracking-controller');
+const notificationCtlr = require('./app/controllers/notification-controller');
 const subscriptionCtlr = require('./app/controllers/subscription-controller');
 const earningAnalyticsCtlr = require('./app/controllers/earningAnalytics-controller');
+const vehiclesTrackingCtlr = require('./app/controllers/vehicleTracking-controller');
 
 // Public Route
 app.post('/users/register', usersCtlr.register);
@@ -51,7 +55,29 @@ app.get('/api/reviews/:id', authenticateUser, reviewCtlr.show);
 app.get('/api/reviews', authenticateUser, reviewCtlr.list);
 app.put('/api/reviews/:id', authenticateUser, reviewCtlr.update);
 app.delete('/api/reviews/:id', authenticateUser, reviewCtlr.remove);
-// subscription 
+
+// VehicleTracking
+app.post('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.create);
+app.get('/api/vehicleTrackings/:id', authenticateUser, vehiclesTrackingCtlr.show);
+app.get('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.list);
+app.put('/api/vehicleTrackings/:id', authenticateUser, vehicleTrackingCtlr.update);
+app.delete('/api/vehicleTrackings/:id', authenticateUser, vehiclesTrackingCtlr.remove);
+
+// BookingCancellation
+app.post('/api/bookingCancellation', authenticateUser, bookingCancellationCtlr.create);
+app.get('/api/bookingCancellation', authenticateUser, bookingCancellationCtlr.show);
+app.get('/api/bookingCancellation', authenticateUser, bookingCancellationCtlr.list);
+app.put('/api/bookingCancellation', authenticateUser, bookingCancellationCtlr.update);
+app.delete('/api/bookingCancellation', authenticateUser, bookingCancellationCtlr.remove);
+
+// Notification
+app.post('/api/notifications', authenticateUser, notificationCtlr.create);
+app.get('/api/notifications', authenticateUser, notificationCtlr.show);
+app.get('/api/notifications', authenticateUser, notificationCtlr.list);
+app.put('/api/notifications', authenticateUser, notificationCtlr.update);
+app.delete('/api/notifications', authenticateUser, notificationCtlr.remove);
+
+// Subscription 
 app.post('/api/subscriptions', authenticateUser, subscriptionCtlr.create);
 app.get('/api/subscriptions/:id', authenticateUser, subscriptionCtlr.show);
 app.get('/api/subscriptions', authenticateUser, subscriptionCtlr.list);
