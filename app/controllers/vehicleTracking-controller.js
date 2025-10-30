@@ -1,4 +1,3 @@
-const vehicleTracking = require('../models/vehicleTracking-model');
 const VehicleTracking = require('../models/vehicleTracking-model');
 const VehicleTrackingValidation = require('../validations/vehicleTracking-validations');
 
