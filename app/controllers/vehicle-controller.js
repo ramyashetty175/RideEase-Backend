@@ -10,9 +10,9 @@ vehiclesCtlr.create = async (req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const vehicleInDB = await Vehicle.findOne({ registrationNumber: value.registrationNumber });
+        const vehicleInDB = await Vehicle.findOne({ registrationNumber: value.registrationNumber, owner: req.userId });
         if(vehicleInDB) {
-            return res.status(400).json({ error: 'vehicle already exists' }); 
+            return res.status(400).json({ error: 'vehicle already exists' });
         }
         const vehicle = new Vehicle();
         vehicle.owner = req.userId;
@@ -40,7 +40,7 @@ vehiclesCtlr.create = async (req, res) => {
 vehiclesCtlr.show = async (req, res) => {
     const id = req.params.id;
     try {
-        const vehicle = await Vehicle.findOne({ _id: id, owner: req.userId });
+        const vehicle = await Vehicle.findOne({ _id: id, user: req.userId });
         if(!vehicle) {
             return res.status(404).json({ error: 'record not found' });
         }
@@ -53,7 +53,7 @@ vehiclesCtlr.show = async (req, res) => {
 
 vehiclesCtlr.list = async (req, res) => {
     try {
-        const vehicle = await Vehicle.find({ owner: req.userId });
+        const vehicle = await Vehicle.find({ user: req.userId });
         res.json(vehicle);
     } catch(err) {
         console.log(err);
@@ -69,7 +69,7 @@ vehiclesCtlr.update = async (req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const vehicle = await Vehicle.findOneAndUpdate({ _id: id, owner: req.userId }, value, { new: true });
+        const vehicle = await Vehicle.findOneAndUpdate({ _id: id, user: req.userId }, value, { new: true });
         if(!vehicle) {
             return res.status(404).json({ error: 'record not found' });
         }

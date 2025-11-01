@@ -14,7 +14,8 @@ const complexityOptions = {
 const UserRegisterValidation = Joi.object({
     username: Joi.string().trim().min(5).max(10).required(),
     email: Joi.string().email().trim().lowercase().required(),
-    password: passwordComplexity(complexityOptions).required()
+    password: passwordComplexity(complexityOptions).required(),
+    role: Joi.string()
 })
 
 const UserLoginValidation = Joi.object({
@@ -22,7 +23,13 @@ const UserLoginValidation = Joi.object({
     password: passwordComplexity(complexityOptions).required()
 })
 
+const ApproveOwnerValidation = Joi.object({
+    //role: Joi.string().valid('owner').required(),
+    isApproved: Joi.boolean().required()
+})
+
 module.exports = {
     UserRegisterValidation,
-    UserLoginValidation
+    UserLoginValidation,
+    ApproveOwnerValidation
 }

@@ -1,5 +1,5 @@
 const User = require('../models/user-Authmodel');
-const { UserRegisterValidation, UserLoginValidation } = require('../validations/user-Authvalidations');
+const { UserRegisterValidation, UserLoginValidation, ApproveOwnerValidation } = require('../validations/user-Authvalidations');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -14,7 +14,7 @@ usersCtlr.register = async(req, res) => {
     try {
         const userByEmail = await User.findOne({ email: value.email });
         if(userByEmail) {
-           return res.status(404).json({ msg: 'email already exists' });
+           return res.status(400).json({ msg: 'email already exists' });
         }
         const user = new User();
         user.username = value.username;
@@ -24,7 +24,13 @@ usersCtlr.register = async(req, res) => {
         user.password = hash;
         const userCount = await User.countDocuments();
         if(userCount == 0) {
-           user.role = "admin";
+            user.role = "admin";
+        } else if(value.role == "owner") {
+            user.role = "owner";
+            user.isApproved = "false";
+        } else {
+            user.role = "user";
+            user.isApproved = "true";
         }
         await user.save();
         res.status(201).json(user);
@@ -84,6 +90,27 @@ usersCtlr.remove = async(req, res) => {
     const id = req.params.id;
     try {
         const user = await User.findByIdAndDelete(id);
+        res.json(user);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
+}
+
+usersCtlr.approveOwner = async(req, res) => {
+    const body = req.body;
+    const id = req.params.id;
+    const { error, value } = ApproveOwnerValidation.validate(body);
+    if(error) {
+        return res.status(400).json({ error: error.details });
+    }
+    try {
+        const user = await User.findOneAndUpdate({ _id: id }, value, { new: true });
+        if(!user) {
+            return res.status(404).json({ error: 'record not found' });
+        }
+        user.isApproved = true;
+        await user.save();
         res.json(user);
     } catch(err) {
         console.log(err);
