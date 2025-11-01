@@ -13,6 +13,22 @@ const UserAuthenSchema = new mongoose.Schema({
       enum: ["admin", "owner", "user"],
       default: 'user'
     }, 
+    insuranceDoc: {
+      type: String,
+      default: null
+    },
+    licenceDoc: {
+      type: String,
+      default: null
+    },
+    insuranceVerified: {
+      type: Boolean,
+      default: false
+    },
+    licenceVerified: {
+      type: Boolean,
+      default: false
+    },
     isApproved: {
       type: Boolean,
       default: false
