@@ -7,7 +7,7 @@ notificationCtlr.create = async(req, res) => {
     const body = req.body;
     const { error, value } = NotificationValidation.validate(body, { abortEarly: true });
     if(error) {
-        res.status(400).json({ error: error.details });
+        return res.status(400).json({ error: error.details });
     }
     try {
         // const existingNotification = await Notification.findOne({ type: value.type, vehicleId, userId, 5 min ,user: req.userId });
@@ -23,7 +23,6 @@ notificationCtlr.create = async(req, res) => {
         notification.title = value.title;
         notification.message = value.message;
         notification.priority = value.priority;
-        notification.isRead = value.isRead;
         await notification.save();
         res.status(201).json(notification);
     } catch(err) {
