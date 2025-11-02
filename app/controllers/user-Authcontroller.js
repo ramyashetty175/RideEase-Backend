@@ -109,8 +109,10 @@ usersCtlr.approveOwner = async(req, res) => {
         if(!user) {
             return res.status(404).json({ error: 'record not found' });
         }
-        if(user.licenceVerified && user.insuranceVerified) {
-           user.isApproved = true;
+        if(user.insuranceDoc && user.licenceDoc) {
+            user.insuranceVerified = true;
+            user.licenceVerified = true;
+            user.isApproved = true;
         }
         await user.save();
         res.json(user);

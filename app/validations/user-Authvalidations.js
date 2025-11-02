@@ -24,8 +24,8 @@ const UserLoginValidation = Joi.object({
 })
 
 const ApproveOwnerValidation = Joi.object({
-    insuranceVerified: Joi.boolean(),
-    licenceVerified: Joi.boolean()
+    insuranceDoc: Joi.string().required(),
+    licenceDoc: Joi.string().required()
 })
 
 module.exports = {

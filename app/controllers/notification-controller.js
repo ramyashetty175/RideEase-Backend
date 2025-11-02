@@ -10,8 +10,9 @@ notificationCtlr.create = async(req, res) => {
         res.status(400).json({ error: error.details });
     }
     try {
+        const existingNotification = await Notification.findOne({ user: req.userId });
         if(existingNotification) {
-            res.status(400).json({ error: 'record already exists' });
+            res.status(400).json({ error: 'notification already exists' });
         }
         const notification = new Notification();
         notification.type = value.type;
