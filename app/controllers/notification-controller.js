@@ -10,11 +10,15 @@ notificationCtlr.create = async(req, res) => {
         res.status(400).json({ error: error.details });
     }
     try {
-        const existingNotification = await Notification.findOne({ user: req.userId });
-        if(existingNotification) {
-            res.status(400).json({ error: 'notification already exists' });
-        }
+        // const existingNotification = await Notification.findOne({ type: value.type, vehicleId, userId, 5 min ,user: req.userId });
+        // if(existingNotification) {
+        //     res.status(400).json({ error: 'notification already exists' });
+        // }
         const notification = new Notification();
+        notification.senderId = req.userId;
+        notification.userId = value.userId;
+        notification.relatedId = value.relatedId;
+        notification.relatedModel = value.relatedModel;
         notification.type = value.type;
         notification.title = value.title;
         notification.message = value.message;
@@ -63,7 +67,7 @@ notificationCtlr.update = async(req, res) => {
         res.status(400).json({ error: error.details });
     }
     try {
-        const notification = await Notification.findOne({ _id: id, user: req.userId}, value, { new: true });
+        const notification = await Notification.findOneAndUpdate({ _id: id, user: req.userId}, value, { new: true });
         if(!notification) {
             res.status(404).json({ error: 'record not found' });
         }
