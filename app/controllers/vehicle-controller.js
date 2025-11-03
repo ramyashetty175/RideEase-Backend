@@ -1,4 +1,6 @@
 const Vehicle = require('../models/vehicle-model');
+const Notification = require('../models/notification-model');
+const User = require('../models/user-Authmodel');
 const { VehicleValidation, ApproveVehicleValidation } = require('../validations/vehicle-validations');
 
 const vehiclesCtlr = {};
@@ -16,11 +18,25 @@ vehiclesCtlr.create = async (req, res) => {
         }
         const vehicle = new Vehicle();
         if(req.role == "admin") {
-           vehicle.owner = req.userId;
-           vehicle.isApproved = true;
+            vehicle.owner = req.userId;
+            vehicle.isApproved = true;
         } else if(req.role == "owner") {
-           vehicle.owner = req.userId;
-           vehicle.isApproved = false;
+            vehicle.owner = req.userId;
+            vehicle.isApproved = false;
+            const admin = await User.findOne({ role: "admin" });
+            if(admin) {
+               const notification = new Notification();
+               notification.userId = admin._id;
+               notification.senderId = req.userId;
+               notification.vehicleId = vehicle._id
+               notification.relatedId = vehicle._id;
+               notification.relatedModel = vehicle;
+               notification.type = "system";
+               notification.title = "New Vehicle Pending Approval";
+               notification.message = `Owner ${req.user.username} added a new vehicle (${vehicle.vehicleName}) awaiting approval.`;
+               notification.priority = "high"
+               await notification.save();
+            }
         }
         vehicle.vehicleName = value.vehicleName;
         vehicle.brand = value.brand;

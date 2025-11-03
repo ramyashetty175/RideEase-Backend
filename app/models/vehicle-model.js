@@ -15,7 +15,7 @@ const VehicleSchema = new mongoose.Schema({
         type: String,
         unique: true
     },
-    license: {
+    licenseDoc: {
         type: String, 
         default: null
     },

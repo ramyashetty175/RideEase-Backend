@@ -74,10 +74,10 @@ app.delete('/api/bookingCancellation', authenticateUser, bookingCancellationCtlr
 
 // Notification
 app.post('/api/notifications', authenticateUser, notificationCtlr.create);
-app.get('/api/notifications', authenticateUser, notificationCtlr.show);
+app.get('/api/notifications/:id', authenticateUser, notificationCtlr.show);
 app.get('/api/notifications', authenticateUser, notificationCtlr.list);
-app.put('/api/notifications', authenticateUser, notificationCtlr.update);
-app.delete('/api/notifications', authenticateUser, notificationCtlr.remove);
+app.put('/api/notifications/:id', authenticateUser, notificationCtlr.update);
+app.delete('/api/notifications/:id', authenticateUser, authorizeUser(['admin']), notificationCtlr.remove);
 
 // Subscription 
 app.post('/api/subscriptions', authenticateUser, subscriptionCtlr.create);
