@@ -1,5 +1,5 @@
 const Vehicle = require('../models/vehicle-model');
-const VehicleValidation = require('../validations/vehicle-validations');
+const { VehicleValidation, ApproveVehicleValidation } = require('../validations/vehicle-validations');
 
 const vehiclesCtlr = {};
 
@@ -33,7 +33,6 @@ vehiclesCtlr.create = async (req, res) => {
         vehicle.pricePerDay = value.pricePerDay;
         vehicle.location = value.location;
         vehicle.images = value.images;
-        vehicle.availabilityStatus = value.availabilityStatus;
         vehicle.averageRating = value.averageRating;
         await vehicle.save();
         res.status(201).json(vehicle);
@@ -70,7 +69,7 @@ vehiclesCtlr.list = async (req, res) => {
 vehiclesCtlr.update = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
-     const{ error, value } = VehicleValidation.validate(body);
+     const{ error, value } = ApproveVehicleValidation.validate(body);
     if(error) {
         return res.status(400).json({ error: error.details });
     }
@@ -103,16 +102,19 @@ vehiclesCtlr.remove = async (req, res) => {
 vehiclesCtlr.approveOwner = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
-    const { error, value } = VehicleValidation.validate(body, { abortEarly: false });
+    const { error, value } = ApproveVehicleValidation.validate(body, { abortEarly: false });
     if(error) {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const vehicle = await Vehicle.findOneAndUpdate({ _id: id, owner: req.userId }, value, { new: true });
+        const vehicle = await Vehicle.findOneAndUpdate({ _id: id }, value, { new: true });
         if(!vehicle) {
            return res.status(404).json({ error: 'record not found' });
         }
-        vehicle.isApproved = true;
+        if(vehicle.licenseDoc) {
+           vehicle.isApproved = true;
+           vehicle.availabilityStatus = "Available";
+        }
         await vehicle.save();
         res.json(vehicle);
     } catch(err) {

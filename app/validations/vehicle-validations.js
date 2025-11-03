@@ -5,7 +5,7 @@ const VehicleValidation = Joi.object({
     brand: Joi.string().trim().required(),
     type: Joi.string().trim().required(),
     registrationNumber: Joi.string().trim().required(),
-    license: Joi.string().required(),
+    licenseDoc: Joi.string(),
     fuelType: Joi.string().trim().required(),
     transmission: Joi.string().trim().required(),
     seats: Joi.number().min(1).required(),
@@ -16,4 +16,11 @@ const VehicleValidation = Joi.object({
     averageRating: Joi.number()
 })
 
-module.exports = VehicleValidation;
+const ApproveVehicleValidation = Joi.object({
+    licenseDoc: Joi.string().required()
+})
+
+module.exports = {
+    VehicleValidation,
+    ApproveVehicleValidation
+}

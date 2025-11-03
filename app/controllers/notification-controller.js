@@ -80,7 +80,7 @@ notificationCtlr.update = async(req, res) => {
 notificationCtlr.remove = async(req, res) => {
     const id = req.params.id;
     try {
-        const notification = await Notification.findOne({ _id: id, user: req.userId });
+        const notification = await Notification.findOneAndDelete({ _id: id, user: req.userId });
         if(!notification) {
             res.status(404).json({ error: 'record not found' });
         }

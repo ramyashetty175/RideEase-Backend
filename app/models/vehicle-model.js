@@ -17,7 +17,7 @@ const VehicleSchema = new mongoose.Schema({
     },
     license: {
         type: String, 
-        required: true
+        default: null
     },
     isApproved: {
         type: Boolean,
@@ -41,8 +41,8 @@ const VehicleSchema = new mongoose.Schema({
     ],
     availabilityStatus: {
         type: String,
-        enum: ["Available", "Booked", "Maintainance"],
-        default: "Available"
+        enum: ["Available", "Booked", "Maintainance", "unAvailable"],
+        default: "unAvailable"
     },
     averageRating: {
         type: Number,

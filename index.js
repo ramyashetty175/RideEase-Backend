@@ -37,7 +37,7 @@ app.post('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin']), v
 app.get('/api/vehicles/:id', authenticateUser, vehiclesCtlr.show);
 app.get('/api/vehicles', authenticateUser, vehiclesCtlr.list);
 app.put('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesCtlr.update);
-app.put('/api/vehicles/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.approveOwner);
+app.put('/api/vehicles/approveOwner/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.approveOwner);
 app.delete('/api/vehicles/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.remove);
 // Booking
 app.post('/api/bookings', authenticateUser, bookingsCtlr.create);

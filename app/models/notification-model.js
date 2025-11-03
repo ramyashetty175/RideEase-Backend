@@ -19,20 +19,23 @@ const notificationSchema = new mongoose.Schema({
    },
    relatedModel: {
       type: String,
-      enum: ["Booking", "Payment", "BookingCancellation", "VehicleReturn", "SpeedAlert", "System"]
+      enum: ["Vehicle", "Booking", "Payment", "BookingCancellation", "VehicleReturn", "SpeedAlert", "System"]
    },
    type: {
       type: String,
       enum: [
-        "booking_created",
-        "booking_canceled",
-        "payment_success",
-        "payment_failed",
-        "speed_alert",
-        "vehicle_return",
-        "refund_processed",
-        "penalty_applied",
-        "system",
+         "vehicle_created",
+         "vehicle_approved",
+         "vehicle_deleted",
+         "booking_created",
+         "booking_canceled",
+         "payment_success",
+         "payment_failed",
+         "speed_alert",
+         "vehicle_return",
+         "refund_processed",
+         "penalty_applied",
+         "system",
       ]
    },
    title: String,
