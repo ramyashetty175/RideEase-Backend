@@ -1,3 +1,4 @@
+const { error } = require('../../../User-Authentication/app/validations/category-Validations');
 const Booking = require('../models/booking-model');
 const Notification = require('../models/notification-model');
 const User = require('../models/user-Authmodel');
@@ -94,32 +95,83 @@ bookingsCtlr.remove = async(req, res) => {
     }
 }
 
-bookingsCtlr.checkAvailability = async (req, res) => {
-
+bookingsCtlr.checkAvailability = async (req, res) => { p
+    const body = req.body;
+    const { error, value } = BookingValidation.validate(body, { abortEarly: false });
+    if(error) {
+        return res.status(400).json({ error: error.details });
+    }
+    try {
+        
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
 }
 
 bookingsCtlr.approve = async (req, res) => {
-    
+    const body = req.body;
+    const id = req.params.id;
+    try {
+
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
 }
 
 bookingsCtlr.confirmBooking = async (req, res) => {
+    const body = req.body;
+    const id = req.params.id;
+    try {
 
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
 }
 
 bookingsCtlr.startTrip = async (req, res) => {
+    const body = req.body;
+    const id = req.params.id;
+    try {
 
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
 }
 
 bookingsCtlr.endTrip = async(req, res) => {
+    const body = req.body;
+    const id = req.params.id;
+    try {
 
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
 }
 
-bookingsCtlr.cancelBooking = async (req, res) => {
+bookingsCtlr.cancelBooking = async (req, res) => { p
+    const body = req.body;
+    try {
 
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
 }
 
 bookingsCtlr.extendBooking = async (req, res) => {
+    const body = req.body;
+    const id = req.params.id;
+    try {
 
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
 }
 
 module.exports = bookingsCtlr;

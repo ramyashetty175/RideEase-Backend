@@ -87,6 +87,32 @@ bookingCancellationCtlr.remove = async(req, res) => {
     }
 }
 
-bookingCancellationCtlr.
+bookingCancellationCtlr.requestCancel = async ( req, res) => {
+    try {
+        const bookingCancellation = await BookingCancellation
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
+}
+
+bookingCancellationCtlr.approveCancel = async (req, res) => {
+    const body = req.body;
+    const id = req.params.id;
+    const { error, value } = BookingCancellation.validate(body);
+    if(error) {
+        return res.status(400).json({ error: error.details });
+    }
+    try {
+        const bookingCancellation = BookingCancellation.findOne({ _id: id }, value, { new: true });
+        if(!bookingCancellation) {
+            return res.status(404).json({ error: 'record not found' });
+        }
+        res.json(bookingCancellation);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
+}
 
 module.exports = bookingCancellationCtlr;

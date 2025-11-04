@@ -76,6 +76,8 @@ app.get('/api/bookingCancellation/:id', authenticateUser, bookingCancellationCtl
 app.get('/api/bookingCancellation', authenticateUser, bookingCancellationCtlr.list);
 app.put('/api/bookingCancellation/:id', authenticateUser, bookingCancellationCtlr.update);
 app.delete('/api/bookingCancellation/:id', authenticateUser, bookingCancellationCtlr.remove);
+app.post('/api/bookingCancellation/requestCancel/:id', authenticateUser, bookingCancellationCtlr.requestCancel);
+app.put('/api/bookingCancellation/approveCancel/:id', authenticateUser, bookingCancellationCtlr.approveCancel);
 // Notification
 // app.post('/api/notifications', authenticateUser, notificationCtlr.create);
 // app.get('/api/notifications/:id', authenticateUser, notificationCtlr.show);
