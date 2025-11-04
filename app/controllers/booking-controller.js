@@ -1,4 +1,6 @@
 const Booking = require('../models/booking-model');
+const Notification = require('../models/notification-model');
+const User = require('../models/user-Authmodel');
 const BookingValidation = require('../validations/booking-validations');
 
 const bookingsCtlr = {};
@@ -90,6 +92,34 @@ bookingsCtlr.remove = async(req, res) => {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
     }
+}
+
+bookingsCtlr.checkAvailability = async (req, res) => {
+
+}
+
+bookingsCtlr.approve = async (req, res) => {
+    
+}
+
+bookingsCtlr.confirmBooking = async (req, res) => {
+
+}
+
+bookingsCtlr.startTrip = async (req, res) => {
+
+}
+
+bookingsCtlr.endTrip = async(req, res) => {
+
+}
+
+bookingsCtlr.cancelBooking = async (req, res) => {
+
+}
+
+bookingsCtlr.extendBooking = async (req, res) => {
+
 }
 
 module.exports = bookingsCtlr;

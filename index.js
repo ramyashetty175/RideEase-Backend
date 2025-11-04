@@ -45,6 +45,13 @@ app.get('/api/bookings/:id', authenticateUser, bookingsCtlr.show);
 app.get('/api/bookings', authenticateUser, bookingsCtlr.list);
 app.put('/api/bookings/:id', authenticateUser, bookingsCtlr.update);
 app.delete('/api/bookings/:id', authenticateUser, bookingsCtlr.remove);
+app.put('/api/bookings/approve/:id', authenticateUser, bookingsCtlr.approve);
+app.post('/api/bookings/checkAvailability', authenticateUser, bookingsCtlr.checkAvailability);
+app.put('/api/bookings/confirm/:id', authenticateUser, bookingsCtlr.confirm);
+app.put('/api/bookings/start/:id', authenticateUser, bookingsCtlr.startTrip);
+app.put('/api/bookings/end/:id', authenticateUser, bookingsCtlr.endTrip);
+app.post('/api/bookings/cancel/:id', authenticateUser, bookingsCtlr.cancel);
+app.put('/api/bookings/extend/:id', authenticateUser, bookingsCtlr.extend);
 // payment
 app.post('/api/payments', authenticateUser, paymentCtlr.create);
 app.get('/api/payments/:id', authenticateUser, paymentCtlr.show);
@@ -57,28 +64,24 @@ app.get('/api/reviews/:id', authenticateUser, reviewCtlr.show);
 app.get('/api/reviews', authenticateUser, reviewCtlr.list);
 app.put('/api/reviews/:id', authenticateUser, reviewCtlr.update);
 app.delete('/api/reviews/:id', authenticateUser, reviewCtlr.remove);
-
 // VehicleTracking
 app.post('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.create);
 app.get('/api/vehicleTrackings/:id', authenticateUser, vehiclesTrackingCtlr.show);
 app.get('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.list);
 app.put('/api/vehicleTrackings/:id', authenticateUser, vehicleTrackingCtlr.update);
 app.delete('/api/vehicleTrackings/:id', authenticateUser, vehiclesTrackingCtlr.remove);
-
 // BookingCancellation
 app.post('/api/bookingCancellation', authenticateUser, bookingCancellationCtlr.create);
-app.get('/api/bookingCancellation', authenticateUser, bookingCancellationCtlr.show);
+app.get('/api/bookingCancellation/:id', authenticateUser, bookingCancellationCtlr.show);
 app.get('/api/bookingCancellation', authenticateUser, bookingCancellationCtlr.list);
-app.put('/api/bookingCancellation', authenticateUser, bookingCancellationCtlr.update);
-app.delete('/api/bookingCancellation', authenticateUser, bookingCancellationCtlr.remove);
-
+app.put('/api/bookingCancellation/:id', authenticateUser, bookingCancellationCtlr.update);
+app.delete('/api/bookingCancellation/:id', authenticateUser, bookingCancellationCtlr.remove);
 // Notification
-app.post('/api/notifications', authenticateUser, notificationCtlr.create);
-app.get('/api/notifications/:id', authenticateUser, notificationCtlr.show);
-app.get('/api/notifications', authenticateUser, notificationCtlr.list);
-app.put('/api/notifications/:id', authenticateUser, notificationCtlr.update);
-app.delete('/api/notifications/:id', authenticateUser, authorizeUser(['admin']), notificationCtlr.remove);
-
+// app.post('/api/notifications', authenticateUser, notificationCtlr.create);
+// app.get('/api/notifications/:id', authenticateUser, notificationCtlr.show);
+// app.get('/api/notifications', authenticateUser, notificationCtlr.list);
+// app.put('/api/notifications/:id', authenticateUser, notificationCtlr.update);
+// app.delete('/api/notifications/:id', authenticateUser, authorizeUser(['admin']), notificationCtlr.remove);
 // Subscription 
 app.post('/api/subscriptions', authenticateUser, subscriptionCtlr.create);
 app.get('/api/subscriptions/:id', authenticateUser, subscriptionCtlr.show);

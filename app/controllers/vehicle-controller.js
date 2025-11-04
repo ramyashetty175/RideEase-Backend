@@ -30,7 +30,7 @@ vehiclesCtlr.create = async (req, res) => {
                notification.senderId = req.userId;
                notification.vehicleId = vehicle._id
                notification.relatedId = vehicle._id;
-               notification.relatedModel = vehicle;
+               notification.relatedModel = "Vehicle";
                notification.type = "system";
                notification.title = "New Vehicle Pending Approval";
                notification.message = `Owner ${req.user.username} added a new vehicle (${vehicle.vehicleName}) awaiting approval.`;
@@ -109,6 +109,20 @@ vehiclesCtlr.remove = async (req, res) => {
             return res.status(404).json({ error: 'record not found' });
         }
         res.json(vehicle);
+        const admin = await User.findOne({ role: 'admin' });
+        if(admin) {
+            const notification = new Notification();
+            notification.userId = owner._id;
+            notification.senderId = req.userId;
+            notification.vehicleId = vehicle._id
+            notification.relatedId = vehicle._id;
+            notification.relatedModel = "Vehicle";
+            notification.type = "system";
+            notification.title = "Vehicle Approved";
+            notification.message = `admin removed ${vehicle.vehicleName} vehicle`;
+            notification.priority = "high"
+            await notification.save();
+        }
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -133,6 +147,20 @@ vehiclesCtlr.approveOwner = async (req, res) => {
         }
         await vehicle.save();
         res.json(vehicle);
+        const owner = await User.findOne({ role: owner });
+        if(owner) {
+            const notification = new Notification();
+            notification.userId = owner._id;
+            notification.senderId = req.userId;
+            notification.vehicleId = vehicle._id
+            notification.relatedId = vehicle._id;
+            notification.relatedModel = "Vehicle";
+            notification.type = "system";
+            notification.title = "Vehicle Approved";
+            notification.message = `Your vehicle "${vehicle.vehicleName}" has been approved and is now active.`;
+            notification.priority = "high"
+            await notification.save();
+        }
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });

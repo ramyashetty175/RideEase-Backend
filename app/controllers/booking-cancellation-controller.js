@@ -87,4 +87,6 @@ bookingCancellationCtlr.remove = async(req, res) => {
     }
 }
 
+bookingCancellationCtlr.
+
 module.exports = bookingCancellationCtlr;
