@@ -1,7 +1,7 @@
-const { error } = require('../../../User-Authentication/app/validations/category-Validations');
 const Booking = require('../models/booking-model');
 const Notification = require('../models/notification-model');
 const User = require('../models/user-Authmodel');
+const { findOneAndUpdate } = require('../models/vehicleTracking-model');
 const BookingValidation = require('../validations/booking-validations');
 
 const bookingsCtlr = {};
@@ -112,8 +112,16 @@ bookingsCtlr.checkAvailability = async (req, res) => { p
 bookingsCtlr.approve = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
+    const { error, value } = BookingValidation.validate(body);
+    if(error) {
+        return res.status(400).json({ error: error.details });
+    }
     try {
-
+        const booking = await findOneAndUpdate({ _id: id }, value, { new: true });
+        if(!booking) {
+           return res.status(404).json({ error: 'record not found' });
+        }
+        res.json(booking);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -123,8 +131,16 @@ bookingsCtlr.approve = async (req, res) => {
 bookingsCtlr.confirmBooking = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
+    const { error, value } = BookingValidation.validate(body);
+    if(error) {
+        return res.status(400).json({ error: error.details });
+    }
     try {
-
+        const booking = await Booking.findByIdAndUpdate({ _id: id }, value, { new: true });
+        if(booking) {
+            return res.status(404).json({ error: 'record not found' });
+        }
+        res.json(booking);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -134,8 +150,16 @@ bookingsCtlr.confirmBooking = async (req, res) => {
 bookingsCtlr.startTrip = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
+    const { error, value } = BookingValidation.validate(body);
+    if(error) {
+        return res.status(400).json({ error: error.details });
+    }
     try {
-
+        const booking = await Booking.findOneAndUpdate({ _id: id }, value, { new: true });
+        if(booking) {
+            return res.status(404).json({ error: 'record not found' });
+        }
+        res.json(booking);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -145,8 +169,16 @@ bookingsCtlr.startTrip = async (req, res) => {
 bookingsCtlr.endTrip = async(req, res) => {
     const body = req.body;
     const id = req.params.id;
+    const { error, value } = BookingValidation.validate(body);
+    if(error) {
+        return res.status(400).json({ error: error.details });
+    }
     try {
-
+        const booking = await Booking.findOneAndUpdate({ _id: id }, value, { new: true });
+        if(!booking) {
+           return res.status(404).json({ error: 'record not found' });
+        }
+        res.json(booking);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -156,7 +188,6 @@ bookingsCtlr.endTrip = async(req, res) => {
 bookingsCtlr.cancelBooking = async (req, res) => { p
     const body = req.body;
     try {
-
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -166,8 +197,16 @@ bookingsCtlr.cancelBooking = async (req, res) => { p
 bookingsCtlr.extendBooking = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
+    const { error, value } = BookingValidation.validate(body);
+    if(error) {
+        return res.status(400).json({ error: error.details });
+    }
     try {
-
+        const booking = await Booking.findOneAndUpdate({ _id: id }, value, { new: true });
+        if(!booking) {
+           return res.status(404).json({ error: 'record not found' });
+        }
+        res.json(booking);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
