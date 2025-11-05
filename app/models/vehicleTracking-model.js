@@ -11,10 +11,30 @@ const vehicleTrackingSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    maxSpeed: {
+        type: Number,
+        default: 0
+    },
+    avgSpeed: {
+        type: Number,
+        default: 0
+    },
+    distanceTravelled: {
+        type: Number,
+        default: 0
+    },
     status: {
         type: String,
         enum: ["moving", "parked", "offline"],
         default: "moving"
+    },
+    isLive: {
+        type: Boolean,
+        default: true
+    },
+    lastUpdatedAt: {
+        type: Date,
+        default: Date.now()
     }
 }, { timestamps: true })
 

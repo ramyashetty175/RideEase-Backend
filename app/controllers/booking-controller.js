@@ -128,7 +128,7 @@ bookingsCtlr.approve = async (req, res) => {
     }
 }
 
-bookingsCtlr.confirmBooking = async (req, res) => {
+bookingsCtlr.confirm = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
     const { error, value } = BookingValidation.validate(body);
@@ -185,7 +185,7 @@ bookingsCtlr.endTrip = async(req, res) => {
     }
 }
 
-bookingsCtlr.cancelBooking = async (req, res) => { p
+bookingsCtlr.cancel = async (req, res) => { p
     const body = req.body;
     try {
     } catch(err) {
@@ -194,7 +194,7 @@ bookingsCtlr.cancelBooking = async (req, res) => { p
     }
 }
 
-bookingsCtlr.extendBooking = async (req, res) => {
+bookingsCtlr.extend = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
     const { error, value } = BookingValidation.validate(body);
