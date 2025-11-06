@@ -82,4 +82,40 @@ vehiclesTrackingCtlr.remove = async (req, res) => {
     }
 }
 
+vehiclesTrackingCtlr.live = async (req, res) => {
+    try {
+        
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
+}
+
+vehiclesTrackingCtlr.history = async (req, res) => {
+    try {
+
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
+}
+
+vehiclesTrackingCtlr.alerts = async (req, res) => {
+    try {
+
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
+}
+
+vehiclesTrackingCtlr.hourlyCost = async (req, res) => {
+    try {
+
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
+}
+
 module.exports = vehiclesTrackingCtlr;

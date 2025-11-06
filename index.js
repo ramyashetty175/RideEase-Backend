@@ -45,13 +45,13 @@ app.get('/api/bookings/:id', authenticateUser, bookingsCtlr.show);
 app.get('/api/bookings', authenticateUser, bookingsCtlr.list);
 app.put('/api/bookings/:id', authenticateUser, bookingsCtlr.update);
 app.delete('/api/bookings/:id', authenticateUser, bookingsCtlr.remove);
-app.put('/api/bookings/approve/:id', authenticateUser, bookingsCtlr.approve);
+app.put('/api/bookings/approve/:id', authenticateUser, authorizeUser(['owner']), bookingsCtlr.approve);
 app.post('/api/bookings/checkAvailability', authenticateUser, bookingsCtlr.checkAvailability);
-app.put('/api/bookings/confirm/:id', authenticateUser, bookingsCtlr.confirm);
-app.put('/api/bookings/start/:id', authenticateUser, bookingsCtlr.startTrip);
-app.put('/api/bookings/end/:id', authenticateUser, bookingsCtlr.endTrip);
-app.post('/api/bookings/cancel/:id', authenticateUser, bookingsCtlr.cancel);
-app.put('/api/bookings/extend/:id', authenticateUser, bookingsCtlr.extend);
+app.put('/api/bookings/confirm/:id', authenticateUser, bookingsCtlr.confirm);   
+app.put('/api/bookings/start/:id', authenticateUser, bookingsCtlr.startTrip);  
+app.put('/api/bookings/end/:id', authenticateUser, bookingsCtlr.endTrip);     
+app.post('/api/bookings/cancel/:id', authenticateUser, bookingsCtlr.cancel); 
+app.put('/api/bookings/extend/:id', authenticateUser, bookingsCtlr.extend); 
 // payment
 app.post('/api/payments', authenticateUser, paymentCtlr.create);
 app.get('/api/payments/:id', authenticateUser, paymentCtlr.show);
@@ -70,6 +70,10 @@ app.get('/api/vehicleTrackings/:id', authenticateUser, vehiclesTrackingCtlr.show
 app.get('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.list);
 app.put('/api/vehicleTrackings/:id', authenticateUser, vehicleTrackingCtlr.update);
 app.delete('/api/vehicleTrackings/:id', authenticateUser, vehiclesTrackingCtlr.remove);
+app.get('/api/vehicleTrackings/live/:id', authenticateUser, vehicleTrackingCtlr.live);
+//app.get('/api/vehicleTrackings/history/:id/?startDate&endDate', authenticateUser, vehicleTrackingCtlr.history);
+app.get('/api/vehicleTrackings/alerts/:id', authenticateUser, vehicleTrackingCtlr.alerts);
+app.get('/api/vehicleTrackings/hourlycost/:id', authenticateUser, vehicleTrackingCtlr.hourlyCost); // bookingId
 // BookingCancellation
 app.post('/api/bookingCancellation', authenticateUser, bookingCancellationCtlr.create);
 app.get('/api/bookingCancellation/:id', authenticateUser, bookingCancellationCtlr.show);

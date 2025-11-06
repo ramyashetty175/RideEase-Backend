@@ -1,8 +1,7 @@
 const Booking = require('../models/booking-model');
 const Notification = require('../models/notification-model');
 const User = require('../models/user-Authmodel');
-const { findOneAndUpdate } = require('../models/vehicleTracking-model');
-const BookingValidation = require('../validations/booking-validations');
+const { BookingValidation, BookingAvailabilityValidation, BookingApproveValidation } = require('../validations/booking-validations');
 
 const bookingsCtlr = {};
 
@@ -95,14 +94,18 @@ bookingsCtlr.remove = async(req, res) => {
     }
 }
 
-bookingsCtlr.checkAvailability = async (req, res) => { p
+bookingsCtlr.checkAvailability = async (req, res) => { 
     const body = req.body;
-    const { error, value } = BookingValidation.validate(body, { abortEarly: false });
+    const { error, value } = BookingAvailabilityValidation.validate(body, { abortEarly: false });
     if(error) {
         return res.status(400).json({ error: error.details });
     }
     try {
-        
+        const overlappingBooking = await Booking.findOne({ vehicle: value.vehicle, startDate: value.startDate, endDate: value.endDate });
+        if(overlappingBooking) {
+           res.json({ message: 'Vehicle is not avialable for selected Dates' });
+        }
+        res.json({ message: 'Vehicle is availbale for booking' });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -112,15 +115,22 @@ bookingsCtlr.checkAvailability = async (req, res) => { p
 bookingsCtlr.approve = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
-    const { error, value } = BookingValidation.validate(body);
+    const { error, value } = BookingApproveValidation.validate(body);
     if(error) {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const booking = await findOneAndUpdate({ _id: id }, value, { new: true });
+        const booking = await Booking.findOneAndUpdate({ _id: id }, value, { new: true });
         if(!booking) {
            return res.status(404).json({ error: 'record not found' });
         }
+        const owner = await User.findOne({ user: owner });
+        if(owner) {
+           bookingStatus = "Approved";
+        }
+        booking.pickupTime = value.pickupTime;
+        booking.returnTime = value.returnTime;
+        await booking.save();
         res.json(booking);
     } catch(err) {
         console.log(err);
@@ -131,7 +141,7 @@ bookingsCtlr.approve = async (req, res) => {
 bookingsCtlr.confirm = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
-    const { error, value } = BookingValidation.validate(body);
+    const { error, value } = BookingApproveValidation.validate(body);
     if(error) {
         return res.status(400).json({ error: error.details });
     }
@@ -140,6 +150,8 @@ bookingsCtlr.confirm = async (req, res) => {
         if(booking) {
             return res.status(404).json({ error: 'record not found' });
         }
+        booking.paymentStatus = "Paid";
+        await booking.save();
         res.json(booking);
     } catch(err) {
         console.log(err);
