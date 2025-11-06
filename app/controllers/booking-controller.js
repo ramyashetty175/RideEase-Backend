@@ -2,6 +2,7 @@ const Booking = require('../models/booking-model');
 const Notification = require('../models/notification-model');
 const User = require('../models/user-Authmodel');
 const { BookingValidation, BookingAvailabilityValidation, BookingApproveValidation } = require('../validations/booking-validations');
+const { message } = require('../validations/vehicleTracking-validations');
 
 const bookingsCtlr = {};
 
@@ -168,9 +169,13 @@ bookingsCtlr.startTrip = async (req, res) => {
     }
     try {
         const booking = await Booking.findOneAndUpdate({ _id: id }, value, { new: true });
-        if(booking) {
+        if(!booking) {
             return res.status(404).json({ error: 'record not found' });
         }
+        booking.bookingStatus = "in-progress";
+        booking.startTrip = new Date();
+        booking.vehicle.avialabilityStatus = "Booked";
+        await booking.save();
         res.json(booking);
     } catch(err) {
         console.log(err);
@@ -190,6 +195,10 @@ bookingsCtlr.endTrip = async(req, res) => {
         if(!booking) {
            return res.status(404).json({ error: 'record not found' });
         }
+        booking.bookingStatus = "Completed";
+        booking.endTrip = new Date();
+        booking.vehicle.avialabilityStatus = "Available";
+        await booking.save();
         res.json(booking);
     } catch(err) {
         console.log(err);
@@ -199,7 +208,18 @@ bookingsCtlr.endTrip = async(req, res) => {
 
 bookingsCtlr.cancel = async (req, res) => { p
     const body = req.body;
+    const { error, value } = BookingValidation.validate(body);
+    if(error) {
+        return res.status(400).json({ error: error.details });
+    }
     try {
+        const booking = await Booking.findOne({ bookingStatus: Pending || confirmed });
+        if(!booking) {
+            res.json({ message: 'you cannot cancel the booking' });
+        }
+        booking.bookingStatus = "Cancel";
+        await booking.save();
+        res.json(booking);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -218,6 +238,9 @@ bookingsCtlr.extend = async (req, res) => {
         if(!booking) {
            return res.status(404).json({ error: 'record not found' });
         }
+        booking.endDate = new Date();
+        booking.bookingStatus = "in-progress";
+        await booking.save();
         res.json(booking);
     } catch(err) {
         console.log(err);

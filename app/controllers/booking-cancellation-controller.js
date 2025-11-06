@@ -1,9 +1,11 @@
 const BookingCancellation = require('../models/booking-cancellation-model');
+const User = require('../models/user-Authmodel');
+const Booking = require('../models/booking-model');
 const BookingCancellationValidation = require('../validations/booking-cancellation-validations');
 
 const bookingCancellationCtlr = {};
 
-bookingCancellationCtlr.create = async(req, res) => {
+bookingCancellationCtlr.requestCancel = async(req, res) => {
     const body = req.body;
     const { error, value } = BookingCancellationValidation.validate(body, { abortEarly: false });
     if(error) {
@@ -87,15 +89,6 @@ bookingCancellationCtlr.remove = async(req, res) => {
     }
 }
 
-bookingCancellationCtlr.requestCancel = async ( req, res) => {
-    try {
-        const bookingCancellation = await BookingCancellation
-    } catch(err) {
-        console.log(err);
-        res.status(500).json({ error: 'Something went wrong!!!' });
-    }
-}
-
 bookingCancellationCtlr.approveCancel = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
@@ -104,10 +97,17 @@ bookingCancellationCtlr.approveCancel = async (req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const bookingCancellation = BookingCancellation.findOne({ _id: id }, value, { new: true });
+        const bookingCancellation = await BookingCancellation.findOne({ _id: id }, value, { new: true });
         if(!bookingCancellation) {
             return res.status(404).json({ error: 'record not found' });
         }
+        const owner = await User.findOne({ user: owner });
+        if(owner) {
+           bookingCancellation.status = "approved";
+        }
+        booking.bookingStatus = "Canceled";
+        Booking.save();
+        await bookingCancellation.save();
         res.json(bookingCancellation);
     } catch(err) {
         console.log(err);

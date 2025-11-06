@@ -75,13 +75,12 @@ app.get('/api/vehicleTrackings/live/:id', authenticateUser, vehicleTrackingCtlr.
 app.get('/api/vehicleTrackings/alerts/:id', authenticateUser, vehicleTrackingCtlr.alerts);
 app.get('/api/vehicleTrackings/hourlycost/:id', authenticateUser, vehicleTrackingCtlr.hourlyCost); // bookingId
 // BookingCancellation
-app.post('/api/bookingCancellation', authenticateUser, bookingCancellationCtlr.create);
+app.post('/api/bookingCancellation/requestCancel/:id', authenticateUser, bookingCancellationCtlr.create);
 app.get('/api/bookingCancellation/:id', authenticateUser, bookingCancellationCtlr.show);
 app.get('/api/bookingCancellation', authenticateUser, bookingCancellationCtlr.list);
 app.put('/api/bookingCancellation/:id', authenticateUser, bookingCancellationCtlr.update);
 app.delete('/api/bookingCancellation/:id', authenticateUser, bookingCancellationCtlr.remove);
-app.post('/api/bookingCancellation/requestCancel/:id', authenticateUser, bookingCancellationCtlr.requestCancel);
-app.put('/api/bookingCancellation/approveCancel/:id', authenticateUser, bookingCancellationCtlr.approveCancel);
+app.put('/api/bookingCancellation/approveCancel/:id', authenticateUser, authorizeUser(['owner']), bookingCancellationCtlr.approveCancel);
 // Notification
 // app.post('/api/notifications', authenticateUser, notificationCtlr.create);
 // app.get('/api/notifications/:id', authenticateUser, notificationCtlr.show);
