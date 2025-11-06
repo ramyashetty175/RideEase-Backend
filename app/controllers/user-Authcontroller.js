@@ -122,4 +122,20 @@ usersCtlr.approveOwner = async(req, res) => {
     }
 }
 
+usersCtlr.profile = async (req, res) => {
+
+}
+
+usersCtlr.updateProfile = async (req, res) => {
+
+}
+
+usersCtlr.listOwners = async (req, res) => {
+
+}
+
+usersCtlr.search = async (req, res) => {
+    
+}
+
 module.exports = usersCtlr;

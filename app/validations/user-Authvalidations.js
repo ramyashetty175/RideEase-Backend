@@ -28,8 +28,13 @@ const ApproveOwnerValidation = Joi.object({
     licenceDoc: Joi.string().required()
 })
 
+const UpdateProfileValidation = Joi.object({
+    
+})
+
 module.exports = {
     UserRegisterValidation,
     UserLoginValidation,
-    ApproveOwnerValidation
+    ApproveOwnerValidation,
+    UpdateProfileValidation
 }
