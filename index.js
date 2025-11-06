@@ -66,12 +66,8 @@ app.put('/api/reviews/:id', authenticateUser, reviewCtlr.update);
 app.delete('/api/reviews/:id', authenticateUser, reviewCtlr.remove);
 // VehicleTracking
 app.post('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.create);
-app.get('/api/vehicleTrackings/:id', authenticateUser, vehiclesTrackingCtlr.show);
-app.get('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.list);
-app.put('/api/vehicleTrackings/:id', authenticateUser, vehicleTrackingCtlr.update);
-app.delete('/api/vehicleTrackings/:id', authenticateUser, vehiclesTrackingCtlr.remove);
 app.get('/api/vehicleTrackings/live/:id', authenticateUser, vehicleTrackingCtlr.live);
-//app.get('/api/vehicleTrackings/history/:id/?startDate&endDate', authenticateUser, vehicleTrackingCtlr.history);
+app.get('/api/vehicleTrackings/history/:id/?startDate&endDate', authenticateUser, vehicleTrackingCtlr.history);
 app.get('/api/vehicleTrackings/alerts/:id', authenticateUser, vehicleTrackingCtlr.alerts);
 app.get('/api/vehicleTrackings/hourlycost/:id', authenticateUser, vehicleTrackingCtlr.hourlyCost); // bookingId
 // BookingCancellation

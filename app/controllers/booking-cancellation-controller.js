@@ -97,7 +97,7 @@ bookingCancellationCtlr.approveCancel = async (req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const bookingCancellation = await BookingCancellation.findOne({ _id: id }, value, { new: true });
+        const bookingCancellation = await BookingCancellation.findOneAndUpdate({ _id: id }, value, { new: true });
         if(!bookingCancellation) {
             return res.status(404).json({ error: 'record not found' });
         }
@@ -107,7 +107,7 @@ bookingCancellationCtlr.approveCancel = async (req, res) => {
         }
         booking.bookingStatus = "Canceled";
         Booking.save();
-        await bookingCancellation.save();
+        await BookingCancellation.save();
         res.json(bookingCancellation);
     } catch(err) {
         console.log(err);
