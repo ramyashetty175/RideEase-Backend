@@ -15,7 +15,7 @@ const UserRegisterValidation = Joi.object({
     username: Joi.string().trim().min(5).max(10).required(),
     email: Joi.string().email().trim().lowercase().required(),
     password: passwordComplexity(complexityOptions).required(),
-    role: Joi.string()
+    role: Joi.string().trim().valid("owner", "user")
 })
 
 const UserLoginValidation = Joi.object({
@@ -34,6 +34,7 @@ const UpdateProfileValidation = Joi.object({
 
 module.exports = {
     UserRegisterValidation,
+    OwnerRegisterValidation,
     UserLoginValidation,
     ApproveOwnerValidation,
     UpdateProfileValidation

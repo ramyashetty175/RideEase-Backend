@@ -23,20 +23,6 @@ vehiclesCtlr.create = async (req, res) => {
         } else if(req.role == "owner") {
             vehicle.owner = req.userId;
             vehicle.isApproved = false;
-            const admin = await User.findOne({ role: "admin" });
-            if(admin) {
-               const notification = new Notification();
-               notification.userId = admin._id;
-               notification.senderId = req.userId;
-               notification.vehicleId = vehicle._id
-               notification.relatedId = vehicle._id;
-               notification.relatedModel = "Vehicle";
-               notification.type = "system";
-               notification.title = "New Vehicle Pending Approval";
-               notification.message = `Owner ${req.user.username} added a new vehicle (${vehicle.vehicleName}) awaiting approval.`;
-               notification.priority = "high"
-               await notification.save();
-            }
         }
         vehicle.vehicleName = value.vehicleName;
         vehicle.brand = value.brand;
@@ -147,20 +133,6 @@ vehiclesCtlr.approveOwner = async (req, res) => {
         }
         await vehicle.save();
         res.json(vehicle);
-        const owner = await User.findOne({ role: owner });
-        if(owner) {
-            const notification = new Notification();
-            notification.userId = owner._id;
-            notification.senderId = req.userId;
-            notification.vehicleId = vehicle._id
-            notification.relatedId = vehicle._id;
-            notification.relatedModel = "Vehicle";
-            notification.type = "system";
-            notification.title = "Vehicle Approved";
-            notification.message = `Your vehicle "${vehicle.vehicleName}" has been approved and is now active.`;
-            notification.priority = "high"
-            await notification.save();
-        }
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });

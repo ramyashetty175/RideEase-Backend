@@ -27,10 +27,9 @@ usersCtlr.register = async(req, res) => {
             user.role = "admin";
         } else if(value.role == "owner") {
             user.role = "owner";
-            user.isApproved = "false";
+            user.isApproved = false;
         } else {
             user.role = "user";
-            user.isApproved = "true";
         }
         await user.save();
         res.status(201).json(user);

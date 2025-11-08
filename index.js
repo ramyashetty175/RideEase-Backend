@@ -4,7 +4,7 @@ require('dotenv').config();
 const app = express();
 app.use(express.json());
 app.use(cors());
-const port = process.env.PORT || 3010;
+const port = process.env.PORT || 3020;
 
 const configureDB = require('./config/db');
 configureDB();
@@ -67,11 +67,11 @@ app.delete('/api/reviews/:id', authenticateUser, reviewCtlr.remove);
 // VehicleTracking
 app.post('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.create);
 app.get('/api/vehicleTrackings/live/:id', authenticateUser, vehicleTrackingCtlr.live);
-app.get('/api/vehicleTrackings/history/:id/?startDate&endDate', authenticateUser, vehicleTrackingCtlr.history);
+//app.get('/api/vehicleTrackings/history/:id/?startDate&endDate', authenticateUser, vehicleTrackingCtlr.history);
 app.get('/api/vehicleTrackings/alerts/:id', authenticateUser, vehicleTrackingCtlr.alerts);
 app.get('/api/vehicleTrackings/hourlycost/:id', authenticateUser, vehicleTrackingCtlr.hourlyCost); // bookingId
 // BookingCancellation
-app.post('/api/bookingCancellation/requestCancel/:id', authenticateUser, bookingCancellationCtlr.create);
+app.post('/api/bookingCancellation/requestCancel/:id', authenticateUser, bookingCancellationCtlr.requestCancel);
 app.get('/api/bookingCancellation/:id', authenticateUser, bookingCancellationCtlr.show);
 app.get('/api/bookingCancellation', authenticateUser, bookingCancellationCtlr.list);
 app.put('/api/bookingCancellation/:id', authenticateUser, bookingCancellationCtlr.update);
