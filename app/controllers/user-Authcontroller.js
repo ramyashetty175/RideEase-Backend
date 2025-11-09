@@ -2,6 +2,7 @@ const User = require('../models/user-Authmodel');
 const { UserRegisterValidation, UserLoginValidation, ApproveOwnerValidation } = require('../validations/user-Authvalidations');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { error } = require('../validations/vehicleTracking-validations');
 
 const usersCtlr = {};
 
@@ -77,7 +78,12 @@ usersCtlr.account = async(req, res) => {
 
 usersCtlr.list = async(req, res) => {
     try {
-        const users = await User.find();
+        let users;
+        if(req.role == "admin") {
+            await User.find();
+        }else {
+            await User.find({ user: req.userId });
+        }
         res.json(users);
     } catch(err) {
         console.log(err);
@@ -88,7 +94,12 @@ usersCtlr.list = async(req, res) => {
 usersCtlr.remove = async(req, res) => {
     const id = req.params.id;
     try {
-        const user = await User.findByIdAndDelete(id);
+        let user;
+        if(req.role == "admin") {
+           await User.findByIdAndDelete(id);
+        } else {
+           await User.findOneAndDelete({ _id: id, user: req.userId });
+        }
         res.json(user);
     } catch(err) {
         console.log(err);
@@ -104,7 +115,7 @@ usersCtlr.approveOwner = async(req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const user = await User.findOneAndUpdate({ _id: id }, value, { new: true });
+        const user = await User.findByIdAndUpdate(id , value, { new: true });
         if(!user) {
             return res.status(404).json({ error: 'record not found' });
         }
@@ -112,9 +123,11 @@ usersCtlr.approveOwner = async(req, res) => {
             user.insuranceVerified = true;
             user.licenceVerified = true;
             user.isApproved = true;
+            await user.save();
+        } else {
+            return res.json({ success: true, message: "Your account is pending approval by admin" });
         }
-        await user.save();
-        res.json(user);
+        res.json({ success: true, message: "Your account is approved by admin" });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -122,19 +135,64 @@ usersCtlr.approveOwner = async(req, res) => {
 }
 
 usersCtlr.profile = async (req, res) => {
-
+    const { name, email, bio, avatar } = req.body;
+    const { error, value } = UserRegisterValidation.validate(req.body);
+    if(error) {
+       res.status(400).json({ error: error.details });
+    }
+    try {
+        const existingProfile = await User.findOne({ email: value.email });
+        if(existingProfile) {
+            return res.status(400).json({ msg: 'profile already exists' });
+        }
+        const profile = new Profile();
+        profile.name = value.name;
+        profile.email = value.email;
+        profile.bio = value.bio;
+        profile.avatar = value.avatar;
+        await profile.save();
+        res.status(201).json(profile);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
 }
 
 usersCtlr.updateProfile = async (req, res) => {
-
+    const body = req.body;
+    const id = req.params.id;
+    const { error, value } = UpdateProfileValidation.validate(body);
+    if(error) {
+        res.status(400).json({ error: error.details });
+    }
+    try {
+        const profile = await User.findOneAndUpdate({ _id: id, user: req.userId }, value, { new: true });
+        if(!profile) {
+            return res.status(404).json({ error: 'record not found' });
+        }
+        res.json(profile);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
 }
 
 usersCtlr.listOwners = async (req, res) => {
+    try {
 
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
 }
 
 usersCtlr.search = async (req, res) => {
-    
+    try {
+
+    } catch(err) {
+       console.log(err);
+       res.status(500).json({ error: 'Something went wrong!!!' });
+    }
 }
 
 module.exports = usersCtlr;

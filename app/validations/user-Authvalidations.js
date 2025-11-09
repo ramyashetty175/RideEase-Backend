@@ -29,12 +29,14 @@ const ApproveOwnerValidation = Joi.object({
 })
 
 const UpdateProfileValidation = Joi.object({
-    
+    name: Joi.string().trim().required(),
+    email: Joi.string().email().trim().lowercase().required(),
+    bio: Joi.string().trim().min(10).max(128).required(),
+    avatar: Joi.string().uri().trim().optional()
 })
 
 module.exports = {
     UserRegisterValidation,
-    OwnerRegisterValidation,
     UserLoginValidation,
     ApproveOwnerValidation,
     UpdateProfileValidation
