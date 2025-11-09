@@ -95,27 +95,13 @@ vehiclesCtlr.remove = async (req, res) => {
             return res.status(404).json({ error: 'record not found' });
         }
         res.json(vehicle);
-        const admin = await User.findOne({ role: 'admin' });
-        if(admin) {
-            const notification = new Notification();
-            notification.userId = owner._id;
-            notification.senderId = req.userId;
-            notification.vehicleId = vehicle._id
-            notification.relatedId = vehicle._id;
-            notification.relatedModel = "Vehicle";
-            notification.type = "system";
-            notification.title = "Vehicle Approved";
-            notification.message = `admin removed ${vehicle.vehicleName} vehicle`;
-            notification.priority = "high"
-            await notification.save();
-        }
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
     }
 }
 
-vehiclesCtlr.approveOwner = async (req, res) => {
+vehiclesCtlr.approveVehicle = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
     const { error, value } = ApproveVehicleValidation.validate(body, { abortEarly: false });

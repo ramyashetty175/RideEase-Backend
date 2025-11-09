@@ -32,10 +32,9 @@ app.get('/users', authenticateUser, authorizeUser(['admin', 'owner']), usersCtlr
 app.get('/users/account', authenticateUser, usersCtlr.account);
 app.put('/users/approveOwner/:id', authenticateUser, authorizeUser(['admin']), usersCtlr.approveOwner);
 app.delete('/users/:id', authenticateUser, authorizeUser(['admin', 'user']), usersCtlr.remove);
-app.post('/users/profile', authenticateUser, authorizeUser(['user']), usersCtlr.profile);
 app.put('/users/updateProfile/:id', authenticateUser, authorizeUser(['user']), usersCtlr.updateProfile);
 app.get('/users/listOwners', authenticateUser, authorizeUser(['admin']), usersCtlr.listOwners);
-app.get('users/searchUser', authenticateUser, usersCtlr.search);
+app.get('users/search', authenticateUser, usersCtlr.search);
 // Vehicle
 app.post('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin']), vehiclesCtlr.create);
 app.get('/api/vehicles/:id', authenticateUser, vehiclesCtlr.show);

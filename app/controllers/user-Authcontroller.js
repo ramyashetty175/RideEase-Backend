@@ -1,8 +1,7 @@
 const User = require('../models/user-Authmodel');
-const { UserRegisterValidation, UserLoginValidation, ApproveOwnerValidation } = require('../validations/user-Authvalidations');
+const { UserRegisterValidation, UserLoginValidation, ApproveOwnerValidation, UpdateProfileValidation } = require('../validations/user-Authvalidations');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { error } = require('../validations/vehicleTracking-validations');
 
 const usersCtlr = {};
 
@@ -134,30 +133,6 @@ usersCtlr.approveOwner = async(req, res) => {
     }
 }
 
-usersCtlr.profile = async (req, res) => {
-    const { name, email, bio, avatar } = req.body;
-    const { error, value } = UserRegisterValidation.validate(req.body);
-    if(error) {
-       res.status(400).json({ error: error.details });
-    }
-    try {
-        const existingProfile = await User.findOne({ email: value.email });
-        if(existingProfile) {
-            return res.status(400).json({ msg: 'profile already exists' });
-        }
-        const profile = new Profile();
-        profile.name = value.name;
-        profile.email = value.email;
-        profile.bio = value.bio;
-        profile.avatar = value.avatar;
-        await profile.save();
-        res.status(201).json(profile);
-    } catch(err) {
-        console.log(err);
-        res.status(500).json({ error: 'Something went wrong!!!' });
-    }
-}
-
 usersCtlr.updateProfile = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
@@ -166,7 +141,7 @@ usersCtlr.updateProfile = async (req, res) => {
         res.status(400).json({ error: error.details });
     }
     try {
-        const profile = await User.findOneAndUpdate({ _id: id, user: req.userId }, value, { new: true });
+        const profile = await User.findOneAndUpdate({ _id: req.userId }, value, { new: true });
         if(!profile) {
             return res.status(404).json({ error: 'record not found' });
         }
@@ -179,7 +154,8 @@ usersCtlr.updateProfile = async (req, res) => {
 
 usersCtlr.listOwners = async (req, res) => {
     try {
-
+        const owners = await User.find({ role: 'owner' });
+        res.json(owners);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -188,7 +164,7 @@ usersCtlr.listOwners = async (req, res) => {
 
 usersCtlr.search = async (req, res) => {
     try {
-
+       
     } catch(err) {
        console.log(err);
        res.status(500).json({ error: 'Something went wrong!!!' });
