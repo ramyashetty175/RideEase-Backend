@@ -133,6 +133,28 @@ usersCtlr.approveOwner = async(req, res) => {
     }
 }
 
+usersCtlr.listOwners = async (req, res) => {
+    try {
+        const owners = await User.find({ role: 'owner' });
+        res.json(owners);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
+}
+
+usersCtlr.profile = async (req, res) => {
+    try {
+        // const profile = await 
+        // if(!profile) {
+        //     return res.status(404).json({ error: 'record not found' });
+        // }
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
+}
+
 usersCtlr.updateProfile = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
@@ -152,10 +174,9 @@ usersCtlr.updateProfile = async (req, res) => {
     }
 }
 
-usersCtlr.listOwners = async (req, res) => {
+usersCtlr.changePassword = async (req, res) => {
     try {
-        const owners = await User.find({ role: 'owner' });
-        res.json(owners);
+
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
