@@ -23,6 +23,11 @@ const UserLoginValidation = Joi.object({
     password: passwordComplexity(complexityOptions).required()
 })
 
+const ChangePasswordValidation = Joi.object({
+    Password: passwordComplexity(complexityOptions).required(),
+    newPassword: passwordComplexity(complexityOptions).required()
+})
+
 const ApproveOwnerValidation = Joi.object({
     insuranceDoc: Joi.string().required(),
     licenceDoc: Joi.string().required()
@@ -38,6 +43,7 @@ const UpdateProfileValidation = Joi.object({
 module.exports = {
     UserRegisterValidation,
     UserLoginValidation,
+    ChangePasswordValidation,
     ApproveOwnerValidation,
     UpdateProfileValidation
 }

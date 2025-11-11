@@ -29,16 +29,15 @@ app.post('/users/login', usersCtlr.login);
 
 // Private Route
 app.get('/users', authenticateUser, authorizeUser(['admin', 'owner']), usersCtlr.list);
-app.get('/users/account', authenticateUser, usersCtlr.account);
 app.put('/users/approveOwner/:id', authenticateUser, authorizeUser(['admin']), usersCtlr.approveOwner);
-app.delete('/users/:id', authenticateUser, authorizeUser(['admin', 'user']), usersCtlr.remove);
+app.delete('/users/profile/:id', authenticateUser, authorizeUser(['admin', 'user']), usersCtlr.remove);
 app.get('/users/listOwners', authenticateUser, authorizeUser(['admin']), usersCtlr.listOwners);
 app.get('users/search', authenticateUser, usersCtlr.search);
 
 // Authenticated User Profile
 app.get('/users/profile', authenticateUser, usersCtlr.profile);
-app.put('/users/updateProfile/:id', authenticateUser, authorizeUser(['user']), usersCtlr.updateProfile);
-app.put('/users/changePassword', authenticateUser, authorizeUser(['user']), usersCtlr.changePassword);
+app.put('/users/profile/:id', authenticateUser, authorizeUser(['user']), usersCtlr.updateProfile);
+app.put('/users/password', authenticateUser, authorizeUser(['user']), usersCtlr.changePassword);
 
 // Vehicle
 app.post('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin']), vehiclesCtlr.create);

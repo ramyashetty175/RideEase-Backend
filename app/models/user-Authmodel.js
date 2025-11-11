@@ -4,6 +4,7 @@ const UserAuthenSchema = new mongoose.Schema({
     username: String,
     email: String,
     password: String,
+    newPassword: String,
     loginCount: {
       type: Number,
       default: 0

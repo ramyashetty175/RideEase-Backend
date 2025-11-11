@@ -1,5 +1,5 @@
 const User = require('../models/user-Authmodel');
-const { UserRegisterValidation, UserLoginValidation, ApproveOwnerValidation, UpdateProfileValidation } = require('../validations/user-Authvalidations');
+const { UserRegisterValidation, UserLoginValidation, ChangePasswordValidation, ApproveOwnerValidation, UpdateProfileValidation } = require('../validations/user-Authvalidations');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -59,16 +59,6 @@ usersCtlr.login = async(req, res) => {
         const tokenData = { userId: user._id, role: user.role };
         const token = jwt.sign(tokenData, process.env.JWT_SECRET, { expiresIn: '7d' });
         res.json({ token: token });
-    } catch(err) {
-        console.log(err);
-        res.status(500).json({ error: 'Something went wrong!!!' });
-    }
-}
-
-usersCtlr.account = async(req, res) => {
-    try {
-        const user = await User.findById(req.userId);
-        res.json(user);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -143,12 +133,10 @@ usersCtlr.listOwners = async (req, res) => {
     }
 }
 
-usersCtlr.profile = async (req, res) => {
+usersCtlr.profile = async(req, res) => {
     try {
-        // const profile = await 
-        // if(!profile) {
-        //     return res.status(404).json({ error: 'record not found' });
-        // }
+        const user = await User.findById(req.userId);
+        res.json(user);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -157,7 +145,6 @@ usersCtlr.profile = async (req, res) => {
 
 usersCtlr.updateProfile = async (req, res) => {
     const body = req.body;
-    const id = req.params.id;
     const { error, value } = UpdateProfileValidation.validate(body);
     if(error) {
         res.status(400).json({ error: error.details });
@@ -175,8 +162,26 @@ usersCtlr.updateProfile = async (req, res) => {
 }
 
 usersCtlr.changePassword = async (req, res) => {
+    const body = req.body;
+    const { error, value } = ChangePasswordValidation.validate(body, { abortEarly: false });
+    if(error) {
+        return res.status(400).json({ error: error.details });
+    }
     try {
-
+        const user = await User.findById(req.userId);
+        if(!user) {
+            return res.status(404).json({ error: 'record not found' });
+        }
+        const passwordMatch = await bcryptjs.compare(value.password, user.password);
+        if(!passwordMatch) {
+            return res.status(400).json({ error: 'oldPassword is incorrect' });
+        }
+       
+        const salt = bcryptjs.genSalt();
+        const hash = salt.hash(value.newPassword, salt);
+        user.password = hash;
+        await user.save();
+        res.json({ message: "password updated successfully" });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
