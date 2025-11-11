@@ -2,6 +2,7 @@ const User = require('../models/user-Authmodel');
 const { UserRegisterValidation, UserLoginValidation, ChangePasswordValidation, ApproveOwnerValidation, UpdateProfileValidation } = require('../validations/user-Authvalidations');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { error } = require('../validations/vehicleTracking-validations');
 
 const usersCtlr = {};
 
@@ -163,7 +164,7 @@ usersCtlr.updateProfile = async (req, res) => {
 
 usersCtlr.changePassword = async (req, res) => {
     const body = req.body;
-    const { error, value } = ChangePasswordValidation.validate(body, { abortEarly: false });
+    const { error, value } = ChangePasswordValidation.validate(body);
     if(error) {
         return res.status(400).json({ error: error.details });
     }
@@ -176,7 +177,6 @@ usersCtlr.changePassword = async (req, res) => {
         if(!passwordMatch) {
             return res.status(400).json({ error: 'oldPassword is incorrect' });
         }
-       
         const salt = bcryptjs.genSalt();
         const hash = salt.hash(value.newPassword, salt);
         user.password = hash;
@@ -190,10 +190,25 @@ usersCtlr.changePassword = async (req, res) => {
 
 usersCtlr.search = async (req, res) => {
     try {
-       
+        const { keyword } = req.body;
+        if(!keyword || keyword.trim() == "") {
+          return res.status(400).json({ error: "keyword is required" });
+        }
+
+        // case-insensitive regex pattern
+        const regex = new RegExp(keyword.trim(), "i");
+
+        // serach Owners (role = "owner") by name
+        const userFilter = {
+            role: "owner",
+            isApproved: true,
+            $or: [{ username: { $regex: regex } }, { email: { $regex: regex } }]
+        }
+        const owners = await User.find(userFilter);
+        res.json(owners);
     } catch(err) {
-       console.log(err);
-       res.status(500).json({ error: 'Something went wrong!!!' });
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
     }
 }
 
