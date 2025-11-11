@@ -3,17 +3,17 @@ const Joi= require('joi');
 const VehicleValidation = Joi.object({
     vehicleName: Joi.string().trim().required(),
     brand: Joi.string().trim().required(),
-    type: Joi.string().trim().required(),
+    type: Joi.string().trim().valid("Car", "Bike").required(),
     registrationNumber: Joi.string().trim().required(),
     licenseDoc: Joi.string(),
-    fuelType: Joi.string().trim().required(),
-    transmission: Joi.string().trim().required(),
+    fuelType: Joi.string().trim().valid("Petrol", "Diesel", "Electric").required(),
+    transmission: Joi.string().trim().valid("Manual", "Electric").required(),
     seats: Joi.number().min(1).required(),
     pricePerDay: Joi.number().required(),
     location: Joi.string().required(),
-    images: Joi.array().ordered(Joi.string().required()),
-    availabilityStatus: Joi.string().trim(),
-    averageRating: Joi.number()
+    images: Joi.array().items(Joi.string().uri().required()),
+    availabilityStatus: Joi.string().trim().valid("Available", "Booked", "Maintainance", "unAvailable"),
+    averageRating: Joi.number().min(0).max(5).optional()
 })
 
 const ApproveVehicleValidation = Joi.object({

@@ -2,7 +2,7 @@ const User = require('../models/user-Authmodel');
 const { UserRegisterValidation, UserLoginValidation, ChangePasswordValidation, ApproveOwnerValidation, UpdateProfileValidation } = require('../validations/user-Authvalidations');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { error } = require('../validations/vehicleTracking-validations');
+const { error, message } = require('../validations/vehicleTracking-validations');
 
 const usersCtlr = {};
 
@@ -205,6 +205,9 @@ usersCtlr.search = async (req, res) => {
             $or: [{ username: { $regex: regex } }, { email: { $regex: regex } }]
         }
         const owners = await User.find(userFilter);
+        if(owners.length == 0) {
+            return res.status(400).json({ message: "No match owners found "});
+        }
         res.json(owners);
     } catch(err) {
         console.log(err);

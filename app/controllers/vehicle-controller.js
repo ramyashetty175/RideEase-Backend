@@ -1,6 +1,4 @@
 const Vehicle = require('../models/vehicle-model');
-const Notification = require('../models/notification-model');
-const User = require('../models/user-Authmodel');
 const { VehicleValidation, ApproveVehicleValidation } = require('../validations/vehicle-validations');
 
 const vehiclesCtlr = {};
@@ -35,9 +33,9 @@ vehiclesCtlr.create = async (req, res) => {
         vehicle.pricePerDay = value.pricePerDay;
         vehicle.location = value.location;
         vehicle.images = value.images;
-        vehicle.averageRating = value.averageRating;
+        vehicle.averageRating = 0;
         await vehicle.save();
-        res.status(201).json(vehicle);
+        res.status(201).json({ msg: "Vehicle added successfully" ,vehicle });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!' });
@@ -71,12 +69,12 @@ vehiclesCtlr.list = async (req, res) => {
 vehiclesCtlr.update = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
-     const{ error, value } = ApproveVehicleValidation.validate(body);
+     const{ error, value } = VehicleValidation.validate(body);
     if(error) {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const vehicle = await Vehicle.findOneAndUpdate({ _id: id, user: req.userId }, value, { new: true });
+        const vehicle = await Vehicle.findOneAndUpdate({ _id: id, owner: req.userId }, value, { new: true });
         if(!vehicle) {
             return res.status(404).json({ error: 'record not found' });
         }
@@ -125,4 +123,29 @@ vehiclesCtlr.approveVehicle = async (req, res) => {
     }
 }
 
+vehicle.search = async (req, res) => {
+    try {
+        const { keyword } = req.body;
+        if(!keyword || keyword.trim() == "") {
+          return res.status(400).json({ error: "keyword is required" });
+        }
+
+        // case-insensitive regex pattern
+        const regex = new RegExp(keyword.trim(), "i");
+
+        // serach vehicle by registrationNumber or Name
+        const vehicleFilter = {
+            isApproved: true,
+            $or: [{ vehicleName: { $regex: regex } }, { registrationNumber: { $regex: regex } }]
+        }
+        const vehicle = await Vehicle.find(vehicleFilter);
+        if(vehicle.length == 0) {
+            return res.status(400).json({ message: "No match vehicle found" });
+        }
+        res.json(vehicle);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
+}
 module.exports = vehiclesCtlr;

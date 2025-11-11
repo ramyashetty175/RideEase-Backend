@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const VehicleSchema = new mongoose.Schema({
     owner: {
-        type: String,
+        type: mongoose.Schema.ObjectId,
         ref: 'User'
     },
     vehicleName: String,
@@ -46,9 +46,7 @@ const VehicleSchema = new mongoose.Schema({
     },
     averageRating: {
         type: Number,
-        default: 0,
-        min: 0,
-        max: 5
+        default: 0
     }
 }, { timestamps: true });
 
