@@ -19,7 +19,7 @@ const BookingAvailabilityValidation = Joi.object({
 
 const BookingApproveValidation = Joi.object({
     pickupTime: Joi.string().trim().required(),
-    returnTime: Joi.string().trim().required()
+    returnTime: Joi.string().trim().required(),
 })
 
 module.exports = { BookingValidation, BookingAvailabilityValidation, BookingApproveValidation };
