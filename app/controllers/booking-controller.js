@@ -1,8 +1,6 @@
 const Booking = require('../models/booking-model');
-const Notification = require('../models/notification-model');
 const User = require('../models/user-Authmodel');
 const { BookingValidation, BookingAvailabilityValidation, BookingApproveValidation } = require('../validations/booking-validations');
-const { message } = require('../validations/vehicleTracking-validations');
 
 const bookingsCtlr = {};
 
@@ -25,10 +23,8 @@ bookingsCtlr.create = async(req, res) => {
         booking.pickupLocation = value.pickupLocation;
         booking.returnLocation = value.returnLocation;
         booking.totalAmount = value.totalAmount;
-        booking.paymentStatus = value.paymentStatus;
-        booking.bookingStatus = value.bookingStatus;
         await booking.save();
-        res.status(201).json(booking);
+        res.status(201).json({ message: "booking created successfully", booking });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });

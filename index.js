@@ -42,10 +42,11 @@ app.put('/users/password/:id', authenticateUser, authorizeUser(['user']), usersC
 // Vehicle
 app.post('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin']), vehiclesCtlr.create);
 app.get('/api/vehicles/:id', authenticateUser, vehiclesCtlr.show);
-app.get('/api/vehicles', authenticateUser, vehiclesCtlr.list);
+app.get('/api/vehicles', authenticateUser, vehiclesCtlr.listVehicles);
 app.put('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesCtlr.update);
 app.put('/api/vehicles/approveOwner/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.approveOwner);
-app.delete('/api/vehicles/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.remove);
+app.get('/api/vehicles/search', authenticateUser, vehiclesCtlr.serach);
+app.delete('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesCtlr.remove);
 
 // Booking
 app.post('/api/bookings', authenticateUser, bookingsCtlr.create);

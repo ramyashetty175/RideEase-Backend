@@ -2,7 +2,6 @@ const User = require('../models/user-Authmodel');
 const { UserRegisterValidation, UserLoginValidation, ChangePasswordValidation, ApproveOwnerValidation, UpdateProfileValidation } = require('../validations/user-Authvalidations');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { error, message } = require('../validations/vehicleTracking-validations');
 
 const usersCtlr = {};
 
@@ -97,7 +96,7 @@ usersCtlr.remove = async(req, res) => {
     }
 }
 
-usersCtlr.approveOwner = async(req, res) => {
+usersCtlr.approveOwner = async(req, res) => { //
     const body = req.body;
     const id = req.params.id;
     const { error, value } = ApproveOwnerValidation.validate(body);
@@ -115,7 +114,7 @@ usersCtlr.approveOwner = async(req, res) => {
             user.isApproved = true;
             await user.save();
         } else {
-            return res.json({ success: true, message: "Your account is pending approval by admin" });
+            return res.status(400).json({ success: true, message: "Your account is pending approval by admin" });
         }
         res.json({ success: true, message: "Your account is approved by admin" });
     } catch(err) {

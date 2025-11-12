@@ -35,7 +35,7 @@ vehiclesCtlr.create = async (req, res) => {
         vehicle.images = value.images;
         vehicle.averageRating = 0;
         await vehicle.save();
-        res.status(201).json({ msg: "Vehicle added successfully" ,vehicle });
+        res.status(201).json({ msg: "Vehicle added successfully", vehicle });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!' });
@@ -45,7 +45,7 @@ vehiclesCtlr.create = async (req, res) => {
 vehiclesCtlr.show = async (req, res) => {
     const id = req.params.id;
     try {
-        const vehicle = await Vehicle.findOne({ _id: id, owner: req.userId });
+        const vehicle = await Vehicle.findById(id);
         if(!vehicle) {
             return res.status(404).json({ error: 'record not found' });
         }
@@ -56,9 +56,14 @@ vehiclesCtlr.show = async (req, res) => {
     }
 }
 
-vehiclesCtlr.list = async (req, res) => {
+vehiclesCtlr.listVehicles = async (req, res) => {
     try {
-        const vehicle = await Vehicle.find({ owner: req.userId });
+        let vehicle;
+        if(req.role == "admin") {
+            vehicle = await Vehicle.find({ isApproved: false });
+        } else {
+            vehicle = await Vehicle.find({ isApproved: true });
+        }
         res.json(vehicle);
     } catch(err) {
         console.log(err);
@@ -88,21 +93,23 @@ vehiclesCtlr.update = async (req, res) => {
 vehiclesCtlr.remove = async (req, res) => {
     const id = req.params.id;
     try {
-        const vehicle = await Vehicle.findOneAndDelete({ _id: id, owner: req.userId });
-        if(!vehicle) {
-            return res.status(404).json({ error: 'record not found' });
+        let vehicle;
+        if(req.role == "admin") {
+            vehicle = await Vehicle.findByIdAndDelete(id);
+        } else {
+            vehicle = await Vehicle.findOneAndDelete({ _id: id, owner: req.userId });
         }
-        res.json(vehicle);
+        res.json({ message: "Vehicle deleted successfully", vehicle });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
     }
 }
 
-vehiclesCtlr.approveVehicle = async (req, res) => {
+vehiclesCtlr.approveVehicle = async (req, res) => { //
     const body = req.body;
     const id = req.params.id;
-    const { error, value } = ApproveVehicleValidation.validate(body, { abortEarly: false });
+    const { error, value } = ApproveVehicleValidation.validate(body);
     if(error) {
         return res.status(400).json({ error: error.details });
     }
@@ -114,9 +121,11 @@ vehiclesCtlr.approveVehicle = async (req, res) => {
         if(vehicle.licenseDoc) {
            vehicle.isApproved = true;
            vehicle.availabilityStatus = "Available";
+           await vehicle.save();
+        } else {
+            return res.status(400).json({ message: "Vehicle is not approved by Admin" });
         }
-        await vehicle.save();
-        res.json(vehicle);
+        res.json({ message: "Vehicle approved by Admin", vehicle });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
