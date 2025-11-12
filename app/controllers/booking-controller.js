@@ -1,5 +1,5 @@
 const Booking = require('../models/booking-model');
-const User = require('../models/user-Authmodel');
+const Vehicle = require('../models/vehicle-model');
 const { BookingValidation, BookingAvailabilityValidation, BookingApproveValidation } = require('../validations/booking-validations');
 
 const bookingsCtlr = {};
@@ -11,7 +11,7 @@ bookingsCtlr.create = async(req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const existingBooking = await Booking.findOne({ vehicle: value.vehicle, startDate: value.startDate, user: req.userId });
+        const existingBooking = await Booking.findOne({ vehicle: value.vehicle, startDate: value.startDate, user: req.userId }); //
         if(existingBooking) {
             return res.status(400).json({ error: 'Vehicle is not available for the selected dates' });
         }
@@ -31,10 +31,18 @@ bookingsCtlr.create = async(req, res) => {
     }
 }
 
-bookingsCtlr.show = async(req, res) => {
+bookingsCtlr.show = async(req, res) => { 
     const id = req.params.id;
     try {
-        const booking = await Booking.findOne({ _id: id, user: req.userId });
+        let booking;
+        if(req.role == "admin") {
+           booking = await Booking.findById(id);
+        } else if(req.role == "owner") {
+           booking = await Booking.findOne({ _id: id, owner: req.userId });
+        }
+        else {
+           booking = await Booking.findOne({ _id: id, user: req.userId });
+        }
         if(!booking) {
             return res.status(404).json({ error: 'record not found' });
         }
@@ -45,13 +53,18 @@ bookingsCtlr.show = async(req, res) => {
     }
 }
 
-bookingsCtlr.list = async(req, res) => {
+bookingsCtlr.listBookings = async(req, res) => { 
     try {
-        const booking = await Booking.find({ user: req.userId });
-        if(!booking) {
-            return res.status(404).json({ error: 'record not found' });
+        let bookings;
+        if(req.role == "admin") {
+            bookings = await Booking.find();
+        } else if(req.role == "owner") {
+            bookings = await Booking.find({ owner: req.userId });
         }
-        res.json(booking);
+        else {
+            bookings = await Booking.find({ user: req.userId });
+        }
+        res.json(bookings);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -66,7 +79,14 @@ bookingsCtlr.update = async(req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const booking = await Booking.findOneAndUpdate({ _id: id, user: req.userId }, value, { new: true });
+        let booking;
+        if(req.role == "admin") {
+            booking = await Booking.findByIdAndUpdate(id, value, { new: true });
+        } else if(req.role == "owner") {
+            booking = await Booking.findOneAndUpdate({ _id: id, owner: req.userId }, value, { new: true });
+        } else {
+            booking = await Booking.findOneAndUpdate({ _id: id, user: req.userId }, value, { new: true });
+        }
         if(!booking) {
            return res.status(404).json({ error: 'record not found' });
         }
@@ -80,19 +100,27 @@ bookingsCtlr.update = async(req, res) => {
 bookingsCtlr.remove = async(req, res) => {
     const id = req.params.id;
     try {
-        const booking = await Booking.findOneAndDelete({ _id: id, user: req.userId });
+        let booking;
+        if(req.role == "admin") {
+           booking = await Booking.findByIdAndDelete(id);
+        } else if(req.role == "owner") {
+            booking = await Booking.findOneAndDelete({ _id: id, owner: req.userId });
+        }
+        else {
+           booking = await Booking.findOneAndDelete({ _id: id, user: req.userId });
+        }
         if(!booking) {
             return res.status(404).json({ error: 'record not found' });
         }
-        res.json(booking);
+        res.json({ message: "booking deleted successfully", booking });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
     }
 }
 
-bookingsCtlr.checkAvailability = async (req, res) => { 
-    const body = req.body;
+bookingsCtlr.checkAvailability = async (req, res) => {  //
+    const body = req.body; 
     const { error, value } = BookingAvailabilityValidation.validate(body, { abortEarly: false });
     if(error) {
         return res.status(400).json({ error: error.details });
@@ -117,18 +145,22 @@ bookingsCtlr.approve = async (req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const booking = await Booking.findOneAndUpdate({ _id: id }, value, { new: true });
+        const updatedData = {
+            ...value,
+            bookingStatus: "Approved",
+            pickupTime: value.pickupTime,
+            returnTime: value.returnTime
+        }
+        let booking;
+        if(req.role == "admin") {
+            booking = await Booking.findByIdAndUpdate(id, updatedData, { new: true });
+        } else if(req.role == "owner") {
+            booking = await Booking.findOneAndUpdate({ _id: id, owner: req.userId }, updatedData, { new: true });
+        }
         if(!booking) {
            return res.status(404).json({ error: 'record not found' });
         }
-        const owner = await User.findOne({ user: owner });
-        if(owner) {
-           bookingStatus = "Approved";
-        }
-        booking.pickupTime = value.pickupTime;
-        booking.returnTime = value.returnTime;
-        await booking.save();
-        res.json(booking);
+        res.json({ message: "booking Approved successfully", booking });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -143,13 +175,15 @@ bookingsCtlr.confirm = async (req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const booking = await Booking.findByIdAndUpdate({ _id: id }, value, { new: true });
-        if(booking) {
+        const updatedData = {
+            ...value,
+            paymentStatus: "Paid"
+        }
+        const booking = await Booking.findByIdAndUpdate(id, updatedData, { new: true });
+        if(!booking) {
             return res.status(404).json({ error: 'record not found' });
         }
-        booking.paymentStatus = "Paid";
-        await booking.save();
-        res.json(booking);
+        res.json({ message: "Booking confirmed successfully", booking });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -164,15 +198,18 @@ bookingsCtlr.startTrip = async (req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const booking = await Booking.findOneAndUpdate({ _id: id }, value, { new: true });
+        const booking = await Booking.findById(id);
         if(!booking) {
             return res.status(404).json({ error: 'record not found' });
         }
+        if(booking.bookingStatus !== "Approved") {
+           return res.status(400).json({ error: "only approved booking can be started" });
+        }
         booking.bookingStatus = "in-progress";
         booking.startTrip = new Date();
-        booking.vehicle.avialabilityStatus = "Booked";
+        await Vehicle.findByIdAndUpdate(booking.vehicle, { avialabilityStatus: "Booked" } );
         await booking.save();
-        res.json(booking);
+        res.json({ message: "trip started successfully", booking });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });

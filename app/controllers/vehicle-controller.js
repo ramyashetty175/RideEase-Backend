@@ -60,7 +60,7 @@ vehiclesCtlr.listVehicles = async (req, res) => {
     try {
         let vehicle;
         if(req.role == "admin") {
-            vehicle = await Vehicle.find({ isApproved: false });
+            vehicle = await Vehicle.find();
         } else {
             vehicle = await Vehicle.find({ isApproved: true });
         }
@@ -71,7 +71,7 @@ vehiclesCtlr.listVehicles = async (req, res) => {
     }
 }
 
-vehiclesCtlr.update = async (req, res) => {
+vehiclesCtlr.update = async (req, res) => { 
     const body = req.body;
     const id = req.params.id;
      const{ error, value } = VehicleValidation.validate(body);
@@ -79,7 +79,12 @@ vehiclesCtlr.update = async (req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const vehicle = await Vehicle.findOneAndUpdate({ _id: id, owner: req.userId }, value, { new: true });
+        let vehicle;
+        if(req.role == "admin") {
+            vehicle = await Vehicle.findByIdAndUpdate(id, value, { new: true });
+        } else {
+            vehicle = await Vehicle.findOneAndUpdate({ _id: id, owner: req.userId }, value, { new: true });
+        }
         if(!vehicle) {
             return res.status(404).json({ error: 'record not found' });
         }
