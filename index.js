@@ -62,6 +62,18 @@ app.put('/api/bookings/end/:id', authenticateUser, bookingsCtlr.endTrip);
 app.post('/api/bookings/cancel/:id', authenticateUser, bookingsCtlr.cancel); 
 app.put('/api/bookings/extend/:id', authenticateUser, bookingsCtlr.extend); 
 
+// BookingCancellation
+app.post('/api/bookingCancellation/requestCancel/:id', authenticateUser, bookingCancellationCtlr.requestCancel);
+app.get('/api/bookingCancellation/:id', authenticateUser, bookingCancellationCtlr.show);
+app.put('/api/bookingCancellation/approveCancel/:id', authenticateUser, authorizeUser(['owner']), bookingCancellationCtlr.approveCancel);
+
+// VehicleTracking
+app.post('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.create);
+app.get('/api/vehicleTrackings/live/:id', authenticateUser, vehicleTrackingCtlr.live);
+//app.get('/api/vehicleTrackings/history/:id/?startDate&endDate', authenticateUser, vehicleTrackingCtlr.history);
+app.get('/api/vehicleTrackings/alerts/:id', authenticateUser, vehicleTrackingCtlr.alerts);
+app.get('/api/vehicleTrackings/hourlycost/:id', authenticateUser, vehicleTrackingCtlr.hourlyCost); // bookingId
+
 // payment
 app.post('/api/payments', authenticateUser, paymentCtlr.create);
 app.get('/api/payments/:id', authenticateUser, paymentCtlr.show);
@@ -75,21 +87,6 @@ app.get('/api/reviews/:id', authenticateUser, reviewCtlr.show);
 app.get('/api/reviews', authenticateUser, reviewCtlr.list);
 app.put('/api/reviews/:id', authenticateUser, reviewCtlr.update);
 app.delete('/api/reviews/:id', authenticateUser, reviewCtlr.remove);
-
-// VehicleTracking
-app.post('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.create);
-app.get('/api/vehicleTrackings/live/:id', authenticateUser, vehicleTrackingCtlr.live);
-//app.get('/api/vehicleTrackings/history/:id/?startDate&endDate', authenticateUser, vehicleTrackingCtlr.history);
-app.get('/api/vehicleTrackings/alerts/:id', authenticateUser, vehicleTrackingCtlr.alerts);
-app.get('/api/vehicleTrackings/hourlycost/:id', authenticateUser, vehicleTrackingCtlr.hourlyCost); // bookingId
-
-// BookingCancellation
-app.post('/api/bookingCancellation/requestCancel/:id', authenticateUser, bookingCancellationCtlr.requestCancel);
-app.get('/api/bookingCancellation/:id', authenticateUser, bookingCancellationCtlr.show);
-app.get('/api/bookingCancellation', authenticateUser, bookingCancellationCtlr.list);
-app.put('/api/bookingCancellation/:id', authenticateUser, bookingCancellationCtlr.update);
-app.delete('/api/bookingCancellation/:id', authenticateUser, bookingCancellationCtlr.remove);
-app.put('/api/bookingCancellation/approveCancel/:id', authenticateUser, authorizeUser(['owner']), bookingCancellationCtlr.approveCancel);
 
 // Notification
 app.post('/api/notifications', authenticateUser, notificationCtlr.create);

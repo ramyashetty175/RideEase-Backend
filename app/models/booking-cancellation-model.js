@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { type } = require('../validations/vehicleTracking-validations');
 
 const bookingCancellationSchema = new mongoose.Schema({
     bookingId: {
@@ -19,7 +18,10 @@ const bookingCancellationSchema = new mongoose.Schema({
         enum: ["customer", "owner", "admin"]
     },
     reason: String,
-    cancelledAt: Date,
+    cancelledAt: {
+        type: Date,
+        default: Date.now
+    },
     status: {
         type: String,
         enum: ["pending", "approved", "rejected"],
