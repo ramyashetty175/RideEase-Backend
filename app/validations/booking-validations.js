@@ -8,7 +8,7 @@ const BookingValidation = Joi.object({
     returnLocation: Joi.string().trim().required(),
     totalAmount: Joi.number().min(0).required(),
     pickupTime: Joi.string().trim().required(),
-    returnTime: Joi.string().trim().required()
+    returnTime: Joi.string().trim().required(),
 })
 
 const BookingAvailabilityValidation = Joi.object({
@@ -22,4 +22,13 @@ const BookingApproveValidation = Joi.object({
     returnTime: Joi.string().trim().required(),
 })
 
-module.exports = { BookingValidation, BookingAvailabilityValidation, BookingApproveValidation };
+const TripActionValidation = Joi.object({
+    tripStartTime: Joi.date().optional(),
+    tripEndTime: Joi.date().optional()
+})
+
+const BookingExtendValidation = Joi.object({
+    endDate: Joi.date().required()
+})
+
+module.exports = { BookingValidation, BookingAvailabilityValidation, BookingApproveValidation, TripActionValidation, BookingExtendValidation };

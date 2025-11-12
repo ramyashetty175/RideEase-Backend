@@ -1,6 +1,6 @@
 const Booking = require('../models/booking-model');
 const Vehicle = require('../models/vehicle-model');
-const { BookingValidation, BookingAvailabilityValidation, BookingApproveValidation } = require('../validations/booking-validations');
+const { BookingValidation, BookingAvailabilityValidation, BookingApproveValidation, TripActionValidation, BookingExtendValidation } = require('../validations/booking-validations');
 
 const bookingsCtlr = {};
 
@@ -180,6 +180,8 @@ bookingsCtlr.confirm = async (req, res) => {
             return res.status(404).json({ error: 'record not found' });
         }
         booking.paymentStatus = "Paid";
+        booking.pickupTime = value.pickupTime;
+        booking.returnTime = value.returnTime;
         await booking.save();
         res.json({ message: "Booking confirmed successfully", booking });
     } catch(err) {
@@ -191,7 +193,7 @@ bookingsCtlr.confirm = async (req, res) => {
 bookingsCtlr.startTrip = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
-    const { error, value } = BookingValidation.validate(body);
+    const { error, value } = TripActionValidation.validate(body);
     if(error) {
         return res.status(400).json({ error: error.details });
     }
@@ -204,7 +206,7 @@ bookingsCtlr.startTrip = async (req, res) => {
            return res.status(400).json({ error: "only approved booking can be started" });
         }
         booking.bookingStatus = "in-progress";
-        booking.startTrip = new Date();
+        booking.tripStartTime = value.tripStartTime || new Date();
         const vehicle = await Vehicle.findById(booking.vehicle);
         if(vehicle) {
             vehicle.availabilityStatus = "Booked";
@@ -221,7 +223,7 @@ bookingsCtlr.startTrip = async (req, res) => {
 bookingsCtlr.endTrip = async(req, res) => {
     const body = req.body;
     const id = req.params.id;
-    const { error, value } = BookingValidation.validate(body);
+    const { error, value } = TripActionValidation.validate(body);
     if(error) {
         return res.status(400).json({ error: error.details });
     }
@@ -234,7 +236,7 @@ bookingsCtlr.endTrip = async(req, res) => {
             return res.status(400).json({ error: "only in-progress bookings can be ended" });
         }
         booking.bookingStatus = "Completed";
-        booking.endTrip = new Date();
+        booking.tripEndTime = value.tripEndTime || new Date();
         const vehicle = await Vehicle.findById(booking.vehicle);
         if(vehicle) {
             vehicle.availabilityStatus = "Available";
@@ -249,12 +251,13 @@ bookingsCtlr.endTrip = async(req, res) => {
 }
 
 bookingsCtlr.cancel = async (req, res) => { 
-    const body = req.body;
+    // const body = req.body;
+    // const id = req.params.id;
+    // const { error, value } = BookingValidation.validate(body);
+    // if(error) {
+    //     return res.status(400).json({ error: error.details });
+    // }
     const id = req.params.id;
-    const { error, value } = BookingValidation.validate(body);
-    if(error) {
-        return res.status(400).json({ error: error.details });
-    }
     try {
         const booking = await Booking.findById(id);
         if(!booking) {
@@ -280,7 +283,7 @@ bookingsCtlr.cancel = async (req, res) => {
 bookingsCtlr.extend = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
-    const { error, value } = BookingValidation.validate(body);
+    const { error, value } = BookingExtendValidation.validate(body);
     if(error) {
         return res.status(400).json({ error: error.details });
     }

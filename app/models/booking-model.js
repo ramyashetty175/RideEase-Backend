@@ -25,7 +25,9 @@ const BookingSchema = new mongoose.Schema({
         default: "Pending"
     },
     pickupTime: String,
-    returnTime: String
+    returnTime: String,
+    tripStartTime: Date,
+    tripEndTime: Date
 }, { timestamps: true });
 
 const Booking = mongoose.model('Booking', BookingSchema);

@@ -50,11 +50,11 @@ app.delete('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner
 
 // Booking
 app.post('/api/bookings', authenticateUser, bookingsCtlr.create);
-app.get('/api/bookings/:id', authenticateUser, bookingsCtlr.show);
-app.get('/api/bookings', authenticateUser, bookingsCtlr.list);
-app.put('/api/bookings/:id', authenticateUser, bookingsCtlr.update);
-app.delete('/api/bookings/:id', authenticateUser, bookingsCtlr.remove);
-app.put('/api/bookings/approve/:id', authenticateUser, authorizeUser(['owner']), bookingsCtlr.approve);
+app.get('/api/bookings/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.show);
+app.get('/api/bookings', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.list);
+app.put('/api/bookings/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.update);
+app.delete('/api/bookings/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.remove);
+app.put('/api/bookings/approve/:id', authenticateUser, authorizeUser(['admin', 'owner']), bookingsCtlr.approve);
 app.post('/api/bookings/checkAvailability', authenticateUser, bookingsCtlr.checkAvailability);
 app.put('/api/bookings/confirm/:id', authenticateUser, bookingsCtlr.confirm);   
 app.put('/api/bookings/start/:id', authenticateUser, bookingsCtlr.startTrip);  
