@@ -22,6 +22,9 @@ bookingCancellationCtlr.requestCancel = async(req, res) => {
             return res.status(400).json({ error: 'Cancellation request already pending' });
         }
         const bookingcancellation = new BookingCancellation();
+        bookingcancellation.bookingId = booking._id;
+        bookingcancellation.vehicleId = booking.vehicle;
+        bookingcancellation.userId = req.userId;
         bookingcancellation.canceledBy = value.canceledBy;
         bookingcancellation.reason = value.reason;
         bookingcancellation.cancelledAt = new Date();
@@ -32,6 +35,7 @@ bookingCancellationCtlr.requestCancel = async(req, res) => {
         bookingcancellation.remarks =  value.remarks;
         await bookingcancellation.save();
         booking.bookingStatus = "Pending";
+        await booking.save();
         res.status(201).json({ message: "Cancellation request submitted successfully", bookingcancellation });
     } catch(err) {
         console.log(err);
