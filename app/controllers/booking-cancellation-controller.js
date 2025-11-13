@@ -3,7 +3,6 @@ const Vehicle = require('../models/vehicle-model');
 const Booking = require('../models/booking-model');
 const { BookingCancellationValidation, BookingCancelActionValidation } = require('../validations/booking-cancellation-validations');
 
-
 const bookingCancellationCtlr = {};
 
 bookingCancellationCtlr.requestCancel = async(req, res) => {

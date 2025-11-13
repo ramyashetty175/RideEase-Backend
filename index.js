@@ -67,17 +67,19 @@ app.post('/api/bookingCancellation/requestCancel/:id', authenticateUser, booking
 app.get('/api/bookingCancellation/:id', authenticateUser, bookingCancellationCtlr.show);
 app.put('/api/bookingCancellation/approveCancel/:id', authenticateUser, authorizeUser(['owner']), bookingCancellationCtlr.approveCancel);
 
+// payment
+app.post('/api/payments/createOrder', authenticateUser, paymentCtlr.createOrder);
+app.post('/api/payments/verify', authenticateUser, paymentCtlr.verifyPayment);
+app.get('/api/payments/cancel', authenticateUser, paymentCtlr.cancel);
+app.get('/api/payment/:id', authenticateUser, paymentCtlr.show);
+app.get('/api/payments', authenticateUser, paymentCtlr.list);
+
 // VehicleTracking
 app.post('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.create);
 app.get('/api/vehicleTrackings/live/:id', authenticateUser, vehicleTrackingCtlr.live);
 //app.get('/api/vehicleTrackings/history/:id/?startDate&endDate', authenticateUser, vehicleTrackingCtlr.history);
 app.get('/api/vehicleTrackings/alerts/:id', authenticateUser, vehicleTrackingCtlr.alerts);
 app.get('/api/vehicleTrackings/hourlycost/:id', authenticateUser, vehicleTrackingCtlr.hourlyCost); // bookingId
-
-// payment
-app.post('/api/payments', authenticateUser, paymentCtlr.create);
-app.get('/api/payments/:id', authenticateUser, paymentCtlr.show);
-app.get('/api/payments', authenticateUser, paymentCtlr.list);
 
 // Review
 app.post('/api/reviews', authenticateUser, reviewCtlr.create);
