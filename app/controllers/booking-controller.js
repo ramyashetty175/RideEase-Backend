@@ -250,35 +250,29 @@ bookingsCtlr.endTrip = async(req, res) => {
     }
 }
 
-bookingsCtlr.cancel = async (req, res) => { 
-    // const body = req.body;
-    // const id = req.params.id;
-    // const { error, value } = BookingValidation.validate(body);
-    // if(error) {
-    //     return res.status(400).json({ error: error.details });
-    // }
-    const id = req.params.id;
-    try {
-        const booking = await Booking.findById(id);
-        if(!booking) {
-            return res.status(404).json({ message: 'record not found' });
-        }
-        if(booking.bookingStatus !== "Pending" && booking.bookingStatus !== "Confirmed") {
-            return res.status(400).json({ message: "You cannot cancel this booking" });
-        }
-        booking.bookingStatus = "Cancelled";
-        const vehicle = await Vehicle.findById(booking.vehicle);
-        if(vehicle) {
-            vehicle.availabilityStatus = "Available";
-            await vehicle.save();
-        }
-        await booking.save();
-        res.json({ message: "booking Cancelled successfully", booking });
-    } catch(err) {
-        console.log(err);
-        res.status(500).json({ error: 'Something went wrong!!!' });
-    }
-}
+// bookingsCtlr.cancel = async (req, res) => { 
+//     const id = req.params.id;
+//     try {
+//         const booking = await Booking.findById(id);
+//         if(!booking) {
+//             return res.status(404).json({ message: 'record not found' });
+//         }
+//         if(booking.bookingStatus !== "Pending" && booking.bookingStatus !== "Confirmed") {
+//             return res.status(400).json({ message: "You cannot cancel this booking" });
+//         }
+//         booking.bookingStatus = "Cancelled";
+//         const vehicle = await Vehicle.findById(booking.vehicle);
+//         if(vehicle) {
+//             vehicle.availabilityStatus = "Available";
+//             await vehicle.save();
+//         }
+//         await booking.save();
+//         res.json({ message: "booking Cancelled successfully", booking });
+//     } catch(err) {
+//         console.log(err);
+//         res.status(500).json({ error: 'Something went wrong!!!' });
+//     }
+// }
 
 bookingsCtlr.extend = async (req, res) => {
     const body = req.body;

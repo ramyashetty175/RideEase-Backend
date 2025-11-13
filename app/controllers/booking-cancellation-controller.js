@@ -1,7 +1,8 @@
 const BookingCancellation = require('../models/booking-cancellation-model');
-const User = require('../models/user-Authmodel');
+const Vehicle = require('../models/vehicle-model');
 const Booking = require('../models/booking-model');
 const { BookingCancellationValidation, BookingCancelActionValidation } = require('../validations/booking-cancellation-validations');
+
 
 const bookingCancellationCtlr = {};
 
@@ -40,7 +41,14 @@ bookingCancellationCtlr.requestCancel = async(req, res) => {
 bookingCancellationCtlr.show = async(req, res) => {
     const id = req.params.id;
     try {
-        const bookingcancellation = await BookingCancellation.findOne({ _id: id, user: req.userId });
+        let bookingcancellation;
+        if(req.role == "admin") {
+            bookingcancellation = await BookingCancellation.findById(id);
+        } else if(req.role == "owner") {
+            bookingcancellation = await BookingCancellation.findOne({}); //
+        } else {
+            bookingcancellation = await BookingCancellation.findOne({ _id: id, userId: req.userId });
+        }
         if(!bookingcancellation) {
             return res.status(404).json({ error: 'record not found' });
         }
@@ -69,14 +77,20 @@ bookingCancellationCtlr.approveCancel = async (req, res) => {
         bookingcancellation.status = value.status;
         bookingcancellation.remarks = value.remarks;
         if(value.status == "approved") {
-            const booking = await Booking.findById(BookingCancellation.bookingId);
-            if(!booking) {
-              booking.bookingStatus = "Canceled";
+            const booking = await Booking.findById(bookingcancellation.bookingId);
+            if(booking) {
+               booking.bookingStatus = "Canceled";
+               await booking.save();
+            }
+            const vehicle = await Vehicle.findById(booking.vehicle);
+            if(vehicle) {
+               vehicle.availabilityStatus = "Available";
+               await vehicle.save();
             }
             bookingcancellation.paymentStatus = "refunded";
         }
-        await bookingCancellation.save();
-        res.json({ message: `cancellation ${value.status} successfully`, bookingCancellation });
+        await bookingcancellation.save();
+        res.json({ message: `cancellation ${value.status} successfully`, bookingcancellation });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });

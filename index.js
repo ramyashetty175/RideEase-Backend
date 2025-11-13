@@ -59,7 +59,7 @@ app.post('/api/bookings/checkAvailability', authenticateUser, bookingsCtlr.check
 app.put('/api/bookings/confirm/:id', authenticateUser, bookingsCtlr.confirm);   
 app.put('/api/bookings/start/:id', authenticateUser, bookingsCtlr.startTrip);  
 app.put('/api/bookings/end/:id', authenticateUser, bookingsCtlr.endTrip);     
-app.post('/api/bookings/cancel/:id', authenticateUser, bookingsCtlr.cancel); //
+// app.post('/api/bookings/cancel/:id', authenticateUser, bookingsCtlr.cancel); 
 app.put('/api/bookings/extend/:id', authenticateUser, bookingsCtlr.extend); 
 
 // BookingCancellation
