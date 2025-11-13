@@ -59,7 +59,7 @@ app.post('/api/bookings/checkAvailability', authenticateUser, bookingsCtlr.check
 app.put('/api/bookings/confirm/:id', authenticateUser, bookingsCtlr.confirm);   
 app.put('/api/bookings/start/:id', authenticateUser, bookingsCtlr.startTrip);  
 app.put('/api/bookings/end/:id', authenticateUser, bookingsCtlr.endTrip);     
-app.post('/api/bookings/cancel/:id', authenticateUser, bookingsCtlr.cancel); 
+app.post('/api/bookings/cancel/:id', authenticateUser, bookingsCtlr.cancel); //
 app.put('/api/bookings/extend/:id', authenticateUser, bookingsCtlr.extend); 
 
 // BookingCancellation
@@ -78,8 +78,6 @@ app.get('/api/vehicleTrackings/hourlycost/:id', authenticateUser, vehicleTrackin
 app.post('/api/payments', authenticateUser, paymentCtlr.create);
 app.get('/api/payments/:id', authenticateUser, paymentCtlr.show);
 app.get('/api/payments', authenticateUser, paymentCtlr.list);
-app.put('/api/payments/:id', authenticateUser, paymentCtlr.update);
-app.delete('/api/payments/:id', authenticateUser, paymentCtlr.remove);
 
 // Review
 app.post('/api/reviews', authenticateUser, reviewCtlr.create);
