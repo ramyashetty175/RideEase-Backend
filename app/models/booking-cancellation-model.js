@@ -15,7 +15,8 @@ const bookingCancellationSchema = new mongoose.Schema({
     },
     canceledBy: {
         type: String,
-        enum: ["customer", "owner", "admin"]
+        enum: ["customer", "owner", "admin"],
+        default: "customer"
     },
     reason: String,
     cancelledAt: {

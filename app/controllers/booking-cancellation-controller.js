@@ -1,7 +1,7 @@
 const BookingCancellation = require('../models/booking-cancellation-model');
 const User = require('../models/user-Authmodel');
 const Booking = require('../models/booking-model');
-const BookingCancellationValidation = require('../validations/booking-cancellation-validations');
+const { BookingCancellationValidation, BookingCancelActionValidation } = require('../validations/booking-cancellation-validations');
 
 const bookingCancellationCtlr = {};
 
@@ -25,16 +25,10 @@ bookingCancellationCtlr.requestCancel = async(req, res) => {
         bookingcancellation.bookingId = booking._id;
         bookingcancellation.vehicleId = booking.vehicle;
         bookingcancellation.userId = req.userId;
-        bookingcancellation.canceledBy = value.canceledBy;
+        bookingcancellation.canceledBy = "customer";
         bookingcancellation.reason = value.reason;
-        bookingcancellation.cancelledAt = new Date();
-        bookingcancellation.status = value.status;
-        bookingcancellation.refundAmount = value.refundAmount;
-        bookingcancellation.penaltyAmount = value.penaltyAmount;
-        bookingcancellation.paymentStatus = value.paymentStatus;
-        bookingcancellation.remarks =  value.remarks;
         await bookingcancellation.save();
-        booking.bookingStatus = "Pending";
+        booking.bookingStatus = "CancelRequested";
         await booking.save();
         res.status(201).json({ message: "Cancellation request submitted successfully", bookingcancellation });
     } catch(err) {
@@ -60,23 +54,29 @@ bookingCancellationCtlr.show = async(req, res) => {
 bookingCancellationCtlr.approveCancel = async (req, res) => {
     const body = req.body;
     const id = req.params.id;
-    const { error, value } = BookingCancellation.validate(body);
+    const { error, value } = BookingCancelActionValidation.validate(body);
     if(error) {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const bookingCancellation = await BookingCancellation.findOneAndUpdate({ _id: id }, value, { new: true });
-        if(!bookingCancellation) {
-            return res.status(404).json({ error: 'record not found' });
+        const bookingcancellation = await BookingCancellation.findById(id);
+        if(!bookingcancellation) {
+            return res.status(404).json({ error: 'Cancellation request not found' });
         }
-        const owner = await User.findOne({ user: owner });
-        if(owner) {
-           bookingCancellation.status = "approved";
+        if(bookingcancellation.status !== "pending") {
+           return res.status(400).json({ error: "This request has already been processed" });
         }
-        booking.bookingStatus = "Canceled";
-        Booking.save();
-        await BookingCancellation.save();
-        res.json(bookingCancellation);
+        bookingcancellation.status = value.status;
+        bookingcancellation.remarks = value.remarks;
+        if(value.status == "approved") {
+            const booking = await Booking.findById(BookingCancellation.bookingId);
+            if(!booking) {
+              booking.bookingStatus = "Canceled";
+            }
+            bookingcancellation.paymentStatus = "refunded";
+        }
+        await bookingCancellation.save();
+        res.json({ message: `cancellation ${value.status} successfully`, bookingCancellation });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
