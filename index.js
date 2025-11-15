@@ -1,9 +1,11 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+require("./app/cron/booking-status-cron");
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(express.urlencoded({ extended: true }));
 const port = process.env.PORT || 3020;
 
 const configureDB = require('./config/db');
@@ -11,6 +13,8 @@ configureDB();
 
 const authenticateUser = require('./app/middlewares/authenticateUser');
 const authorizeUser = require('./app/middlewares/authorizeUser');
+const uploadMiddleware = require('./app/middlewares/fileUploadMiddleware');
+const imageUpload = require('./app/controllers/upload-controller');
 const usersCtlr = require('./app/controllers/user-Authcontroller');
 const vehiclesCtlr = require('./app/controllers/vehicle-controller');
 const bookingsCtlr = require('./app/controllers/booking-controller');
@@ -22,6 +26,7 @@ const notificationCtlr = require('./app/controllers/notification-controller');
 const subscriptionCtlr = require('./app/controllers/subscription-controller');
 const earningAnalyticsCtlr = require('./app/controllers/earningAnalytics-controller');
 const vehiclesTrackingCtlr = require('./app/controllers/vehicleTracking-controller');
+const chatCtlr = require('./app/controllers/chat-Controller');
 
 // Public Route
 app.post('/users/register', usersCtlr.register);
@@ -75,6 +80,9 @@ app.get('/api/payments', authenticateUser, paymentCtlr.list);
 
 // AI ChatBot
 app.post('/api/chat', authenticateUser, chatCtlr.askAI);
+
+// Image Upload
+app.post('/api/upload/avatar', authenticateUser, imageUpload.avatar);
 
 // VehicleTracking
 app.post('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.create);

@@ -1,6 +1,4 @@
 const Payment = require('../models/payment-model');
-const Booking = require('../models/booking-model');
-const PaymentValidation = require('../validations/payment-validations');
 
 const paymentCtlr = {};
 
