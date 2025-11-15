@@ -137,7 +137,7 @@ vehiclesCtlr.approveVehicle = async (req, res) => { //
     }
 }
 
-vehicle.search = async (req, res) => {
+vehiclesCtlr.search = async (req, res) => {
     try {
         const { keyword } = req.body;
         if(!keyword || keyword.trim() == "") {

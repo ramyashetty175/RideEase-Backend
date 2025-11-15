@@ -44,14 +44,14 @@ app.post('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin']), v
 app.get('/api/vehicles/:id', authenticateUser, vehiclesCtlr.show);
 app.get('/api/vehicles', authenticateUser, vehiclesCtlr.listVehicles);
 app.put('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesCtlr.update);
-app.put('/api/vehicles/approveOwner/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.approveOwner);
-app.get('/api/vehicles/search', authenticateUser, vehiclesCtlr.serach);
+app.put('/api/vehicles/approveOwner/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.approveVehicle);
+app.get('/api/vehicles/search', authenticateUser, vehiclesCtlr.search);
 app.delete('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesCtlr.remove);
 
 // Booking
 app.post('/api/bookings', authenticateUser, bookingsCtlr.create);
 app.get('/api/bookings/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.show);
-app.get('/api/bookings', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.list);
+app.get('/api/bookings', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.listBookings);
 app.put('/api/bookings/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.update);
 app.delete('/api/bookings/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.remove);
 app.put('/api/bookings/approve/:id', authenticateUser, authorizeUser(['admin', 'owner']), bookingsCtlr.approve);
@@ -74,7 +74,7 @@ app.get('/api/payment/:id', authenticateUser, paymentCtlr.show);
 app.get('/api/payments', authenticateUser, paymentCtlr.list);
 
 // AI ChatBot
-app.post('/api/chat');
+app.post('/api/chat', authenticateUser, chatCtlr.askAI);
 
 // VehicleTracking
 app.post('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.create);
@@ -95,7 +95,6 @@ app.post('/api/notifications', authenticateUser, notificationCtlr.create);
 app.get('/api/notifications/:id', authenticateUser, notificationCtlr.show);
 app.get('/api/notifications', authenticateUser, notificationCtlr.list);
 app.put('/api/notifications/:id', authenticateUser, notificationCtlr.update);
-app.delete('/api/notifications/:id', authenticateUser, authorizeUser(['admin']), notificationCtlr.remove);
 
 // Subscription 
 app.post('/api/subscriptions', authenticateUser, subscriptionCtlr.create);

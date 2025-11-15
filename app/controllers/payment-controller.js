@@ -42,7 +42,7 @@ paymentCtlr.createOrder = async (req, res) => {
 // });
 
 // Route to handle payment verification
-app.post('/verify-payment', (req, res) => {
+paymentCtlr.verifyPayment = (req, res) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
     const secret = razorpay.key_secret;
@@ -69,7 +69,7 @@ try {
     console.log(err);
     res.status(500).json({ status: 'error', message: 'Error verifying payment' });
   }
-});
+}
 
 paymentCtlr.show = async(req, res) => {
     const id = req.params.id;
