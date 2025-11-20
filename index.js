@@ -40,9 +40,10 @@ app.get('/users/listOwners', authenticateUser, authorizeUser(['admin']), usersCt
 app.get('users/search', authenticateUser, usersCtlr.search);
 
 // Authenticated User Profile
-app.get('/users/profile', authenticateUser, usersCtlr.profile);
-app.put('/users/profile/:id', authenticateUser, authorizeUser(['user']), usersCtlr.updateProfile);
-app.put('/users/password/:id', authenticateUser, authorizeUser(['user']), usersCtlr.changePassword);
+app.post('/users/profile', authenticateUser, usersCtlr.profile);
+app.get('/users/account', authenticateUser, usersCtlr.account);
+app.put('/users/profile/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.updateProfile);
+app.put('/users/password/:id', authenticateUser, usersCtlr.changePassword);
 
 // Vehicle
 app.post('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin']), vehiclesCtlr.create);
