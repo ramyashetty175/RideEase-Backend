@@ -23,6 +23,8 @@ bookingsCtlr.create = async(req, res) => {
         booking.endDate = value.endDate;
         booking.pickupLocation = value.pickupLocation;
         booking.returnLocation = value.returnLocation;
+        booking.pickupTime = value.pickupTime;
+        booking.returnTime = value.returnTime;
         booking.totalAmount = value.totalAmount;
         await booking.save();
         res.status(201).json({ message: "booking created successfully", booking });
