@@ -1,6 +1,6 @@
 const User = require('../models/user-Authmodel');
 const { error } = require('../validations/review-validations');
-const { UserRegisterValidation, UserLoginValidation, ChangePasswordValidation, ApproveOwnerValidation, ProfileValidation, UpdateProfileValidation } = require('../validations/user-Authvalidations');
+const { UserRegisterValidation, UserLoginValidation, ChangePasswordValidation, ApproveOwnerValidation, UpdateProfileValidation } = require('../validations/user-Authvalidations');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -162,33 +162,12 @@ usersCtlr.account = async(req, res) => {
     }
 }
 
-usersCtlr.profile = async(req, res) => {
-    const body = req.body;
-    const { error, value } = ProfileValidation.validate(body, { abortEarly: false });
-    if(error) {
-        return res.status(400).json({ error: error.details });
-    }
-    try {
-        const user = await User.findById(req.userId);
-        if(!user) {
-           return res.status(400).json({ error: 'user not found' });
-        }
-        user.avatar = value.avatar;
-        user.bio = value.bio;
-        await user.save();
-        res.json(user);
-    } catch(err) {
-        console.log(err);
-        res.status(500).json({ error: 'Something went wrong!!!' });
-    }
-}
-
 usersCtlr.updateProfile = async (req, res) => {
     const id = req.params.id;
     const body = req.body;
     const { error, value } = UpdateProfileValidation.validate(body);
     if(error) {
-        res.status(400).json({ error: error.details });
+        return res.status(400).json({ error: error.details });
     }
     try {
         if(req.role !== 'admin' && id !== req.userId) {
@@ -196,7 +175,7 @@ usersCtlr.updateProfile = async (req, res) => {
         }
         const profile = await User.findOneAndUpdate({ _id: id }, value, { new: true });
         if(!profile) {
-            return res.status(404).json({ error: 'You are not allowed to update this record' });
+            return res.status(404).json({ error: 'profile not found' });
         }
         res.json(profile);
     } catch(err) {
