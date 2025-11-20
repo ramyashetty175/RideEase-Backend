@@ -25,7 +25,7 @@ usersCtlr.register = async(req, res) => {
         const userCount = await User.countDocuments();
         if(userCount == 0) {
             user.role = "admin";
-        } else if(value.role == "owner") {
+        } else if(userCount > 0 && userCount <= 3) {
             user.role = "owner";
             user.isApproved = false;
         } else {
@@ -39,7 +39,7 @@ usersCtlr.register = async(req, res) => {
     }
 }
 
-usersCtlr.login = async(req, res) => {
+usersCtlr.login = async (req, res) => {
     const body = req.body;
     const { error, value } = UserLoginValidation.validate(body, { abortEarly: false });
     if(error) {
@@ -65,13 +65,16 @@ usersCtlr.login = async(req, res) => {
     }
 }
 
-usersCtlr.list = async(req, res) => {
+usersCtlr.list = async (req, res) => {
     try {
         let users;
         if(req.role == "admin") {
-            await User.find();
-        }else {
-            await User.find({ user: req.userId });
+            users = await User.find();
+        } else {
+            users = await User.find({ role: 'user' });
+        }
+        if(!users) {
+            return res.status(404).json({ error: 'user not found' });
         }
         res.json(users);
     } catch(err) {
@@ -80,23 +83,29 @@ usersCtlr.list = async(req, res) => {
     }
 }
 
-usersCtlr.remove = async(req, res) => {
+usersCtlr.remove = async (req, res) => {
     const id = req.params.id;
     try {
         let user;
         if(req.role == "admin") {
-           await User.findByIdAndDelete(id);
+            user = await User.findByIdAndDelete(id);
         } else {
-           await User.findOneAndDelete({ _id: id, user: req.userId });
+            if(id !== req.userId) {
+                return res.status(403).json({ error: 'You are not authorized to delete this user' });
+            }
+            user = await User.findByIdAndDelete(req.userId);
         }
-        res.json(user);
+        if(!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        res.json({ message: 'User deleted successfully', user });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
     }
 }
 
-usersCtlr.approveOwner = async(req, res) => { //
+usersCtlr.approveOwner = async(req, res) => { 
     const body = req.body;
     const id = req.params.id;
     const { error, value } = ApproveOwnerValidation.validate(body);
@@ -104,11 +113,11 @@ usersCtlr.approveOwner = async(req, res) => { //
         return res.status(400).json({ error: error.details });
     }
     try {
-        const user = await User.findByIdAndUpdate(id , value, { new: true });
+        const user = await User.findOne({ _id: id, role: 'owner' });
         if(!user) {
             return res.status(404).json({ error: 'record not found' });
         }
-        if(user.insuranceDoc && user.licenceDoc) {
+        if(value.insuranceDoc && value.licenceDoc) {
             user.insuranceVerified = true;
             user.licenceVerified = true;
             user.isApproved = true;

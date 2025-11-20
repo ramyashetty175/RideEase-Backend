@@ -16,26 +16,12 @@ const UserAuthenSchema = new mongoose.Schema({
     }, 
     avatar: String,
     bio: String,
-    insuranceDoc: {
-      type: String,
-      default: null
-    },
-    licenceDoc: {
-      type: String,
-      default: null
-    },
-    insuranceVerified: {
-      type: Boolean,
-      default: false
-    },
-    licenceVerified: {
-      type: Boolean,
-      default: false
-    },
-    isApproved: {
-      type: Boolean,
-      default: false
-    }
+    insuranceDoc: String,
+    licenceDoc: String,
+    insuranceVerified: Boolean,
+    licenceVerified: Boolean,
+    isApproved: Boolean
+
 }, { timestamps: true })
 
 const User = mongoose.model('User', UserAuthenSchema);

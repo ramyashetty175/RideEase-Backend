@@ -35,7 +35,7 @@ app.post('/users/login', usersCtlr.login);
 // Private Route
 app.get('/users', authenticateUser, authorizeUser(['admin', 'owner']), usersCtlr.list);
 app.put('/users/approveOwner/:id', authenticateUser, authorizeUser(['admin']), usersCtlr.approveOwner);
-app.delete('/users/profile/:id', authenticateUser, authorizeUser(['admin', 'user']), usersCtlr.remove);
+app.delete('/users/profile/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.remove);
 app.get('/users/listOwners', authenticateUser, authorizeUser(['admin']), usersCtlr.listOwners);
 app.get('users/search', authenticateUser, usersCtlr.search);
 
