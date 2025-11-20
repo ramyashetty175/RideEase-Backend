@@ -1,4 +1,5 @@
 const Vehicle = require('../models/vehicle-model');
+const { error } = require('../validations/review-validations');
 const { VehicleValidation, ApproveVehicleValidation } = require('../validations/vehicle-validations');
 
 const vehiclesCtlr = {};
@@ -10,7 +11,7 @@ vehiclesCtlr.create = async (req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const vehicleInDB = await Vehicle.findOne({ registrationNumber: value.registrationNumber, owner: req.userId });
+        const vehicleInDB = await Vehicle.findOne({ registrationNumber: value.registrationNumber });
         if(vehicleInDB) {
             return res.status(400).json({ error: 'vehicle already exists' });
         }
@@ -26,7 +27,7 @@ vehiclesCtlr.create = async (req, res) => {
         vehicle.brand = value.brand;
         vehicle.type = value.type;
         vehicle.registrationNumber = value.registrationNumber;
-        vehicle.license = value.license;
+        vehicle.licenseDoc = value.licenseDoc;
         vehicle.fuelType = value.fuelType;
         vehicle.transmission = value.transmission;
         vehicle.seats = value.seats;
@@ -45,9 +46,9 @@ vehiclesCtlr.create = async (req, res) => {
 vehiclesCtlr.show = async (req, res) => {
     const id = req.params.id;
     try {
-        const vehicle = await Vehicle.findById(id);
+        const vehicle = await Vehicle.findOne({ _id: id, isApproved: true });
         if(!vehicle) {
-            return res.status(404).json({ error: 'record not found' });
+            return res.status(404).json({ error: 'vehicle not found or pending approval' });
         }
         res.json(vehicle);
     } catch(err) {
@@ -63,6 +64,9 @@ vehiclesCtlr.listVehicles = async (req, res) => {
             vehicle = await Vehicle.find();
         } else {
             vehicle = await Vehicle.find({ isApproved: true });
+        }
+        if(!vehicle) {
+            return res.status(400).json({ error: 'No vehicle found' });
         }
         res.json(vehicle);
     } catch(err) {
@@ -102,7 +106,13 @@ vehiclesCtlr.remove = async (req, res) => {
         if(req.role == "admin") {
             vehicle = await Vehicle.findByIdAndDelete(id);
         } else {
+            if(id !== req.userId) {
+                return res.status(400).json({ error: 'You are not allowed to remove this vehicle' });
+            }
             vehicle = await Vehicle.findOneAndDelete({ _id: id, owner: req.userId });
+        }
+        if(!vehicle) {
+            return res.status(400).json({ error: 'vehicle not found' });
         }
         res.json({ message: "Vehicle deleted successfully", vehicle });
     } catch(err) {

@@ -23,13 +23,13 @@ const UserLoginValidation = Joi.object({
 })
 
 const ChangePasswordValidation = Joi.object({
-    Password: passwordComplexity(complexityOptions).required(),
+    oldPassword: passwordComplexity(complexityOptions).required(),
     newPassword: passwordComplexity(complexityOptions).required()
 })
 
 const ApproveOwnerValidation = Joi.object({
-    insuranceDoc: Joi.string().required(),
-    licenceDoc: Joi.string().required()
+    insuranceDoc: Joi.string().uri().required(),
+    licenceDoc: Joi.string().uri().required()
 })
 
 const UpdateProfileValidation = Joi.object({

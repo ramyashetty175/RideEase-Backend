@@ -116,15 +116,17 @@ usersCtlr.approveOwner = async(req, res) => {
     try {
         const user = await User.findOne({ _id: id, role: 'owner' });
         if(!user) {
-            return res.status(404).json({ error: 'record not found' });
+            return res.status(404).json({ error: 'Owner account not found or does not exist' });
         }
         if(value.insuranceDoc && value.licenceDoc) {
+            user.insuranceDoc = value.insuranceDoc;
+            user.licenceDoc = value.licenceDoc;
             user.insuranceVerified = true;
             user.licenceVerified = true;
             user.isApproved = true;
             await user.save();
         } else {
-            return res.status(400).json({ success: true, message: "Your account is pending approval by admin" });
+            return res.status(400).json({ success: false, message: "Your account is pending approval by admin. Document is not provided by owner" });
         }
         res.json({ success: true, message: "Your account is approved by admin" });
     } catch(err) {
@@ -184,14 +186,15 @@ usersCtlr.updateProfile = async (req, res) => {
     }
 }
 
-usersCtlr.changePassword = async (req, res) => {
+usersCtlr.changePassword = async (req, res) => {  //
+    const id = req.params.id;
     const body = req.body;
     const { error, value } = ChangePasswordValidation.validate(body);
     if(error) {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const user = await User.findById(req.userId);
+        const user = await User.findById(id);
         if(!user) {
             return res.status(404).json({ error: 'record not found' });
         }
@@ -210,7 +213,7 @@ usersCtlr.changePassword = async (req, res) => {
     }
 }
 
-usersCtlr.search = async (req, res) => {
+usersCtlr.search = async (req, res) => {   //
     try {
         const { keyword } = req.body;
         if(!keyword || keyword.trim() == "") {

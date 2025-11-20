@@ -5,7 +5,7 @@ const VehicleValidation = Joi.object({
     brand: Joi.string().trim().required(),
     type: Joi.string().trim().valid("Car", "Bike").required(),
     registrationNumber: Joi.string().trim().required(),
-    licenseDoc: Joi.string(),
+    licenseDoc: Joi.string().uri().required(),
     fuelType: Joi.string().trim().valid("Petrol", "Diesel", "Electric").required(),
     transmission: Joi.string().trim().valid("Manual", "Electric").required(),
     seats: Joi.number().min(1).required(),

@@ -37,7 +37,7 @@ app.get('/users', authenticateUser, authorizeUser(['admin', 'owner']), usersCtlr
 app.put('/users/approveOwner/:id', authenticateUser, authorizeUser(['admin']), usersCtlr.approveOwner);
 app.delete('/users/profile/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.remove);
 app.get('/users/listOwners', authenticateUser, authorizeUser(['admin']), usersCtlr.listOwners);
-app.get('users/search', authenticateUser, usersCtlr.search);
+app.get('/users/search', authenticateUser, usersCtlr.search);
 
 // Authenticated User Profile
 app.get('/users/account', authenticateUser, usersCtlr.account);
@@ -48,10 +48,10 @@ app.put('/users/password/:id', authenticateUser, usersCtlr.changePassword);
 app.post('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin']), vehiclesCtlr.create);
 app.get('/api/vehicles/:id', authenticateUser, vehiclesCtlr.show);
 app.get('/api/vehicles', authenticateUser, vehiclesCtlr.listVehicles);
-app.put('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesCtlr.update);
-app.put('/api/vehicles/approveOwner/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.approveVehicle);
+app.put('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesCtlr.update); //
+app.put('/api/vehicles/approveOwner/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.approveVehicle); //
+app.delete('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), vehiclesCtlr.remove);
 app.get('/api/vehicles/search', authenticateUser, vehiclesCtlr.search);
-app.delete('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesCtlr.remove);
 
 // Booking
 app.post('/api/bookings', authenticateUser, bookingsCtlr.create);
