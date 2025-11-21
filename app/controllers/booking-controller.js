@@ -11,21 +11,38 @@ bookingsCtlr.create = async(req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const existingBooking = await Booking.find({ vehicle: value.vehicle });
-        const overlappingBooking = existingBooking.find( b=> (b.bookingStatus == "Approved" || b.bookingStatus == "in-progress") && b.startDate <= value.endDate && b.endDate >= value.startDate);
-        if(overlappingBooking) {
-            return res.status(400).json({ error: 'Vehicle is not available for the selected dates' });
+        const now = new Date();
+        const startDateTime = new Date(value.startDateTime);
+        const endDateTime = new Date(value.endDateTime);
+        if(startDateTime <= now) {
+           return res.status(400).json({ error: "Start date/time must be in the future" });
         }
-        const booking = new Booking();
-        booking.user = req.userId;
-        booking.vehicle = value.vehicle;
-        booking.startDate = value.startDate;
-        booking.endDate = value.endDate;
-        booking.pickupLocation = value.pickupLocation;
-        booking.returnLocation = value.returnLocation;
-        booking.pickupTime = value.pickupTime;
-        booking.returnTime = value.returnTime;
-        booking.totalAmount = value.totalAmount;
+        if(endDateTime <= startDateTime) {
+           return res.status(400).json({ error: "End date/time must be after start date/time" });
+        }
+        const vehicle = await Vehicle.findById(value.vehicle);
+        if(!vehicle) {
+            return res.status(404).json({ error: 'Vehicle not found' });
+        }
+        const overlappingBooking = await Booking.findOne({
+            vehicle: value.vehicle,
+            bookingStatus: { $in: ["Approved", "in-progress"] },
+            startDateTime: { $lte: endDateTime },
+            endDateTime: { $gte: startDateTime }
+        });
+        if(overlappingBooking) {
+            return res.status(400).json({ error: 'Vehicle is not available for the selected Time' });
+        }
+        const booking = new Booking({
+            user: req.userId,
+            vehicle: value.vehicle,
+            owner: vehicle.owner,
+            startDateTime,
+            endDateTime,
+            pickupLocation: value.pickupLocation,
+            returnLocation: value.returnLocation,
+            totalAmount: value.totalAmount
+        });
         await booking.save();
         res.status(201).json({ message: "booking created successfully", booking });
     } catch(err) {

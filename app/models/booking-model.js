@@ -13,8 +13,8 @@ const BookingSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'User'
     },
-    startDate: Date,
-    endDate: Date,
+    startDateTime: Date,
+    endDateTime: Date,
     pickupLocation: String,
     returnLocation: String,
     totalAmount: Number,
@@ -28,8 +28,6 @@ const BookingSchema = new mongoose.Schema({
         enum: ["Pending", "Approved", "Confirmed", "in-progress", "Completed", "Canceled", "CancelRequested"],
         default: "Pending"
     },
-    pickupTime: String,
-    returnTime: String,
     tripStartTime: Date,
     tripEndTime: Date
 }, { timestamps: true });
