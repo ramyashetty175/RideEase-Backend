@@ -9,6 +9,10 @@ const BookingSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'Vehicle'
     },
+    owner: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+    },
     startDate: Date,
     endDate: Date,
     pickupLocation: String,

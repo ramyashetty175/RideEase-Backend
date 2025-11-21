@@ -47,7 +47,7 @@ bookingsCtlr.show = async(req, res) => {
            booking = await Booking.findOne({ _id: id, user: req.userId });
         }
         if(!booking) {
-            return res.status(404).json({ error: 'record not found' });
+            return res.status(404).json({ error: 'booking  not found' });
         }
         res.json(booking);
     } catch(err) {

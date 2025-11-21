@@ -2,7 +2,7 @@ const Joi = require('joi');
 
 const BookingValidation = Joi.object({
     vehicle: Joi.string().trim().required(),
-    startDate: Joi.date().min('now').required(),
+    startDate: Joi.date().greater('now').required(),
     endDate: Joi.date().greater(Joi.ref('startDate')).required(),
     pickupLocation: Joi.string().trim().required(),
     returnLocation: Joi.string().trim().required(),
