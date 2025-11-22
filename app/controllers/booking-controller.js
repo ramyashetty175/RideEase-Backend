@@ -1,6 +1,6 @@
 const Booking = require('../models/booking-model');
 const Vehicle = require('../models/vehicle-model');
-const { BookingValidation, BookingAvailabilityValidation, BookingApproveValidation, TripActionValidation, BookingExtendValidation } = require('../validations/booking-validations');
+const { BookingValidation, BookingUpdateValidation, BookingAvailabilityValidation, BookingExtendValidation } = require('../validations/booking-validations');
 
 const bookingsCtlr = {};
 
@@ -85,14 +85,14 @@ bookingsCtlr.listBookings = async(req, res) => {
             bookings = await Booking.find();
         } else if(req.role == "owner") {
             bookings = await Booking.find({ owner: req.userId });
-            if(!bookings) {
+            if(bookings.length == 0) {
                 return res.status(403).json({ error: 'You are not allowed to see this bookings or bookings not exists' });
             }
         }
         else {
             bookings = await Booking.find({ user: req.userId });
-            if(!bookings) {
-               return res.status().json({ error: 'You are not allowed to see this bookings or bookings not exists' });
+            if(bookings.length == 0) {
+               return res.status(403).json({ error: 'You are not allowed to see this bookings or bookings not exists' });
             }
         }
         if(!bookings) {
@@ -108,7 +108,7 @@ bookingsCtlr.listBookings = async(req, res) => {
 bookingsCtlr.update = async(req, res) => {
     const body = req.body;
     const id = req.params.id;
-    const { error, value } = BookingValidation.validate(body);
+    const { error, value } = BookingUpdateValidation.validate(body);
     if(error) {
         return res.status(400).json({ error: error.details });
     }
@@ -118,11 +118,17 @@ bookingsCtlr.update = async(req, res) => {
             booking = await Booking.findByIdAndUpdate(id, value, { new: true });
         } else if(req.role == "owner") {
             booking = await Booking.findOneAndUpdate({ _id: id, owner: req.userId }, value, { new: true });
+            if(!booking) {
+               return res.status(403).json({ error: 'You are not allowed to update this booking or booking not exists' });
+            }
         } else {
             booking = await Booking.findOneAndUpdate({ _id: id, user: req.userId }, value, { new: true });
+            if(!booking) {
+               return res.status(403).json({ error: 'You are not allowed to update this booking or booking not exists' });
+            }
         }
         if(!booking) {
-           return res.status(404).json({ error: 'record not found' });
+           return res.status(404).json({ error: 'booking not found' });
         }
         res.json(booking);
     } catch(err) {
@@ -139,12 +145,18 @@ bookingsCtlr.remove = async(req, res) => {
            booking = await Booking.findByIdAndDelete(id);
         } else if(req.role == "owner") {
             booking = await Booking.findOneAndDelete({ _id: id, owner: req.userId });
+            if(!booking) {
+               return res.status(403).json({ error: 'You are not allowed to remove this booking or booking does not exists' });
+            }
         }
         else {
-           booking = await Booking.findOneAndDelete({ _id: id, user: req.userId });
+            booking = await Booking.findOneAndDelete({ _id: id, user: req.userId });
+            if(!booking) {
+               return res.status(403).json({ error: 'You are not allowed to remove this booking or booking does not exists' });
+            }
         }
         if(!booking) {
-            return res.status(404).json({ error: 'record not found' });
+            return res.status(404).json({ error: 'booking does not exists' });
         }
         res.json({ message: "booking deleted successfully", booking });
     } catch(err) {
@@ -173,12 +185,7 @@ bookingsCtlr.checkAvailability = async (req, res) => {
 }
 
 bookingsCtlr.approve = async (req, res) => {
-    const body = req.body;
     const id = req.params.id;
-    const { error, value } = BookingApproveValidation.validate(body);
-    if(error) {
-        return res.status(400).json({ error: error.details });
-    }
     try {
         let booking;
         if(req.role == "admin") {
@@ -202,18 +209,26 @@ bookingsCtlr.approve = async (req, res) => {
 }
 
 bookingsCtlr.confirm = async (req, res) => {
-    const body = req.body;
     const id = req.params.id;
-    const { error, value } = BookingApproveValidation.validate(body);
-    if(error) {
-        return res.status(400).json({ error: error.details });
-    }
     try {
-        const booking = await Booking.findById(id);
+        let booking;
+        if(req.role == 'admin') {
+            booking = await Booking.findById(id);
+        } else {
+            booking = await Booking.findOne({ _id: id, user: req.userId });
+            if(!booking) {
+                return res.status(403).json({ error: 'you are not allowed to see this booking details or record not found' });
+            }
+        }
         if(!booking) {
-            return res.status(404).json({ error: 'record not found' });
+            return res.status(404).json({ error: 'booking does not exists' });
         }
         booking.paymentStatus = "Paid";
+        const vehicle = await Vehicle.findById(booking.vehicle);
+        if(vehicle) {
+            vehicle.availabilityStatus = "Booked";
+            await vehicle.save();
+        }
         await booking.save();
         res.json({ message: "Booking confirmed successfully", booking });
     } catch(err) {
@@ -223,12 +238,7 @@ bookingsCtlr.confirm = async (req, res) => {
 }
 
 bookingsCtlr.startTrip = async (req, res) => {
-    const body = req.body;
     const id = req.params.id;
-    const { error, value } = TripActionValidation.validate(body);
-    if(error) {
-        return res.status(400).json({ error: error.details });
-    }
     try {
         const booking = await Booking.findById(id);
         if(!booking) {
@@ -238,10 +248,9 @@ bookingsCtlr.startTrip = async (req, res) => {
            return res.status(400).json({ error: "only approved booking can be started" });
         }
         booking.bookingStatus = "in-progress";
-        booking.tripStartTime = value.tripStartTime || new Date();
         const vehicle = await Vehicle.findById(booking.vehicle);
         if(vehicle) {
-            vehicle.availabilityStatus = "Booked";
+            vehicle.availabilityStatus = "unAvailable";
             await vehicle.save();
         }
         await booking.save();
@@ -253,12 +262,7 @@ bookingsCtlr.startTrip = async (req, res) => {
 }
 
 bookingsCtlr.endTrip = async(req, res) => {
-    const body = req.body;
     const id = req.params.id;
-    const { error, value } = TripActionValidation.validate(body);
-    if(error) {
-        return res.status(400).json({ error: error.details });
-    }
     try {
         const booking = await Booking.findById(id);
         if(!booking) {
@@ -268,7 +272,6 @@ bookingsCtlr.endTrip = async(req, res) => {
             return res.status(400).json({ error: "only in-progress bookings can be ended" });
         }
         booking.bookingStatus = "Completed";
-        booking.tripEndTime = value.tripEndTime || new Date();
         const vehicle = await Vehicle.findById(booking.vehicle);
         if(vehicle) {
             vehicle.availabilityStatus = "Available";
@@ -281,30 +284,6 @@ bookingsCtlr.endTrip = async(req, res) => {
         res.status(500).json({ error: 'Something went wrong!!!' });
     }
 }
-
-// bookingsCtlr.cancel = async (req, res) => { 
-//     const id = req.params.id;
-//     try {
-//         const booking = await Booking.findById(id);
-//         if(!booking) {
-//             return res.status(404).json({ message: 'record not found' });
-//         }
-//         if(booking.bookingStatus !== "Pending" && booking.bookingStatus !== "Confirmed") {
-//             return res.status(400).json({ message: "You cannot cancel this booking" });
-//         }
-//         booking.bookingStatus = "Cancelled";
-//         const vehicle = await Vehicle.findById(booking.vehicle);
-//         if(vehicle) {
-//             vehicle.availabilityStatus = "Available";
-//             await vehicle.save();
-//         }
-//         await booking.save();
-//         res.json({ message: "booking Cancelled successfully", booking });
-//     } catch(err) {
-//         console.log(err);
-//         res.status(500).json({ error: 'Something went wrong!!!' });
-//     }
-// }
 
 bookingsCtlr.extend = async (req, res) => {
     const body = req.body;
