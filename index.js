@@ -60,16 +60,17 @@ app.get('/api/bookings', authenticateUser, authorizeUser(['admin', 'owner', 'use
 app.put('/api/bookings/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.update);
 app.delete('/api/bookings/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.remove);
 app.put('/api/bookings/approve/:id', authenticateUser, authorizeUser(['admin', 'owner']), bookingsCtlr.approve);
-app.post('/api/bookings/check', authenticateUser, authorizeUser(['admin', 'user']),bookingsCtlr.checkAvailability); //
+app.put('/api/bookings/check/:id', authenticateUser,bookingsCtlr.checkAvailability); 
 app.put('/api/bookings/confirm/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.confirm);   
 app.put('/api/bookings/start/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.startTrip);  
 app.put('/api/bookings/end/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.endTrip);     
 app.put('/api/bookings/extend/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.extend); 
 
 // BookingCancellation
-app.post('/api/bookingCancellation/requestCancel/:id', authenticateUser, bookingCancellationCtlr.requestCancel);
-app.get('/api/bookingCancellation/:id', authenticateUser, bookingCancellationCtlr.show);
-app.put('/api/bookingCancellation/approveCancel/:id', authenticateUser, authorizeUser(['owner']), bookingCancellationCtlr.approveCancel);
+app.post('/api/bookingCancellation/request/:id', authenticateUser, authorizeUser(['admin', 'owner']), bookingCancellationCtlr.requestCancel);
+app.get('/api/bookingCancellation/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingCancellationCtlr.show);
+app.get('/api/bookingCancellation', authenticateUser, authorizeUser(['admin', 'owner', 'user'], bookingCancellationCtlr.list));
+app.put('/api/bookingCancellation/approve/:id', authenticateUser, authorizeUser(['admin','owner']), bookingCancellationCtlr.approveCancel);
 
 // payment
 app.post('/api/payments/createOrder', authenticateUser, paymentCtlr.createOrder);

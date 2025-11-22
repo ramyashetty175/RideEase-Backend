@@ -11,8 +11,8 @@ const BookingValidation = Joi.object({
 
 const BookingAvailabilityValidation = Joi.object({
     vehicle: Joi.string().trim().required(),
-    startDateTime: Joi.date().greater("now").required(),
-    endDateTime: Joi.date().greater(Joi.ref("startDateTime")).required()
+    startDateTime: Joi.date().iso().required(),
+    endDateTime: Joi.date().iso().min(Joi.ref('startDateTime')).required()
 })
 
 const BookingUpdateValidation = Joi.object({
