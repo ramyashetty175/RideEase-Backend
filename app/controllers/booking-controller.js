@@ -172,12 +172,16 @@ bookingsCtlr.checkAvailability = async (req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const existingBooking = await Booking.find({ vehicle: value.vehicle });
-        const overlappingBooking = existingBooking.find( b => (b.bookingStatus == "Approved" || b.bookingStatus == "in-progress") && b.startDate <= value.endDate && b.endDate >= value.startDate);
+        const overlappingBooking = await Booking.findOne({
+            vehicle: value.vehicle,
+            bookingStatus: { $in: ["Approved", "in-progress"] },
+            startDateTime: { $lt: new Date(value.endDateTime) },
+            endDateTime: { $gt: new Date(value.startDateTime) }
+        });
         if(overlappingBooking) {
-           return res.json({ message: 'Vehicle is not available for selected Dates' });
+            return res.json({ available: false, message: 'Vehicle is not available for the selected date/time' });
         }
-        res.json({ message: 'Vehicle is available for booking' });
+        res.json({ available: true, message: 'Vehicle is available for booking' });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -326,7 +330,7 @@ bookingsCtlr.extend = async (req, res) => {
         await booking.save();
         const vehicle = await Vehicle.findById(booking.vehicle);
         if(vehicle) {
-            vehicle.availabilityStatus = "Available";
+            vehicle.availabilityStatus = "unAvailable";
             await vehicle.save();
         }
         res.json({ message: "Booking extended successfullly", booking });

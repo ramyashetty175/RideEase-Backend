@@ -11,8 +11,8 @@ const BookingValidation = Joi.object({
 
 const BookingAvailabilityValidation = Joi.object({
     vehicle: Joi.string().trim().required(),
-    startDate: Joi.date().required(),
-    endDate: Joi.date().required()
+    startDateTime: Joi.date().greater("now").required(),
+    endDateTime: Joi.date().greater(Joi.ref("startDateTime")).required()
 })
 
 const BookingUpdateValidation = Joi.object({
@@ -22,13 +22,8 @@ const BookingUpdateValidation = Joi.object({
     returnLocation: Joi.string().trim().invalid(Joi.ref("pickupLocation")).optional()
 });
 
-const TripActionValidation = Joi.object({
-    tripStartTime: Joi.date().optional(),
-    tripEndTime: Joi.date().optional()
-})
-
 const BookingExtendValidation = Joi.object({
-    endDate: Joi.date().required()
+    endDateTime: Joi.date().greater("now").required()
 })
 
-module.exports = { BookingValidation, BookingUpdateValidation, BookingAvailabilityValidation, TripActionValidation, BookingExtendValidation };
+module.exports = { BookingValidation, BookingUpdateValidation, BookingAvailabilityValidation, BookingExtendValidation };
