@@ -309,16 +309,26 @@ bookingsCtlr.extend = async (req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const booking = await Booking.findById(id);
-        if(!booking) {
-           return res.status(404).json({ error: 'record not found' });
+        let booking;
+        if(req.role == 'admin') {
+            booking = await Booking.findById(id);
+        } else {
+            booking = await Booking.findOne({ _id: id, user: req.userId });
+            if(!booking) {
+               return res.status(404).json({ error: 'You are not allowed to see details of this booking or booking does not exists' });
+            }
         }
-        if(booking.bookingStatus !== "in-progress" && booking.bookingStatus !== "Approved") {
-           return res.status(400).json({ message: "Only in-progress and Approved booking can be extended" });
+        if(booking.bookingStatus !== "in-progress") {
+           return res.status(400).json({ message: "Only in-progress booking can be extended" });
         }
-        booking.endDate = value.endDate || new Date();
+        booking.endDateTime = value.endDateTime;
         booking.bookingStatus = "in-progress";
         await booking.save();
+        const vehicle = await Vehicle.findById(booking.vehicle);
+        if(vehicle) {
+            vehicle.availabilityStatus = "Available";
+            await vehicle.save();
+        }
         res.json({ message: "Booking extended successfullly", booking });
     } catch(err) {
         console.log(err);
