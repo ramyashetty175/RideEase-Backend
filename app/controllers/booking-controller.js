@@ -4,39 +4,6 @@ const { BookingValidation, BookingAvailabilityValidation, BookingApproveValidati
 
 const bookingsCtlr = {};
 
-// bookingsCtlr.create = async(req, res) => {
-//     const body = req.body;
-//     const { error, value } = BookingValidation.validate(body, { abortEarly: false });
-//     if(error) {
-//         return res.status(400).json({ error: error.details });
-//     }
-//     try {
-//         const vehicle = await Vehicle.findById(value.vehicle);
-//         if(!vehicle) {
-//             return res.status(404).json({ error: 'Vehicle not found' });
-//         }
-//         const existingBooking = await Booking.findOne({ vehicle: value.vehicle, user: req.userId });
-//         const overlappingBooking = existingBooking.findOne( b=> (b.bookingStatus == "Approved" || b.bookingStatus == "in-progress") && b.startDate <= value.endDate && b.endDate >= value.startDate);
-//         if(overlappingBooking) {
-//             return res.status(400).json({ error: 'Vehicle is not available for the selected dates' });
-//         }
-//         const booking = new Booking();
-//         booking.user = req.userId;
-//         booking.vehicle = value.vehicle;
-//         booking.owner = vehicle.owner;
-//         booking.startDateTime = value.startDateTime;
-//         booking.endDateTime = value.endDateTime;
-//         booking.pickupLocation = value.pickupLocation;
-//         booking.returnLocation = value.returnLocation;
-//         booking.totalAmount = value.totalAmount;
-//         await booking.save();
-//         res.status(201).json({ message: "booking created successfully", booking });
-//     } catch(err) {
-//         console.log(err);
-//         res.status(500).json({ error: 'Something went wrong!!!' });
-//     }
-// }
-
 bookingsCtlr.create = async(req, res) => {
     const body = req.body;
     const { error, value } = BookingValidation.validate(body, { abortEarly: false });
@@ -118,9 +85,18 @@ bookingsCtlr.listBookings = async(req, res) => {
             bookings = await Booking.find();
         } else if(req.role == "owner") {
             bookings = await Booking.find({ owner: req.userId });
+            if(!bookings) {
+                return res.status(403).json({ error: 'You are not allowed to see this bookings or bookings not exists' });
+            }
         }
         else {
             bookings = await Booking.find({ user: req.userId });
+            if(!bookings) {
+               return res.status().json({ error: 'You are not allowed to see this bookings or bookings not exists' });
+            }
+        }
+        if(!bookings) {
+            return res.status(404).json({ error: 'You are not allowed to see this bookings or bookings not exists' });
         }
         res.json(bookings);
     } catch(err) {
