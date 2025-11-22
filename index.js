@@ -60,11 +60,11 @@ app.get('/api/bookings', authenticateUser, authorizeUser(['admin', 'owner', 'use
 app.put('/api/bookings/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.update);
 app.delete('/api/bookings/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.remove);
 app.put('/api/bookings/approve/:id', authenticateUser, authorizeUser(['admin', 'owner']), bookingsCtlr.approve);
-app.post('/api/bookings/checkAvailability', authenticateUser, bookingsCtlr.checkAvailability); //
+app.post('/api/bookings/checkAvailability', authenticateUser, authorizeUser(['admin', 'user']),bookingsCtlr.checkAvailability); //
 app.put('/api/bookings/confirm/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.confirm);   
-app.put('/api/bookings/start/:id', authenticateUser, bookingsCtlr.startTrip);  
-app.put('/api/bookings/end/:id', authenticateUser, bookingsCtlr.endTrip);     
-app.put('/api/bookings/extend/:id', authenticateUser, bookingsCtlr.extend); 
+app.put('/api/bookings/start/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.startTrip);  
+app.put('/api/bookings/end/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.endTrip);     
+app.put('/api/bookings/extend/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.extend); 
 
 // BookingCancellation
 app.post('/api/bookingCancellation/requestCancel/:id', authenticateUser, bookingCancellationCtlr.requestCancel);

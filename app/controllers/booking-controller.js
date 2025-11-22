@@ -240,7 +240,15 @@ bookingsCtlr.confirm = async (req, res) => {
 bookingsCtlr.startTrip = async (req, res) => {
     const id = req.params.id;
     try {
-        const booking = await Booking.findById(id);
+        let booking;
+        if(req.role == 'admin') {
+           booking = await Booking.findById(id);
+        } else {
+            booking = await Booking.findOne({ _id: id, user: req.userId });
+            if(!booking) {
+               return res.status(403).json({ error: 'You are not allowed to see this booking details or booking does not exists' });
+            }
+        }
         if(!booking) {
             return res.status(404).json({ error: 'record not found' });
         }
