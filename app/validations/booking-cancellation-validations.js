@@ -5,15 +5,16 @@ const BookingCancellationValidation = Joi.object({
     remarks: Joi.string().optional(),
     refundAmount: Joi.number().min(0).optional(),
     penaltyAmount: Joi.number().min(0).optional(),
-    status: Joi.string().valid("pending", "approved", "rejected").optional()
+    status: Joi.string().optional()
 })
 
-const BookingCancelActionValidation = Joi.object({
+const BookingCancelValidation = Joi.object({
+    status: Joi.string().required(),
     reason: Joi.string().required(),
     remarks: Joi.string().optional()
 })
 
 module.exports = {
     BookingCancellationValidation,
-    BookingCancelActionValidation
+    BookingCancelValidation
 }

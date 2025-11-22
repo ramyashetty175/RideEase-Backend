@@ -67,7 +67,7 @@ app.put('/api/bookings/end/:id', authenticateUser, authorizeUser(['admin', 'user
 app.put('/api/bookings/extend/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.extend); 
 
 // BookingCancellation
-app.post('/api/bookingCancellation/request/:id', authenticateUser, authorizeUser(['admin', 'owner']), bookingCancellationCtlr.requestCancel);
+app.post('/api/bookingCancellation/request/:id', authenticateUser, authorizeUser(['user']), bookingCancellationCtlr.requestCancel);
 app.get('/api/bookingCancellation/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingCancellationCtlr.show);
 app.get('/api/bookingCancellation', authenticateUser, authorizeUser(['admin', 'owner', 'user'], bookingCancellationCtlr.list));
 app.put('/api/bookingCancellation/approve/:id', authenticateUser, authorizeUser(['admin','owner']), bookingCancellationCtlr.approveCancel);
