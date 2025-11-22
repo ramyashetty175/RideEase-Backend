@@ -91,9 +91,15 @@ bookingsCtlr.show = async(req, res) => {
            booking = await Booking.findById(id);
         } else if(req.role == "owner") {
            booking = await Booking.findOne({ _id: id, owner: req.userId });
+            if(!booking) {
+               return res.status(403).json({ error: 'You are not authorized to see this booking or booking not exists' });
+            }
         }
         else {
-           booking = await Booking.findOne({ _id: id, user: req.userId });
+            booking = await Booking.findOne({ _id: id, user: req.userId });
+            if(!booking) {
+               return res.status(403).json({ error: 'You are not authorized to see this booking or booking not exists' });
+            }
         }
         if(!booking) {
             return res.status(404).json({ error: 'booking  not found' });
@@ -203,6 +209,9 @@ bookingsCtlr.approve = async (req, res) => {
             booking = await Booking.findById(id);
         } else if(req.role == "owner") {
             booking = await Booking.findOne({ _id: id, owner: req.userId });
+            if(!booking) {
+                return res.status(403).json({ error: 'You are not authorized to approve this vehicle or record not exists' });
+            }
         }
         if(!booking) {
            return res.status(404).json({ error: 'record not found' });
@@ -229,8 +238,6 @@ bookingsCtlr.confirm = async (req, res) => {
             return res.status(404).json({ error: 'record not found' });
         }
         booking.paymentStatus = "Paid";
-        booking.pickupTime = value.pickupTime;
-        booking.returnTime = value.returnTime;
         await booking.save();
         res.json({ message: "Booking confirmed successfully", booking });
     } catch(err) {
