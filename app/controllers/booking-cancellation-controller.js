@@ -17,8 +17,15 @@ bookingCancellationCtlr.requestCancel = async(req, res) => {
         if(!booking) {
             return res.status(404).json({ error: 'Booking not found or not allowed' });
         }
-        if(booking.bookingStatus === "completed" || booking.bookingStatus === "cancelled") {
+        const vehicle = await Vehicle.findById(booking.vehicle);
+        if(!vehicle) {
+            return res.status(404).json({ error: 'Vehicle not found' });
+        }
+        if(booking.bookingStatus === "Completed" || booking.bookingStatus === "Canceled") {
             return res.status(400).json({ error: "Cannot cancel a completed or cancelled booking" });
+        }
+        if(booking.bookingStatus === "CancelRequested") {
+            return res.status(400).json({ error: "Cancellation already requested" });
         }
         const existingRequest = await BookingCancellation.findOne({ bookingId: id, status: 'pending' });
         if(existingRequest) {
@@ -26,7 +33,8 @@ bookingCancellationCtlr.requestCancel = async(req, res) => {
         }
         const bookingcancellation = new BookingCancellation();
         bookingcancellation.bookingId = booking._id;
-        bookingcancellation.vehicleId = booking.vehicle;
+        bookingcancellation.vehicleId = vehicle._id;
+        bookingcancellation.owner = vehicle.owner;
         bookingcancellation.userId = req.userId;
         bookingcancellation.canceledBy = "customer";
         bookingcancellation.reason = value.reason;
@@ -53,7 +61,7 @@ bookingCancellationCtlr.show = async(req, res) => {
             }
         } else {
             bookingcancellation = await BookingCancellation.findOne({ _id: id, user: req.userId });
-            if(!bookingcancellation.length) {
+            if(!bookingcancellation) {
                return res.status(403).json({ error: 'You are not allowed to see this cancellation record or record does not exists' });
             }
         }
@@ -107,7 +115,7 @@ bookingCancellationCtlr.approveCancel = async (req, res) => {
         } else {
             bookingcancellation = await BookingCancellation.findOne({ _id: id, owner: req.userId });
             if(!bookingcancellation) {
-               return res.status(404).json({ error: 'You cannot cancel this booking or Cancellation request not found' });
+               return res.status(403).json({ error: 'You cannot cancel this booking or Cancellation request not found' });
             }
         }
         if(!bookingcancellation) {
@@ -117,15 +125,14 @@ bookingCancellationCtlr.approveCancel = async (req, res) => {
            return res.status(400).json({ error: "This request has already been processed" });
         }
         bookingcancellation.status = value.status;
-        bookingcancellation.reason = value.reason;
-        bookingcancellation.remarks = value.remarks;
+        bookingcancellation.remarks = value.remarks || null;
         if(value.status == "approved") {
             const booking = await Booking.findById(bookingcancellation.bookingId);
             if(booking) {
                booking.bookingStatus = "Canceled";
                await booking.save();
             }
-            const vehicle = await Vehicle.findById(booking.vehicle);
+            const vehicle = await Vehicle.findById(bookingcancellation.vehicleId);
             if(vehicle) {
                vehicle.availabilityStatus = "Available";
                await vehicle.save();

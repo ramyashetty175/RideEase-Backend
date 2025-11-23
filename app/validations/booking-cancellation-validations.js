@@ -9,8 +9,7 @@ const BookingCancellationValidation = Joi.object({
 })
 
 const BookingCancelValidation = Joi.object({
-    status: Joi.string().required(),
-    reason: Joi.string().required(),
+    status: Joi.string().valid("approved", "rejected").required(),
     remarks: Joi.string().optional()
 })
 

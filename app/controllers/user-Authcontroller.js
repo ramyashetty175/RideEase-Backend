@@ -71,11 +71,13 @@ usersCtlr.list = async (req, res) => {
         let users;
         if(req.role == "admin") {
             users = await User.find();
-        } else {
+        } else if(req.role == 'owner'){
             users = await User.find({ role: 'user' });
+        } else {
+            users = await User.find({ _id: req.userId });
         }
-        if(!users) {
-            return res.status(404).json({ error: 'user not found' });
+        if(users.length == 0) {
+            return res.status(404).json({ error: 'users not found' });
         }
         res.json(users);
     } catch(err) {

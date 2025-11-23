@@ -9,6 +9,10 @@ const bookingCancellationSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'Vehicle'
     },
+    owner: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+    },
     userId: {
         type: mongoose.Schema.ObjectId,
         ref: 'User'
