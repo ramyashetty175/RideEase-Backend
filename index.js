@@ -29,29 +29,29 @@ const vehiclesTrackingCtlr = require('./app/controllers/vehicleTracking-controll
 const chatCtlr = require('./app/controllers/chat-Controller');
 
 // Public Route
-app.post('/users/register', usersCtlr.register);
-app.post('/users/login', usersCtlr.login);
+app.post('/users/register', usersCtlr.register); //
+app.post('/users/login', usersCtlr.login);  //
 
 // Private Route
-app.get('/users', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.list);
-app.put('/users/approveOwner/:id', authenticateUser, authorizeUser(['admin']), usersCtlr.approveOwner);
-app.delete('/users/profile/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.remove);
-app.get('/users/listOwners', authenticateUser, authorizeUser(['admin']), usersCtlr.listOwners);
-app.get('/users/search', authenticateUser, usersCtlr.search);
+app.get('/users', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.list); //
+app.put('/users/approveOwner/:id', authenticateUser, authorizeUser(['admin']), usersCtlr.approveOwner);  // button
+app.delete('/users/profile/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.remove); //button
+app.get('/users/listOwners', authenticateUser, authorizeUser(['admin']), usersCtlr.listOwners); //
+app.get('/users/search', authenticateUser, usersCtlr.search); //
 
 // Authenticated User Profile
-app.get('/users/account', authenticateUser, usersCtlr.account);
-app.put('/users/profile/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.updateProfile);
-app.put('/users/password/:id', authenticateUser, usersCtlr.changePassword);
+app.get('/users/account', authenticateUser, usersCtlr.account); //
+app.put('/users/profile/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.updateProfile); //
+app.put('/users/password/:id', authenticateUser, usersCtlr.changePassword); //
 
 // Vehicle
-app.post('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin']), vehiclesCtlr.create);
-app.get('/api/vehicles/:id', authenticateUser, vehiclesCtlr.show);
-app.get('/api/vehicles', authenticateUser, vehiclesCtlr.listVehicles);
+app.post('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin']), vehiclesCtlr.create); 
+app.get('/api/vehicles/:id', authenticateUser, vehiclesCtlr.show);  //
+app.get('/api/vehicles', authenticateUser, vehiclesCtlr.listVehicles); //
 app.put('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesCtlr.update); 
 app.put('/api/vehicles/approve/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.approveVehicle); 
-app.delete('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesCtlr.remove);
-app.get('/api/vehicles/search', authenticateUser, vehiclesCtlr.search);
+app.delete('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesCtlr.remove); // button
+app.get('/api/vehicles/search', authenticateUser, vehiclesCtlr.search); //
 
 // Booking
 app.post('/api/bookings', authenticateUser, bookingsCtlr.create);

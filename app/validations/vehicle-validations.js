@@ -6,6 +6,7 @@ const VehicleValidation = Joi.object({
     type: Joi.string().trim().valid("Car", "Bike").required(),
     registrationNumber: Joi.string().trim().required(),
     licenseDoc: Joi.string().uri().required(),
+    insuranceDoc: Joi.string().uri().required(),
     fuelType: Joi.string().trim().valid("Petrol", "Diesel", "Electric").required(),
     transmission: Joi.string().trim().valid("Manual", "Electric").required(),
     seats: Joi.number().min(1).required(),
@@ -17,7 +18,8 @@ const VehicleValidation = Joi.object({
 })
 
 const ApproveVehicleValidation = Joi.object({
-    licenseDoc: Joi.string().required()
+    licenseDoc: Joi.string().required(),
+    insuranceDoc: Joi.string().required()
 })
 
 module.exports = {

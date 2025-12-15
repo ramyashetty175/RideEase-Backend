@@ -1,5 +1,6 @@
 const Booking = require('../models/booking-model');
 const Vehicle = require('../models/vehicle-model');
+const user = require('../models/user-Authmodel');
 const { BookingValidation, BookingUpdateValidation, BookingAvailabilityValidation, BookingExtendValidation } = require('../validations/booking-validations');
 
 const bookingsCtlr = {};
@@ -210,6 +211,13 @@ bookingsCtlr.approve = async (req, res) => {
         }
         if(!booking) {
            return res.status(404).json({ error: 'record not found' });
+        }
+        const user = await User.findById(booking.user);
+        if(!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        if(!user.licenceDoc || !user.insuranceDoc) {
+            return res.status(400).json({ error: "User has not uploaded Licence or Insurance documents" });
         }
         booking.bookingStatus = "Approved";
         await booking.save();

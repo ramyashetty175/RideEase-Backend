@@ -139,12 +139,12 @@ usersCtlr.approveOwner = async(req, res) => {
 
 usersCtlr.listOwners = async (req, res) => {
     try {
-        let owners;
-        if(req.role == 'admin') {
-           owners = await User.find({ role: 'owner' });
+        const owners = await User.find({ role: 'owner' });
+        if(req.role !== 'admin') {
+           return res.status(403).json({ error: 'You are not allowed to see owners list'});
         }
-        if(!owners) {
-            res.status(400).json({ error: 'owners not found' });
+        if(owners.length == 0) {
+            return res.status(404).json({ error: 'owners not found' });
         }
         res.json(owners);
     } catch(err) {
