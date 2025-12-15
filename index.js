@@ -84,6 +84,8 @@ app.post('/api/chat', authenticateUser, chatCtlr.askAI);
 
 // Image Upload
 app.post('/api/upload/avatar', authenticateUser, imageUpload.avatar);
+app.post('/api/upload/licence', authenticateUser, imageUpload.licence);
+app.post('/api/upload/insurance', authenticateUser, imageUpload.insurance);
 
 // VehicleTracking
 app.post('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.create);
