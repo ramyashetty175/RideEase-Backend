@@ -35,7 +35,9 @@ const ApproveOwnerValidation = Joi.object({
 
 const UpdateProfileValidation = Joi.object({
     bio: Joi.string().trim().min(10).max(128).optional(),
-    avatar: Joi.string().uri().trim().optional()
+    avatar: Joi.string().uri().trim().optional(),
+    insuranceDoc: Joi.string().uri().optional(),
+    licenceDoc: Joi.string().uri().optional()
 })
 
 module.exports = {

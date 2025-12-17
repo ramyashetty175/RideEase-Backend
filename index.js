@@ -41,7 +41,7 @@ app.get('/users/search', authenticateUser, usersCtlr.search); //
 
 // Authenticated User Profile
 app.get('/users/account', authenticateUser, usersCtlr.account); //
-app.put('/users/profile/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.updateProfile); //
+app.put('/users/profile', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.updateProfile); //
 app.put('/users/password/:id', authenticateUser, usersCtlr.changePassword); //
 
 // Vehicle
@@ -83,9 +83,9 @@ app.get('/api/payments', authenticateUser, paymentCtlr.list);
 app.post('/api/chat', authenticateUser, chatCtlr.askAI);
 
 // Image Upload
-app.post('/api/upload/avatar', authenticateUser, imageUpload.avatar);
-app.post('/api/upload/licence', authenticateUser, imageUpload.licence);
-app.post('/api/upload/insurance', authenticateUser, imageUpload.insurance);
+app.post('/api/upload/avatar', authenticateUser, authorizeUser(['Admin','owner','user']), imageUpload.avatar);
+app.post('/api/upload/licence', authenticateUser, authorizeUser(['Admin','owner','user']), imageUpload.licence);
+app.post('/api/upload/insurance', authenticateUser, authorizeUser(['Admin','owner','user']), imageUpload.insurance);
 
 // VehicleTracking
 app.post('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.create);

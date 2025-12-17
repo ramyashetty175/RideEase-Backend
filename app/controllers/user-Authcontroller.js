@@ -167,17 +167,16 @@ usersCtlr.account = async(req, res) => {
 }
 
 usersCtlr.updateProfile = async (req, res) => {
-    const id = req.params.id;
     const body = req.body;
     const { error, value } = UpdateProfileValidation.validate(body);
     if(error) {
         return res.status(400).json({ error: error.details });
     }
     try {
-        if(req.role !== 'admin' && id !== req.userId) {
-           return res.status(403).json({ error: 'You are not authorized to update this profile' });
+        if(!req.userId) {
+            return res.status(401).json({ error: 'You are not allowed to update this profile' });
         }
-        const profile = await User.findOneAndUpdate({ _id: id }, value, { new: true });
+        const profile = await User.findOneAndUpdate({ _id: req.userId }, value, { new: true });
         if(!profile) {
             return res.status(404).json({ error: 'profile not found' });
         }

@@ -5,6 +5,10 @@ const imageUpload = {};
 
 imageUpload.avatar = async (req, res) => {
     try {
+        const targetUserId = req.role === 'Admin' ? req.body.userId || req.userId : req.userId;
+        if(req.role !== 'Admin' && req.userId !== targetUserId) {
+            return res.status(403).json({ error: "You are not authorized to update this profile" });
+        }
         if(!req.files || !req.files.avatar) {
            return res.status(400).json({ error: "NO file uploaded" });
         }
@@ -17,7 +21,6 @@ imageUpload.avatar = async (req, res) => {
                 resource_type: "image"
             }
         )
-        // return res.status(200).json({ avatarUrl: uploadResult.secure_url });
         const user = await User.findById(req.userId);
         if (!user) {
             return res.status(404).json({ error: "User not found" });
@@ -33,6 +36,10 @@ imageUpload.avatar = async (req, res) => {
 
 imageUpload.licence = async (req, res) => {
     try {
+        const targetUserId = req.role === 'Admin' ? req.body.userId || req.userId : req.userId;
+        if(req.role !== 'Admin' && req.userId !== targetUserId) {
+            return res.status(403).json({ error: "You are not authorized to update this profile" });
+        }
         if (!req.files || !req.files.licenceDoc) {
             return res.status(400).json({ error: "No file uploaded" });
         }
@@ -58,6 +65,10 @@ imageUpload.licence = async (req, res) => {
 
 imageUpload.insurance = async (req, res) => {
     try {
+        const targetUserId = req.role === 'Admin' ? req.body.userId || req.userId : req.userId;
+        if(req.role !== 'Admin' && req.userId !== targetUserId) {
+            return res.status(403).json({ error: "You are not authorized to update this profile" });
+        }
         if (!req.files || !req.files.insuranceDoc) {
             return res.status(400).json({ error: "No file uploaded" });
         }
