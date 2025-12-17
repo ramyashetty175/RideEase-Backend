@@ -153,18 +153,18 @@ usersCtlr.listOwners = async (req, res) => {
     }
 }
 
-usersCtlr.account = async(req, res) => {
+usersCtlr.account = async (req, res) => {
     try {
         const user = await User.findById(req.userId);
         if(!user) {
-            return res.status(400).json({ error: 'user not found' });
+            return res.status(404).json({ error: 'User not found' });
         }
         res.json(user);
-    } catch(err) {
+    } catch (err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
     }
-}
+};
 
 usersCtlr.updateProfile = async (req, res) => {
     const body = req.body;
@@ -173,9 +173,6 @@ usersCtlr.updateProfile = async (req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        if(!req.userId) {
-            return res.status(401).json({ error: 'You are not allowed to update this profile' });
-        }
         const profile = await User.findOneAndUpdate({ _id: req.userId }, value, { new: true });
         if(!profile) {
             return res.status(404).json({ error: 'profile not found' });
