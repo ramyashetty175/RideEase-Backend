@@ -153,7 +153,7 @@ usersCtlr.listOwners = async (req, res) => {
     }
 }
 
-usersCtlr.account = async (req, res) => {
+usersCtlr.profile = async (req, res) => {
     try {
         const user = await User.findById(req.userId);
         if(!user) {
