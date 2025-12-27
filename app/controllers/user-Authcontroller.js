@@ -196,12 +196,12 @@ usersCtlr.changePassword = async (req, res) => {  //
         if(!user) {
             return res.status(404).json({ error: 'record not found' });
         }
-        const passwordMatch = await bcryptjs.compare(value.password, user.password);
+        const passwordMatch = await bcryptjs.compare(value.oldpassword, user.password);
         if(!passwordMatch) {
             return res.status(400).json({ error: 'oldPassword is incorrect' });
         }
-        const salt = bcryptjs.genSalt();
-        const hash = salt.hash(value.newPassword, salt);
+        const salt = await bcryptjs.genSalt();
+        const hash = await bcryptjs.hash(value.newPassword, salt);
         user.password = hash;
         await user.save();
         res.json({ message: "password updated successfully" });

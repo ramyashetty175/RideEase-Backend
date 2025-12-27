@@ -34,6 +34,7 @@ const ApproveOwnerValidation = Joi.object({
 })
 
 const UpdateProfileValidation = Joi.object({
+    username: Joi.string().trim().optional(),
     bio: Joi.string().trim().min(10).max(128).optional(),
     avatar: Joi.string().uri().trim().optional(),
     insuranceDoc: Joi.string().uri().optional(),

@@ -6,7 +6,6 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
-app.use(uploadMiddleware);
 
 const port = process.env.PORT || 3020;
 
@@ -17,7 +16,6 @@ const authenticateUser = require('./app/middlewares/authenticateUser');
 const authorizeUser = require('./app/middlewares/authorizeUser');
 const uploadMiddleware = require('./app/middlewares/fileUploadMiddleware');
 const imageUpload = require('./app/controllers/upload-controller');
-const uploadMiddleware = require("./middlewares/uploadMiddleware");
 const usersCtlr = require('./app/controllers/user-Authcontroller');
 const vehiclesCtlr = require('./app/controllers/vehicle-controller');
 const bookingsCtlr = require('./app/controllers/booking-controller');
@@ -43,7 +41,7 @@ app.get('/users/listOwners', authenticateUser, authorizeUser(['admin']), usersCt
 app.get('/users/search', authenticateUser, usersCtlr.search); //
 
 // Authenticated User Profile
-app.get('/users/profile', authenticateUser, authorizeUser(['admin','user']), usersCtlr.profile); //
+app.get('/users/profile', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.profile); //
 app.put('/users/profile', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.updateProfile); //
 app.put('/users/password/:id', authenticateUser, authorizeUser(['user']), usersCtlr.changePassword); //
 
@@ -86,9 +84,9 @@ app.get('/api/payments', authenticateUser, paymentCtlr.list);
 app.post('/api/chat', authenticateUser, chatCtlr.askAI);
 
 // Image Upload
-app.post('/api/upload/avatar', authenticateUser, authorizeUser(['owner','user']), uploadMiddleware, imageUpload.avatar);
-app.post('/api/upload/licence', authenticateUser, authorizeUser(['owner','user']), uploadMiddleware, imageUpload.licence);
-app.post('/api/upload/insurance', authenticateUser, authorizeUser(['owner','user']), uploadMiddleware, imageUpload.insurance);
+app.post('/api/upload/avatar', authenticateUser, authorizeUser(['admin', 'owner', 'user']), uploadMiddleware, imageUpload.avatar);
+app.post('/api/upload/licence', authenticateUser, authorizeUser(['owner', 'user']), uploadMiddleware, imageUpload.licence);
+app.post('/api/upload/insurance', authenticateUser, authorizeUser(['owner', 'user']), uploadMiddleware, imageUpload.insurance);
 
 // VehicleTracking
 app.post('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.create);
