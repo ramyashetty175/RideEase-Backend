@@ -37,7 +37,8 @@ app.post('/users/login', usersCtlr.login);  //
 app.get('/users', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.list); //
 app.put('/users/approveOwner/:id', authenticateUser, authorizeUser(['admin']), usersCtlr.approveOwner);  // button
 app.delete('/users/profile/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.remove); //button
-app.get('/users/listOwners', authenticateUser, authorizeUser(['admin']), usersCtlr.listOwners); //
+app.get('/users/owners', authenticateUser, authorizeUser(['admin']), usersCtlr.listOwners); //
+app.get('/users/listUsers', authenticateUser, authorizeUser(['admin']), usersCtlr.listUsers);
 app.get('/users/search', authenticateUser, usersCtlr.search); //
 
 // Authenticated User Profile

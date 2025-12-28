@@ -1,6 +1,5 @@
 const User = require('../models/user-Authmodel');
-const { error } = require('../validations/review-validations');
-const { UserRegisterValidation, UserLoginValidation, ChangePasswordValidation, ApproveOwnerValidation, UpdateProfileValidation } = require('../validations/user-Authvalidations');
+const { UserRegisterValidation, UserLoginValidation, ChangePasswordValidation, ApproveOwnerValidation, RejectOwnerValidation, UpdateProfileValidation } = require('../validations/user-Authvalidations');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -108,10 +107,10 @@ usersCtlr.remove = async (req, res) => {
     }
 }
 
-usersCtlr.approveOwner = async(req, res) => { 
+usersCtlr.approveOwner = async (req, res) => { 
     const body = req.body;
     const id = req.params.id;
-    const { error, value } = ApproveOwnerValidation.validate(body);
+    const { error } = ApproveOwnerValidation.validate(body);
     if(error) {
         return res.status(400).json({ error: error.details });
     }
@@ -120,9 +119,7 @@ usersCtlr.approveOwner = async(req, res) => {
         if(!user) {
             return res.status(404).json({ error: 'Owner account not found or does not exist' });
         }
-        if(value.insuranceDoc && value.licenceDoc) {
-            user.insuranceDoc = value.insuranceDoc;
-            user.licenceDoc = value.licenceDoc;
+        if(user.insuranceDoc && user.licenceDoc) {
             user.insuranceVerified = true;
             user.licenceVerified = true;
             user.isApproved = true;
@@ -137,16 +134,44 @@ usersCtlr.approveOwner = async(req, res) => {
     }
 }
 
+usersCtlr.rejectOwner = async (req, res) => {
+    const body = req.body;
+    const id = req.params.id;
+    const { error, value } = RejectOwnerValidation.validate(body);
+    if(error) {
+        return res.status(400).json({ error: error.details });
+    }
+    try {
+        const user = await User.findOne({ _id: id, role: 'owner' });
+        if(!user) {
+            return res.status(404).json({ error: 'Owner account not found or does not exist' });
+        }
+        user.insuranceVerified = false;
+        user.licenceVerified = false;
+        user.isApproved = false;
+        user.rejectionReason = value.reason;
+        await user.save();
+        res.json({ success: true, message: "Your account is rejected by admin" });
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
+}
+
 usersCtlr.listOwners = async (req, res) => {
     try {
         const owners = await User.find({ role: 'owner' });
-        if(req.role !== 'admin') {
-           return res.status(403).json({ error: 'You are not allowed to see owners list'});
-        }
-        if(owners.length == 0) {
-            return res.status(404).json({ error: 'owners not found' });
-        }
         res.json(owners);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
+}
+
+usersCtlr.listUsers = async (req, res) => {
+    try {
+        const users = await User.find({ role: 'user' });
+        res.json(users);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -201,7 +226,7 @@ usersCtlr.changePassword = async (req, res) => {  //
             return res.status(400).json({ error: 'oldPassword is incorrect' });
         }
         const salt = await bcryptjs.genSalt();
-        const hash = await bcryptjs.hash(value.newPassword, salt);
+        const hash = await bcryptjs.hash(value.newpassword, salt);
         user.password = hash;
         await user.save();
         res.json({ message: "password updated successfully" });
