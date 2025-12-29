@@ -1,5 +1,6 @@
 const cloudinary = require("../../config/cloudinary");
 const User = require('../models/user-Authmodel');
+const Vehicle = require('../models/user-Authmodel');
 
 const imageUpload = {};
 
@@ -73,6 +74,84 @@ imageUpload.insurance = async (req, res) => {
         if (!user) return res.status(404).json({ error: "User not found" });
         user.insuranceDoc = uploadResult.secure_url;
         await user.save();
+        return res.status(200).json({ insuranceDoc: uploadResult.secure_url, message: "Insurance uploaded successfully" });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
+}
+
+imageUpload.Vehicleimage = async (req, res) => {
+    try {
+        const { vehicleId } = req.params;
+        if(!req.files || !req.files.iamge) {
+           return res.status(400).json({ error: "NO file uploaded" });
+        }
+        const file = req.files.vehicle;
+        const uploadResult = await cloudinary.uploader.upload(
+            file.tempFilePath,
+            {
+                folder: "vehicle_images",
+                public_id: `vehicle_${Date.now()}`,
+                resource_type: "image"
+            }
+        )
+        const vehicle = await Vehicle.findById(vehicleId);
+        if (!vehicle) {
+            return res.status(404).json({ error: "Vehicle not found" });
+        }
+        vehicle.image = uploadResult.secure_url;
+        await vehicle.save();
+        res.status(200).json({ image: uploadResult.secure_url, message: "Vehicle image uploaded successfully" });
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    } 
+}
+
+imageUpload.Vehiclelicence = async (req, res) => {
+    try {
+        if (!req.files || !req.files.licenceDoc) {
+            return res.status(400).json({ error: "No file uploaded" });
+        }
+        const file = req.files.licenceDoc;
+        const uploadResult = await cloudinary.uploader.upload(
+            file.tempFilePath,
+            {
+                folder: "licence_docs",
+                public_id: `licence_${Date.now()}`,
+                resource_type: "image"
+            }
+        );
+        const vehicle = await Vehicle.findById();
+        if (!vehicle) return res.status(404).json({ error: "Vehicle not found" });
+        vehicle.licenceDoc = uploadResult.secure_url;
+        await vehicle.save();
+        return res.status(200).json({ licenceDoc: uploadResult.secure_url, message: "Licence uploaded successfully" });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
+}
+
+imageUpload.Vehicleinsurance = async (req, res) => {
+    try {
+        if (!req.files || !req.files.insuranceDoc) {
+            return res.status(400).json({ error: "No file uploaded" });
+        }
+        const file = req.files.insuranceDoc;
+        const uploadResult = await cloudinary.uploader.upload(
+            file.tempFilePath,
+            {
+                folder: "insurance_docs",
+                public_id: `insurance_${Date.now()}`,
+                resource_type: "image"
+            }
+        );
+        const vehicle = await Vehicle.findById();
+        if (!vehicle) return res.status(404).json({ error: "Vehicle not found" });
+        vehicle.insuranceDoc = uploadResult.secure_url;
+        await vehicle.save();
         return res.status(200).json({ insuranceDoc: uploadResult.secure_url, message: "Insurance uploaded successfully" });
     } catch (err) {
         console.log(err);

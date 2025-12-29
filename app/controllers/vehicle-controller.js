@@ -27,12 +27,13 @@ vehiclesCtlr.create = async (req, res) => {
         vehicle.type = value.type;
         vehicle.registrationNumber = value.registrationNumber;
         vehicle.licenseDoc = value.licenseDoc;
+        vehicle.insuranceDoc = value.insuranceDoc;
         vehicle.fuelType = value.fuelType;
         vehicle.transmission = value.transmission;
         vehicle.seats = value.seats;
         vehicle.pricePerDay = value.pricePerDay;
         vehicle.location = value.location;
-        vehicle.images = value.images;
+        vehicle.image = value.image;
         vehicle.averageRating = 0;
         await vehicle.save();
         res.status(201).json({ msg: "Vehicle added successfully", vehicle });

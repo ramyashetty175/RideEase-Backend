@@ -38,11 +38,10 @@ const VehicleSchema = new mongoose.Schema({
     seats: Number,
     pricePerDay: Number,
     location: String, //
-    images: [
-        {
-            type: String
-        }
-    ],
+    image: {
+        type: String,
+        required: true
+    },
     availabilityStatus: {
         type: String,
         enum: ["Available", "Booked", "Maintainance", "unAvailable"],

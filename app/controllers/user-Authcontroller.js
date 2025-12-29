@@ -127,7 +127,7 @@ usersCtlr.approveOwner = async (req, res) => {
         } else {
             return res.status(400).json({ success: false, message: "Your account is pending approval by admin. Document is not provided by owner" });
         }
-        res.json({ success: true, message: "Your account is approved by admin" });
+        res.json(user);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });

@@ -35,7 +35,8 @@ app.post('/users/login', usersCtlr.login);  //
 
 // Private Route
 app.get('/users', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.list); //
-app.put('/users/approveOwner/:id', authenticateUser, authorizeUser(['admin']), usersCtlr.approveOwner);  // button
+app.put('/users/owner/approve/:id', authenticateUser, authorizeUser(['admin']), usersCtlr.approveOwner);  // button
+app.put('/users/owner/reject/:id', authenticateUser, authorizeUser(['admin']), usersCtlr.rejectOwner); 
 app.delete('/users/profile/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.remove); //button
 app.get('/users/owners', authenticateUser, authorizeUser(['admin']), usersCtlr.listOwners); //
 app.get('/users/listUsers', authenticateUser, authorizeUser(['admin']), usersCtlr.listUsers);
@@ -86,8 +87,11 @@ app.post('/api/chat', authenticateUser, chatCtlr.askAI);
 
 // Image Upload
 app.post('/api/upload/avatar', authenticateUser, authorizeUser(['admin', 'owner', 'user']), uploadMiddleware, imageUpload.avatar);
-app.post('/api/upload/licence', authenticateUser, authorizeUser(['owner', 'user']), uploadMiddleware, imageUpload.licence);
-app.post('/api/upload/insurance', authenticateUser, authorizeUser(['owner', 'user']), uploadMiddleware, imageUpload.insurance);
+app.post('/api/upload/user/licence', authenticateUser, authorizeUser(['owner', 'user']), uploadMiddleware, imageUpload.licence);
+app.post('/api/upload/user/insurance', authenticateUser, authorizeUser(['owner', 'user']), uploadMiddleware, imageUpload.insurance);
+app.post('/api/upload/vehicle', authenticateUser, authorizeUser(['admin', 'owner']), uploadMiddleware, imageUpload.vehicle);
+app.post('/api/upload/vehicle/licence', authenticateUser, authorizeUser(['owner']), uploadMiddleware, imageUpload.Vehiclelicence);
+app.post('/api/upload/vehicle/insurance', authenticateUser, authorizeUser(['owner']), uploadMiddleware, imageUpload.Vehicleinsurance);
 
 // VehicleTracking
 app.post('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.create);
