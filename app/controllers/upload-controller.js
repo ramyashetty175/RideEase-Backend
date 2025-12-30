@@ -7,7 +7,7 @@ const imageUpload = {};
 imageUpload.avatar = async (req, res) => {
     try {
         if(!req.files || !req.files.avatar) {
-           return res.status(400).json({ error: "NO file uploaded" });
+           return res.status(400).json({ error: "image is not uploaded" });
         }
         const file = req.files.avatar;
         const uploadResult = await cloudinary.uploader.upload(
@@ -34,7 +34,7 @@ imageUpload.avatar = async (req, res) => {
 imageUpload.licence = async (req, res) => {
     try {
         if (!req.files || !req.files.licenceDoc) {
-            return res.status(400).json({ error: "No file uploaded" });
+            return res.status(400).json({ error: "licence is not uploaded" });
         }
         const file = req.files.licenceDoc;
         const uploadResult = await cloudinary.uploader.upload(
@@ -59,7 +59,7 @@ imageUpload.licence = async (req, res) => {
 imageUpload.insurance = async (req, res) => {
     try {
         if (!req.files || !req.files.insuranceDoc) {
-            return res.status(400).json({ error: "No file uploaded" });
+            return res.status(400).json({ error: "insurance is not uploaded" });
         }
         const file = req.files.insuranceDoc;
         const uploadResult = await cloudinary.uploader.upload(
@@ -83,9 +83,9 @@ imageUpload.insurance = async (req, res) => {
 
 imageUpload.Vehicleimage = async (req, res) => {
     try {
-        const { vehicleId } = req.params;
+        const id = req.params.id;
         if(!req.files || !req.files.iamge) {
-           return res.status(400).json({ error: "NO file uploaded" });
+           return res.status(400).json({ error: "vehicle image is not uploaded" });
         }
         const file = req.files.vehicle;
         const uploadResult = await cloudinary.uploader.upload(
@@ -96,7 +96,7 @@ imageUpload.Vehicleimage = async (req, res) => {
                 resource_type: "image"
             }
         )
-        const vehicle = await Vehicle.findById(vehicleId);
+        const vehicle = await Vehicle.findById(id);
         if (!vehicle) {
             return res.status(404).json({ error: "Vehicle not found" });
         }
@@ -111,8 +111,9 @@ imageUpload.Vehicleimage = async (req, res) => {
 
 imageUpload.Vehiclelicence = async (req, res) => {
     try {
+        const id = req.params.id;
         if (!req.files || !req.files.licenceDoc) {
-            return res.status(400).json({ error: "No file uploaded" });
+            return res.status(400).json({ error: "licence is not uploaded" });
         }
         const file = req.files.licenceDoc;
         const uploadResult = await cloudinary.uploader.upload(
@@ -123,7 +124,7 @@ imageUpload.Vehiclelicence = async (req, res) => {
                 resource_type: "image"
             }
         );
-        const vehicle = await Vehicle.findById();
+        const vehicle = await Vehicle.findById(id);
         if (!vehicle) return res.status(404).json({ error: "Vehicle not found" });
         vehicle.licenceDoc = uploadResult.secure_url;
         await vehicle.save();
@@ -136,8 +137,9 @@ imageUpload.Vehiclelicence = async (req, res) => {
 
 imageUpload.Vehicleinsurance = async (req, res) => {
     try {
+        const id = req.params.id;
         if (!req.files || !req.files.insuranceDoc) {
-            return res.status(400).json({ error: "No file uploaded" });
+            return res.status(400).json({ error: "insurance is not uploaded" });
         }
         const file = req.files.insuranceDoc;
         const uploadResult = await cloudinary.uploader.upload(
@@ -148,7 +150,7 @@ imageUpload.Vehicleinsurance = async (req, res) => {
                 resource_type: "image"
             }
         );
-        const vehicle = await Vehicle.findById();
+        const vehicle = await Vehicle.findById(id);
         if (!vehicle) return res.status(404).json({ error: "Vehicle not found" });
         vehicle.insuranceDoc = uploadResult.secure_url;
         await vehicle.save();

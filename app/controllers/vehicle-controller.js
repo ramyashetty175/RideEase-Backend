@@ -59,16 +59,16 @@ vehiclesCtlr.show = async (req, res) => {
 
 vehiclesCtlr.listVehicles = async (req, res) => {
     try {
-        let vehicle;
-        if(req.role == "admin") {
-            vehicle = await Vehicle.find();
-        } else {
-            vehicle = await Vehicle.find({ isApproved: true });
+        let vehicles;
+        if(req.role == 'admin') {
+            vehicles = await Vehicle.find({ isApproved: true });
+        } else if(req.role == 'owner') {
+            vehicles = await Vehicle.find({ owner: req.userId });
         }
-        if(!vehicle) {
+        if(!vehicles) {
             return res.status(404).json({ error: 'No vehicle found' });
         }
-        res.json(vehicle);
+        res.json(vehicles);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -89,8 +89,8 @@ vehiclesCtlr.update = async (req, res) => {
         } else {
             vehicle = await Vehicle.findOneAndUpdate({ _id: id, owner: req.userId }, value, { new: true });
             if(!vehicle) {
-            return res.status(403).json({ error: 'You are not allowed to update vehicle or vehicle not exists' });
-        }
+                return res.status(403).json({ error: 'You are not allowed to update vehicle or vehicle not exists' });
+            }
         }
         if(!vehicle) {
             return res.status(404).json({ error: 'vehicle not exists' });

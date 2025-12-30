@@ -50,7 +50,7 @@ app.put('/users/password/:id', authenticateUser, authorizeUser(['user']), usersC
 // Vehicle
 app.post('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin']), vehiclesCtlr.create); 
 app.get('/api/vehicles/:id', authenticateUser, vehiclesCtlr.show);  //
-app.get('/api/vehicles', authenticateUser, vehiclesCtlr.listVehicles); //
+app.get('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin']), vehiclesCtlr.listVehicles); //
 app.put('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesCtlr.update); 
 app.put('/api/vehicles/approve/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.approveVehicle); 
 app.delete('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesCtlr.remove); // button
@@ -89,9 +89,9 @@ app.post('/api/chat', authenticateUser, chatCtlr.askAI);
 app.post('/api/upload/avatar', authenticateUser, authorizeUser(['admin', 'owner', 'user']), uploadMiddleware, imageUpload.avatar);
 app.post('/api/upload/user/licence', authenticateUser, authorizeUser(['owner', 'user']), uploadMiddleware, imageUpload.licence);
 app.post('/api/upload/user/insurance', authenticateUser, authorizeUser(['owner', 'user']), uploadMiddleware, imageUpload.insurance);
-app.post('/api/upload/vehicle', authenticateUser, authorizeUser(['admin', 'owner']), uploadMiddleware, imageUpload.vehicle);
-app.post('/api/upload/vehicle/licence', authenticateUser, authorizeUser(['owner']), uploadMiddleware, imageUpload.Vehiclelicence);
-app.post('/api/upload/vehicle/insurance', authenticateUser, authorizeUser(['owner']), uploadMiddleware, imageUpload.Vehicleinsurance);
+app.post('/api/upload/vehicle/:id', authenticateUser, authorizeUser(['admin', 'owner']), uploadMiddleware, imageUpload.Vehicleimage);
+app.post('/api/upload/vehicle/licence/:id', authenticateUser, authorizeUser(['owner']), uploadMiddleware, imageUpload.Vehiclelicence);
+app.post('/api/upload/vehicle/insurance/:id', authenticateUser, authorizeUser(['owner']), uploadMiddleware, imageUpload.Vehicleinsurance);
 
 // VehicleTracking
 app.post('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.create);
