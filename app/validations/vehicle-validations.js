@@ -13,7 +13,7 @@ const VehicleValidation = Joi.object({
     pricePerDay: Joi.number().required(),
     location: Joi.string().required(),
     image: Joi.string().uri().required(),
-    availabilityStatus: Joi.string().trim().valid("Available", "Booked", "Maintainance", "unAvailable"),
+    availabilityStatus: Joi.string().trim().valid("Available", "Booked", "Maintainance", "unAvailable").required(),
     averageRating: Joi.number().min(0).max(5).optional()
 })
 

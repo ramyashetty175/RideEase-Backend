@@ -49,10 +49,10 @@ app.put('/users/password/:id', authenticateUser, authorizeUser(['user']), usersC
 
 // Vehicle
 app.post('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin']), uploadMiddleware, vehiclesCtlr.create);
+app.put('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), uploadMiddleware, vehiclesCtlr.update);
+app.put('/api/vehicles/approve/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.approveVehicle);  
 app.get('/api/vehicles/:id', authenticateUser, vehiclesCtlr.show);  //
 app.get('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin']), vehiclesCtlr.listVehicles); //
-app.put('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesCtlr.update); 
-app.put('/api/vehicles/approve/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.approveVehicle); 
 app.delete('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesCtlr.remove); // button
 app.get('/api/vehicles/search', authenticateUser, vehiclesCtlr.search); //
 
