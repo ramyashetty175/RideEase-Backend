@@ -193,6 +193,13 @@ vehiclesCtlr.update = async (req, res) => {
             return res.status(404).json({ error: 'Vehicle not found' });
         }
 
+        const { error, value } = VehicleValidation.validate(req.body, { abortEarly: false });
+        if (error) {
+            return res.status(400).json({ success: false, errors: error.details });
+        }
+
+        Object.assign(vehicle, value);
+
         if (req.files) {
             if (req.files.image) {
                 const imageRes = await cloudinary.uploader.upload(req.files.image.tempFilePath, {
@@ -221,13 +228,6 @@ vehiclesCtlr.update = async (req, res) => {
                 vehicle.insuranceDoc = insuranceRes.secure_url;
             }
         }
-
-        const { error, value } = VehicleValidation.validate(req.body, { abortEarly: false });
-        if (error) {
-            return res.status(400).json({ success: false, errors: error.details });
-        }
-
-        Object.assign(vehicle, value);
 
         await vehicle.save();
 
