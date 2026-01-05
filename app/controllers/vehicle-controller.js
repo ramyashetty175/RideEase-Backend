@@ -267,7 +267,7 @@ vehiclesCtlr.approveVehicle = async (req, res) => {
         if (!vehicle.licenseDoc || !vehicle.insuranceDoc) {
             return res.status(400).json({ error: "Both license and insurance documents must be uploaded before approval" });
         }
-        vehicle.isApproved = true;
+        vehicle.status = "approved";
         vehicle.availabilityStatus = "Available";
         await vehicle.save();
         return res.json({ message: "Vehicle approved successfully", vehicle });
@@ -287,7 +287,7 @@ vehiclesCtlr.rejectVehicle = async (req, res) => {
         if (!vehicle) {
             return res.status(404).json({ error: 'Vehicle not found' });
         }
-        vehicle.isApproved = false;
+        vehicle.status = "rejected";
         vehicle.availabilityStatus = "unAvailable";
         await vehicle.save();
         return res.json({ message: "Vehicle rejected successfully", vehicle }); 
