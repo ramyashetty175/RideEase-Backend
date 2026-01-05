@@ -20,8 +20,11 @@ const UserAuthenSchema = new mongoose.Schema({
     licenceDoc: String,
     insuranceVerified: Boolean,
     licenceVerified: Boolean,
-    isApproved: Boolean
-
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending"
+    }
 }, { timestamps: true })
 
 const User = mongoose.model('User', UserAuthenSchema);
