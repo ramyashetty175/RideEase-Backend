@@ -27,9 +27,10 @@ usersCtlr.register = async(req, res) => {
             user.role = "admin";
         } else if(userCount > 0 && userCount <= 3) {
             user.role = "owner";
-            user.isApproved = false;
+            user.status = "pending";
         } else {
             user.role = "user";
+            user.status = "approved";
         }
         await user.save();
         res.status(201).json(user);
@@ -122,7 +123,7 @@ usersCtlr.approveOwner = async (req, res) => {
         if(user.insuranceDoc && user.licenceDoc) {
             user.insuranceVerified = true;
             user.licenceVerified = true;
-            user.isApproved = true;
+            user.status = "approved";
             await user.save();
         } else {
             return res.status(400).json({ success: false, message: "Your account is pending approval by admin. Document is not provided by owner" });
@@ -148,7 +149,7 @@ usersCtlr.rejectOwner = async (req, res) => {
         }
         user.insuranceVerified = false;
         user.licenceVerified = false;
-        user.isApproved = false;
+        user.status = "rejected";
         user.rejectionReason = value.reason;
         await user.save();
         res.json({ success: true, message: "Your account is rejected by admin" });
