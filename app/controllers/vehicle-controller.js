@@ -1,6 +1,6 @@
 const Vehicle = require('../models/vehicle-model');
 const cloudinary = require("../../config/cloudinary");
-const { VehicleValidation, ApproveVehicleValidation } = require('../validations/vehicle-validations');
+const { VehicleValidation } = require('../validations/vehicle-validations');
 
 const vehiclesCtlr = {};
 
@@ -133,7 +133,7 @@ vehiclesCtlr.listVehicles = async (req, res) => {
     try {
         let vehicles;
         if(req.role == 'admin') {
-            vehicles = await Vehicle.find({ isApproved: true });
+            vehicles = await Vehicle.find();
         } else if(req.role == 'owner') {
             vehicles = await Vehicle.find({ owner: req.userId });
         }
@@ -188,18 +188,14 @@ vehiclesCtlr.update = async (req, res) => {
                 return res.status(403).json({ error: 'You are not allowed to update this vehicle or it does not exist' });
             }
         }
-
         if (!vehicle) {
             return res.status(404).json({ error: 'Vehicle not found' });
         }
-
         const { error, value } = VehicleValidation.validate(req.body, { abortEarly: false });
         if (error) {
             return res.status(400).json({ success: false, errors: error.details });
         }
-
         Object.assign(vehicle, value);
-
         if (req.files) {
             if (req.files.image) {
                 const imageRes = await cloudinary.uploader.upload(req.files.image.tempFilePath, {
@@ -209,7 +205,6 @@ vehiclesCtlr.update = async (req, res) => {
                 });
                 vehicle.image = imageRes.secure_url;
             }
-
             if (req.files.licenseDoc) {
                 const licenseRes = await cloudinary.uploader.upload(req.files.licenseDoc.tempFilePath, {
                     folder: "vehicles/licenses",
@@ -218,7 +213,6 @@ vehiclesCtlr.update = async (req, res) => {
                 });
                 vehicle.licenseDoc = licenseRes.secure_url;
             }
-
             if (req.files.insuranceDoc) {
                 const insuranceRes = await cloudinary.uploader.upload(req.files.insuranceDoc.tempFilePath, {
                     folder: "vehicles/insurance",
@@ -228,9 +222,7 @@ vehiclesCtlr.update = async (req, res) => {
                 vehicle.insuranceDoc = insuranceRes.secure_url;
             }
         }
-
         await vehicle.save();
-
         res.json({ success: true, message: "Vehicle updated successfully", vehicle });
     } catch (err) {
         console.error(err);
@@ -263,26 +255,42 @@ vehiclesCtlr.remove = async (req, res) => {
 }
 
 vehiclesCtlr.approveVehicle = async (req, res) => { 
-    const body = req.body;
     const id = req.params.id;
-    const { error, value } = ApproveVehicleValidation.validate(body);
-    if(error) {
-        return res.status(400).json({ error: error.details });
-    }
     try {
-        if(req.role == 'admin') {
-            const vehicle = await Vehicle.findById(id);
-            if(!vehicle) {
-               return res.status(404).json({ error: 'vehicle not found' });
-            }
-            vehicle.licenseDoc = value.licenseDoc;
-            vehicle.isApproved = true;
-            vehicle.availabilityStatus = "Available";
-            await vehicle.save();
-            return res.json({ message: "Vehicle approved by Admin", vehicle });
-        } else {
-            return res.json({ message: 'Approval is not needed for this vehicle' });
-        } 
+        if(req.role !== 'admin') {
+            return res.status(403).json({ message: 'Only admin can approve vehicle' });
+        }
+        const vehicle = await Vehicle.findById(id);
+        if (!vehicle) {
+            return res.status(404).json({ error: 'Vehicle not found' });
+        }
+        if (!vehicle.licenseDoc || !vehicle.insuranceDoc) {
+            return res.status(400).json({ error: "Both license and insurance documents must be uploaded before approval" });
+        }
+        vehicle.isApproved = true;
+        vehicle.availabilityStatus = "Available";
+        await vehicle.save();
+        return res.json({ message: "Vehicle approved successfully", vehicle });
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
+}
+
+vehiclesCtlr.rejectVehicle = async (req, res) => { 
+    const id = req.params.id;
+    try {
+        if(req.role !== 'admin') {
+            return res.status(403).json({ message: 'Only admin can reject vehicle' });
+        }
+        const vehicle = await Vehicle.findById(id);
+        if (!vehicle) {
+            return res.status(404).json({ error: 'Vehicle not found' });
+        }
+        vehicle.isApproved = false;
+        vehicle.availabilityStatus = "unAvailable";
+        await vehicle.save();
+        return res.json({ message: "Vehicle rejected successfully", vehicle }); 
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });

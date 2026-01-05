@@ -17,12 +17,6 @@ const VehicleValidation = Joi.object({
     averageRating: Joi.number().min(0).max(5).optional()
 })
 
-const ApproveVehicleValidation = Joi.object({
-    licenseDoc: Joi.string().required(),
-    insuranceDoc: Joi.string().required()
-})
-
 module.exports = {
-    VehicleValidation,
-    ApproveVehicleValidation
+    VehicleValidation
 }

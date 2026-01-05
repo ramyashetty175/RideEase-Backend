@@ -51,6 +51,7 @@ app.put('/users/password/:id', authenticateUser, authorizeUser(['user']), usersC
 app.post('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin']), uploadMiddleware, vehiclesCtlr.create);
 app.put('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), uploadMiddleware, vehiclesCtlr.update);
 app.put('/api/vehicles/approve/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.approveVehicle);  
+app.put('/api/vehicles/reject/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.rejectVehicle);
 app.get('/api/vehicles/:id', authenticateUser, vehiclesCtlr.show);  //
 app.get('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin']), vehiclesCtlr.listVehicles); //
 app.delete('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesCtlr.remove); // button
