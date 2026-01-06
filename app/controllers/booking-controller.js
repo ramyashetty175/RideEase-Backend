@@ -1,6 +1,6 @@
 const Booking = require('../models/booking-model');
 const Vehicle = require('../models/vehicle-model');
-const user = require('../models/user-Authmodel');
+const User = require('../models/user-Authmodel');
 const { BookingValidation, BookingUpdateValidation, BookingAvailabilityValidation, BookingExtendValidation } = require('../validations/booking-validations');
 
 const bookingsCtlr = {};
@@ -219,9 +219,40 @@ bookingsCtlr.approve = async (req, res) => {
         if(!user.licenceDoc || !user.insuranceDoc) {
             return res.status(400).json({ error: "User has not uploaded Licence or Insurance documents" });
         }
-        booking.bookingStatus = "Approved";
+        booking.bookingStatus = "approved";
         await booking.save();
         res.json({ message: "booking Approved successfully", booking });
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong!!!' });
+    }
+}
+
+bookingsCtlr.reject = async (req, res) => {
+    const id = req.params.id;
+    try {
+        let booking;
+        if(req.role == "admin") {
+            booking = await Booking.findById(id);
+        } else if(req.role == "owner") {
+            booking = await Booking.findOne({ _id: id, owner: req.userId });
+            if(!booking) {
+                return res.status(403).json({ error: 'You are not authorized to approve this vehicle or record not exists' });
+            }
+        }
+        if(!booking) {
+           return res.status(404).json({ error: 'record not found' });
+        }
+        const user = await User.findById(booking.user);
+        if(!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        if(!user.licenceDoc || !user.insuranceDoc) {
+            return res.status(400).json({ error: "User has not uploaded Licence or Insurance documents" });
+        }
+        booking.bookingStatus = "canceled";
+        await booking.save();
+        res.json({ message: "booking Canceled successfully", booking });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -243,7 +274,8 @@ bookingsCtlr.confirm = async (req, res) => {
         if(!booking) {
             return res.status(404).json({ error: 'booking does not exists' });
         }
-        booking.paymentStatus = "Paid";
+        // booking.paymentStatus = "Paid";
+        booking.bookingStatus = "confirmed";
         const vehicle = await Vehicle.findById(booking.vehicle);
         if(vehicle) {
             vehicle.availabilityStatus = "Booked";
