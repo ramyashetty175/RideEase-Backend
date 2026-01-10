@@ -228,7 +228,7 @@ bookingsCtlr.approve = async (req, res) => {
     }
 }
 
-bookingsCtlr.reject = async (req, res) => {
+bookingsCtlr.cancel = async (req, res) => {
     const id = req.params.id;
     try {
         let booking;
