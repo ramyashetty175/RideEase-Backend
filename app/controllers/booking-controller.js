@@ -27,7 +27,7 @@ bookingsCtlr.create = async(req, res) => {
         }
         const overlappingBooking = await Booking.findOne({
             vehicle: value.vehicle,
-            bookingStatus: { $in: ["approved", "in-progress"] },
+            bookingStatus: { $in: ["approved", "confirmed", "in-progress"] },
             startDateTime: { $lt: new Date(value.endDateTime) },
             endDateTime: { $gt: new Date(value.startDateTime) }
         });
@@ -42,7 +42,7 @@ bookingsCtlr.create = async(req, res) => {
         booking.endDateTime = value.endDateTime;
         booking.pickupLocation = value.pickupLocation;
         booking.returnLocation = value.returnLocation;
-        booking.totalAmount = value.totalAmount;
+        // booking.totalAmount = value.totalAmount;
         await booking.save();
         res.status(201).json({ message: "booking created successfully", booking });
     } catch(err) {

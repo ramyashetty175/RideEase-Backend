@@ -4,9 +4,9 @@ const BookingValidation = Joi.object({
     vehicle: Joi.string().trim().required(),
     startDateTime: Joi.date().greater("now").required(),
     endDateTime: Joi.date().greater(Joi.ref("startDateTime")).required(),
-    pickupLocation: Joi.string().trim().optional(),
-    returnLocation: Joi.string().trim().invalid(Joi.ref("pickupLocation")).optional(),
-    totalAmount: Joi.number().min(1).required()
+    pickupLocation: Joi.string().trim().required(),
+    returnLocation: Joi.string().trim().valid(Joi.ref("pickupLocation")).required()
+    // totalAmount: Joi.number().min(1).required()
 })
 
 const BookingAvailabilityValidation = Joi.object({
