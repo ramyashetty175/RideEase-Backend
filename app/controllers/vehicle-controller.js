@@ -307,9 +307,9 @@ vehiclesCtlr.search = async (req, res) => {
         // case-insensitive regex pattern
         const regex = new RegExp(keyword.trim(), "i");
 
-        // serach vehicle by registrationNumber or Name
+        // search vehicle by registrationNumber or Name
         const vehicleFilter = {
-            isApproved: true,
+            status: "approved",
             $or: [{ vehicleName: { $regex: regex } }, { registrationNumber: { $regex: regex } }]
         }
         const vehicle = await Vehicle.find(vehicleFilter);
