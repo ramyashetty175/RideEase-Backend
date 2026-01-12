@@ -132,7 +132,7 @@ vehiclesCtlr.show = async (req, res) => {
 vehiclesCtlr.listVehicles = async (req, res) => {
     try {
         let vehicles;
-        if(req.role == 'admin') {
+        if(req.role == 'admin'|| req.role == 'user') {
             vehicles = await Vehicle.find();
         } else if(req.role == 'owner') {
             vehicles = await Vehicle.find({ owner: req.userId });
@@ -303,10 +303,8 @@ vehiclesCtlr.search = async (req, res) => {
         if(!keyword || keyword.trim() == "") {
           return res.status(400).json({ error: "keyword is required" });
         }
-
         // case-insensitive regex pattern
         const regex = new RegExp(keyword.trim(), "i");
-
         // search vehicle by registrationNumber or Name
         const vehicleFilter = {
             status: "approved",

@@ -1,8 +1,12 @@
 const express = require('express');
 const cors = require('cors');
+// import { createServer } from "http";
+// import { Server } from "socket.io";
 require('dotenv').config();
 require("./app/cron/booking-status-cron");
 const app = express();
+// const httpServer = createServer(app);
+// const io = new Server(httpServer, { /* options */ });
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
@@ -52,10 +56,10 @@ app.post('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin']), u
 app.put('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), uploadMiddleware, vehiclesCtlr.update);
 app.put('/api/vehicles/approve/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.approveVehicle);  
 app.put('/api/vehicles/reject/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.rejectVehicle);
-app.get('/api/vehicles/:id', authenticateUser, vehiclesCtlr.show);  //
-app.get('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin']), vehiclesCtlr.listVehicles); //
+app.get('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin', 'user']), vehiclesCtlr.listVehicles); //
 app.delete('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesCtlr.remove); // button
-app.get('/api/vehicles/search', authenticateUser, vehiclesCtlr.search); //
+app.get('/api/vehicles/search', authenticateUser, authorizeUser(['admin', 'owner', 'user']), vehiclesCtlr.search);
+app.get('/api/vehicles/:id', authenticateUser, vehiclesCtlr.show);  
 
 // Booking
 app.post('/api/bookings', authenticateUser, bookingsCtlr.create);
@@ -88,7 +92,7 @@ app.get('/api/payments', authenticateUser, paymentCtlr.list);
 app.post('/api/chat', authenticateUser, chatCtlr.askAI);
 
 // Image Upload
-app.post('/api/upload/avatar', authenticateUser, authorizeUser(['admin', 'owner', 'user']), uploadMiddleware, imageUpload.avatar);
+app.post('/api/upload/user/avatar', authenticateUser, authorizeUser(['admin', 'owner', 'user']), uploadMiddleware, imageUpload.avatar);
 app.post('/api/upload/user/licence', authenticateUser, authorizeUser(['owner', 'user']), uploadMiddleware, imageUpload.licence);
 app.post('/api/upload/user/insurance', authenticateUser, authorizeUser(['owner', 'user']), uploadMiddleware, imageUpload.insurance);
 
@@ -129,3 +133,9 @@ app.delete('/api/earningsAnalytics/:id', authenticateUser, earningAnalyticsCtlr.
 app.listen(port, () => {
     console.log('server is running on port', port);
 })
+
+// io.on("connection", (socket) => {
+  
+// })
+
+// httpServer.listen(3000);
