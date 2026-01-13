@@ -33,20 +33,24 @@ vehiclesTrackingCtlr.create = async (req, res) => {
         return res.status(400).json({ error: error.details });
     }
     try {
-        const vehicleTracking = new VehicleTracking({
-            vehicleId: value.vehicleId,
-            latitude: value.latitude,
-            longitude: value.longitude,
-            speed: value.speed,
-            maxSpeed: value.maxSpeed || value.speed,
-            avgSpeed: value.avgSpeed || value.speed,
-            distanceTravelled: value.distanceTravelled || 0,
-            status: value.status,
-            isLive: value.isLive !== undefined ? value.isLive : true,
-            lastUpdatedAt: value.lastUpdatedAt || Date.now(),
-        });
-        await vehicleTracking.save();
-        res.status(201).json(vehicleTracking);
+        const existVehicleTracking = await VehicleTracking.findOne({ booking: value.booking, isLive: true });
+        if(existVehicleTracking) {
+            return res.status(400).json({ error: 'Vehicle tracking already started for this booking' });
+        }
+        const vehicletracking = new VehicleTracking();
+        vehicletracking.vehicle = value.vehicle;
+        vehicletracking.booking = value.booking;
+        vehicletracking.latitude = value.latitude;
+        vehicletracking.longitude = value.longitude;
+        vehicletracking.speed = value.speed;
+        vehicletracking.maxSpeed = value.maxSpeed || value.speed;
+        vehicletracking.avgSpeed = value.avgSpeed || value.speed;
+        vehicletracking.distanceTravelled = value.distanceTravelled;
+        vehicletracking.status = value.status;
+        vehicletracking.isLive = true;
+        vehicletracking.lastUpdatedAt = Date.now();
+        await vehicletracking.save();
+        res.status(201).json(vehicletracking);
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -65,9 +69,9 @@ vehiclesTrackingCtlr.create = async (req, res) => {
 vehiclesTrackingCtlr.live = async (req, res) => {
     const vehicleId = req.params.id;
     try {
-        const latestTracking = await VehicleTracking.findOne({ vehicleId }).sort({ createdAt: -1 });
+        const latestTracking = await VehicleTracking.findOne({ vehicleId, isLive: true }).sort({ createdAt: -1 });
         if (!latestTracking) {
-            return res.status(404).json({ error: 'No tracking data found for this vehicle' });
+            return res.status(404).json({ error: 'No active tracking found for this vehicle' });
         }
         res.status(200).json(latestTracking);
     } catch (err) {

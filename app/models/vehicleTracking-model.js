@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
 const VehicleTrackingSchema = new mongoose.Schema({
-    vehicleId: {
+    vehicle: {
         type: mongoose.Schema.ObjectId,
         ref: 'Vehicle'
     },
-    bookingId: {
+    booking: {
         type: mongoose.Schema.ObjectId,
         ref: 'Booking'
     },
