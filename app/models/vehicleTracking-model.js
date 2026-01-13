@@ -5,8 +5,16 @@ const vehicleTrackingSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'Vehicle'
     },
-    latitude: Number,
-    longitude: Number,
+    // latitude: Number,
+    // longitude: Number,
+    geo: {
+        type: [Number],   
+        required: true
+    },
+    address: {
+        type: String,
+        required: true
+    },
     speed: {
         type: Number,
         default: 0
