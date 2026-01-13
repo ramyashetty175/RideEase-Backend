@@ -26,9 +26,9 @@ const vehiclesTrackingCtlr = {};
 //     }
 // }
 
-
 vehiclesTrackingCtlr.create = async (req, res) => {
-    const { error, value } = VehicleTrackingValidation.validate(req.body, { abortEarly: false });
+    const body = req.body;
+    const { error, value } = VehicleTrackingValidation.validate(body, { abortEarly: false });
     if (error) {
         return res.status(400).json({ error: error.details });
     }

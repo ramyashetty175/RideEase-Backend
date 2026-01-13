@@ -1,20 +1,16 @@
 const mongoose = require('mongoose');
 
-const vehicleTrackingSchema = new mongoose.Schema({
+const VehicleTrackingSchema = new mongoose.Schema({
     vehicleId: {
         type: mongoose.Schema.ObjectId,
         ref: 'Vehicle'
     },
-    // latitude: Number,
-    // longitude: Number,
-    geo: {
-        type: [Number],   
-        required: true
+    bookingId: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Booking'
     },
-    address: {
-        type: String,
-        required: true
-    },
+    latitude: Number,
+    longitude: Number,
     speed: {
         type: Number,
         default: 0
@@ -46,6 +42,6 @@ const vehicleTrackingSchema = new mongoose.Schema({
     }
 }, { timestamps: true })
 
-const vehicleTracking = mongoose.model('vehicleTracking', vehicleTrackingSchema);
+const VehicleTracking = mongoose.model('VehicleTracking', VehicleTrackingSchema);
 
-module.exports = vehicleTracking;
+module.exports = VehicleTracking;
