@@ -1,12 +1,8 @@
 const express = require('express');
 const cors = require('cors');
-// import { createServer } from "http";
-// import { Server } from "socket.io";
 require('dotenv').config();
 require("./app/cron/booking-status-cron");
 const app = express();
-// const httpServer = createServer(app);
-// const io = new Server(httpServer, { /* options */ });
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
@@ -133,9 +129,3 @@ app.delete('/api/earningsAnalytics/:id', authenticateUser, earningAnalyticsCtlr.
 app.listen(port, () => {
     console.log('server is running on port', port);
 })
-
-// io.on("connection", (socket) => {
-  
-// })
-
-// httpServer.listen(3000);
