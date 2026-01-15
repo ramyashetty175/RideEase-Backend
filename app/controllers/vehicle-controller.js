@@ -4,115 +4,75 @@ const { VehicleValidation } = require('../validations/vehicle-validations');
 
 const vehiclesCtlr = {};
 
-// vehiclesCtlr.create = async (req, res) => {
-//     const body = req.body;
-//     const { error, value } = VehicleValidation.validate(body, { abortEarly: false });
-//     if(error) {
-//         return res.status(400).json({ error: error.details });
-//     }
-//     try {
-//         const vehicleInDB = await Vehicle.findOne({ registrationNumber: value.registrationNumber });
-//         if(vehicleInDB) {
-//             return res.status(400).json({ error: 'vehicle already exists' });
-//         }
-//         const vehicle = new Vehicle();
-//         if(req.role == "admin") {
-//             vehicle.owner = req.userId;
-//             vehicle.isApproved = true;
-//         } else if(req.role == "owner") {
-//             vehicle.owner = req.userId;
-//             vehicle.isApproved = false;
-//         }
-//         vehicle.vehicleName = value.vehicleName;
-//         vehicle.brand = value.brand;
-//         vehicle.type = value.type;
-//         vehicle.registrationNumber = value.registrationNumber;
-//         vehicle.licenseDoc = value.licenseDoc;
-//         vehicle.insuranceDoc = value.insuranceDoc;
-//         vehicle.fuelType = value.fuelType;
-//         vehicle.transmission = value.transmission;
-//         vehicle.seats = value.seats;
-//         vehicle.pricePerDay = value.pricePerDay;
-//         vehicle.location = value.location;
-//         vehicle.image = value.image;
-//         vehicle.averageRating = 0;
-//         await vehicle.save();
-//         res.status(201).json({ msg: "Vehicle added successfully", vehicle });
-//     } catch(err) {
-//         console.log(err);
-//         res.status(500).json({ error: 'Something went wrong!!' });
-//     }
-// }
-
 vehiclesCtlr.create = async (req, res) => {
     try {
-          if (!req.files?.image || !req.files?.licenseDoc || !req.files?.insuranceDoc) {
-              return res.status(400).json({ success: false, error: "All files (image, licenseDoc, insuranceDoc) are required" });
-          }
-          const imageRes = await cloudinary.uploader.upload( 
-              req.files.image.tempFilePath,
-              {
+        if (!req.files.image || !req.files.licenseDoc || !req.files.insuranceDoc) {
+            return res.status(400).json({ success: false, error: "Image, LicenseDoc, InsuranceDoc are required" });
+        }
+        const imageRes = await cloudinary.uploader.upload( 
+            req.files.image.tempFilePath,
+            {
                 folder: "vehicles/images",
                 public_id: `vehicle_image_${Date.now()}`,
                 resource_type: "image"
-              }
-          )
-          const licenseRes = await cloudinary.uploader.upload(
-              req.files.licenseDoc.tempFilePath,
-              {
+            }
+        )
+        const licenseRes = await cloudinary.uploader.upload(
+            req.files.licenseDoc.tempFilePath,
+            {
                 folder: "vehicles/licenses",
                 public_id: `vehicle_license_${Date.now()}`,
                 resource_type: "image"
-              }
-          )
-          const insuranceRes = await cloudinary.uploader.upload(
-              req.files.insuranceDoc.tempFilePath,
-              {
+            }
+        )
+        const insuranceRes = await cloudinary.uploader.upload(
+            req.files.insuranceDoc.tempFilePath,
+            {
                 folder: "vehicles/insurance",
                 public_id: `vehicle_insurance_${Date.now()}`,
                 resource_type: "image"
-              }
-          )
-          const body = {
-              ...req.body,
-              image: imageRes.secure_url,
-              licenseDoc: licenseRes.secure_url,
-              insuranceDoc: insuranceRes.secure_url
-          }
-          const { error, value } = VehicleValidation.validate(body, { abortEarly: false });
-          if (error) {
-              return res.status(400).json({ success: false, errors: error.details });
-          }
-          const vehicleInDB = await Vehicle.findOne({ registrationNumber: value.registrationNumber });
-          if (vehicleInDB) {
-              return res.status(400).json({ success: false, error: "Vehicle already exists" });
-          }
-          const vehicle = new Vehicle();
-          vehicle.vehicleName = value.vehicleName;
-          vehicle.owner = req.userId;
-          vehicle.brand = value.brand;
-          vehicle.type = value.type;
-          vehicle.registrationNumber = value.registrationNumber;
-          vehicle.licenseDoc = value.licenseDoc;
-          vehicle.insuranceDoc = value.insuranceDoc;
-          vehicle.fuelType = value.fuelType;
-          vehicle.transmission = value.transmission;
-          vehicle.seats = value.seats;
-          vehicle.pricePerDay = value.pricePerDay;
-          vehicle.location = value.location;
-          vehicle.image = value.image;
-          vehicle.availabilityStatus = value.availabilityStatus;
-          if (req.role === 'admin') {
-              vehicle.isApproved = true;
-          } else {
-              vehicle.isApproved = false;
-          }
-          await vehicle.save();
-          res.status(201).json({ success: true, message: "Vehicle added successfully", vehicle });
-          } catch (err) {
-              console.error(err);
-              res.status(500).json({ success: false, error: "Something went wrong!!!" });
-          }
+            }
+        )
+        const body = {
+            ...req.body,
+            image: imageRes.secure_url,
+            licenseDoc: licenseRes.secure_url,
+            insuranceDoc: insuranceRes.secure_url
+        }
+        const { error, value } = VehicleValidation.validate(body, { abortEarly: false });
+        if (error) {
+            return res.status(400).json({ success: false, errors: error.details });
+        }
+        const vehicleInDB = await Vehicle.findOne({ registrationNumber: value.registrationNumber });
+        if (vehicleInDB) {
+            return res.status(400).json({ success: false, error: "Vehicle already exists" });
+        }
+        const vehicle = new Vehicle();
+        vehicle.vehicleName = value.vehicleName;
+        vehicle.owner = req.userId;
+        vehicle.brand = value.brand;
+        vehicle.type = value.type;
+        vehicle.registrationNumber = value.registrationNumber;
+        vehicle.licenseDoc = value.licenseDoc;
+        vehicle.insuranceDoc = value.insuranceDoc;
+        vehicle.fuelType = value.fuelType;
+        vehicle.transmission = value.transmission;
+        vehicle.seats = value.seats;
+        vehicle.pricePerDay = value.pricePerDay;
+        vehicle.location = value.location;
+        vehicle.image = value.image;
+        vehicle.availabilityStatus = value.availabilityStatus;
+        if (req.role === 'admin') {
+            vehicle.status = "approved";
+        } else if(req.role == 'owner') {
+            vehicle.status = "pending";
+        }
+        await vehicle.save();
+        res.status(201).json({ success: true, message: "Vehicle added successfully", vehicle });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ success: false, error: "Something went wrong!!!" });
+        }
 }
 
 vehiclesCtlr.show = async (req, res) => {
@@ -134,7 +94,7 @@ vehiclesCtlr.listVehicles = async (req, res) => {
         let vehicles;
         if(req.role == 'admin'|| req.role == 'user') {
             vehicles = await Vehicle.find();
-        } else if(req.role == 'owner') {
+        } else if (req.role == 'owner') {
             vehicles = await Vehicle.find({ owner: req.userId });
         }
         if(!vehicles) {
@@ -229,8 +189,6 @@ vehiclesCtlr.update = async (req, res) => {
         res.status(500).json({ success: false, error: 'Something went wrong!!!' });
     }
 }
-
-
 
 vehiclesCtlr.remove = async (req, res) => {
     const id = req.params.id;

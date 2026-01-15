@@ -16,10 +16,22 @@ const UserAuthenSchema = new mongoose.Schema({
     }, 
     avatar: String,
     bio: String,
-    insuranceDoc: String,
-    licenceDoc: String,
-    insuranceVerified: Boolean,
-    licenceVerified: Boolean,
+    insuranceDoc: {
+      type: String,
+      default: null
+    },
+    licenceDoc: {
+      type: String,
+      default: null
+    },
+    insuranceVerified: {
+      type: Boolean,
+      default: false
+    },
+    licenceVerified: {
+      type: Boolean,
+      default: false
+    },
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],

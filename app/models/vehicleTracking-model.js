@@ -9,38 +9,32 @@ const VehicleTrackingSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'Booking'
     },
-    latitude: Number,
-    longitude: Number,
+    location: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      default: "Point"
+    },
+    coordinates: {
+      type: [Number],
+      required: true
+    }
+    },
     speed: {
-        type: Number,
-        default: 0
-    },
-    maxSpeed: {
-        type: Number,
-        default: 0
-    },
-    avgSpeed: {
-        type: Number,
-        default: 0
-    },
-    distanceTravelled: {
-        type: Number,
-        default: 0
-    },
-    status: {
-        type: String,
-        enum: ["moving", "parked", "offline"],
-        default: "moving"
-    },
-    isLive: {
-        type: Boolean,
-        default: true
-    },
+    type: Number,
+    default: 0
+  },
+  isLive: {
+    type: Boolean,
+    default: true
+  },
     lastUpdatedAt: {
         type: Date,
         default: Date.now()
     }
 }, { timestamps: true })
+
+VehicleTrackingSchema.index({ location: '2dsphere' });
 
 const VehicleTracking = mongoose.model('VehicleTracking', VehicleTrackingSchema);
 

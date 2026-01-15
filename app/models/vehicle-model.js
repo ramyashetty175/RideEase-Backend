@@ -23,10 +23,6 @@ const VehicleSchema = new mongoose.Schema({
         type: String,
         default: null
     },
-    // isApproved: {
-    //     type: Boolean,
-    //     default: false
-    // },
     status: {
         type: String,
         enum: ["pending", "approved", "rejected"],
@@ -42,7 +38,7 @@ const VehicleSchema = new mongoose.Schema({
     },
     seats: Number,
     pricePerDay: Number,
-    location: String, //
+    location: String,
     image: {
         type: String,
         required: true

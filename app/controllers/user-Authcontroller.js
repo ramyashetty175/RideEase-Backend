@@ -73,8 +73,6 @@ usersCtlr.list = async (req, res) => {
             users = await User.find();
         } else if(req.role == 'owner'){
             users = await User.find({ role: 'user' });
-        } else {
-            users = await User.find({ _id: req.userId });
         }
         if(users.length == 0) {
             return res.status(404).json({ error: 'users not found' });
@@ -128,7 +126,7 @@ usersCtlr.approveOwner = async (req, res) => {
         } else {
             return res.status(400).json({ success: false, message: "Your account is pending approval by admin. Document is not provided by owner" });
         }
-        res.json(user);
+        res.status(200).json(user);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -150,9 +148,9 @@ usersCtlr.rejectOwner = async (req, res) => {
         user.insuranceVerified = false;
         user.licenceVerified = false;
         user.status = "rejected";
-        user.rejectionReason = value.reason;
+        user.reason = value.reason;
         await user.save();
-        res.json({ success: true, message: "Your account is rejected by admin" });
+        res.status(200).json({ success: true, message: "Your account is rejected by admin" });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -210,7 +208,7 @@ usersCtlr.updateProfile = async (req, res) => {
     }
 }
 
-usersCtlr.changePassword = async (req, res) => {  //
+usersCtlr.changePassword = async (req, res) => {  
     const id = req.params.id;
     const body = req.body;
     const { error, value } = ChangePasswordValidation.validate(body);
@@ -231,33 +229,6 @@ usersCtlr.changePassword = async (req, res) => {  //
         user.password = hash;
         await user.save();
         res.json({ message: "password updated successfully" });
-    } catch(err) {
-        console.log(err);
-        res.status(500).json({ error: 'Something went wrong!!!' });
-    }
-}
-
-usersCtlr.search = async (req, res) => {   //
-    try {
-        const { keyword } = req.body;
-        if(!keyword || keyword.trim() == "") {
-          return res.status(400).json({ error: "keyword is required" });
-        }
-
-        // case-insensitive regex pattern
-        const regex = new RegExp(keyword.trim(), "i");
-
-        // serach Owners (role = "owner") by name
-        const userFilter = {
-            role: "owner",
-            isApproved: true,
-            $or: [{ username: { $regex: regex } }, { email: { $regex: regex } }]
-        }
-        const owners = await User.find(userFilter);
-        if(owners.length == 0) {
-            return res.status(400).json({ message: "No match owners found "});
-        }
-        res.json(owners);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });

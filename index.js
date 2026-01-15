@@ -1,4 +1,5 @@
 const express = require('express');
+const http = require("http");
 const cors = require('cors');
 require('dotenv').config();
 require("./app/cron/booking-status-cron");
@@ -7,10 +8,16 @@ app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
+
 const port = process.env.PORT || 3020;
 
 const configureDB = require('./config/db');
 configureDB();
+
+
+const { initSocket } = require("./config/socket.js");
+const server = http.createServer(app);
+initSocket(server);
 
 const authenticateUser = require('./app/middlewares/authenticateUser');
 const authorizeUser = require('./app/middlewares/authorizeUser');
@@ -93,11 +100,8 @@ app.post('/api/upload/user/licence', authenticateUser, authorizeUser(['owner', '
 app.post('/api/upload/user/insurance', authenticateUser, authorizeUser(['owner', 'user']), uploadMiddleware, imageUpload.insurance);
 
 // VehicleTracking
-app.post('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.create);
-app.get('/api/vehicleTrackings/live/:id', authenticateUser, vehicleTrackingCtlr.live);
-//app.get('/api/vehicleTrackings/history/:id/?startDate&endDate', authenticateUser, vehicleTrackingCtlr.history);
-app.get('/api/vehicleTrackings/alerts/:id', authenticateUser, vehicleTrackingCtlr.alerts);
-app.get('/api/vehicleTrackings/hourlycost/:id', authenticateUser, vehicleTrackingCtlr.hourlyCost); // bookingId
+// app.post('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.create);
+// app.post('/api/vehicleTrackings/live', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesTrackingCtlr.updateVehicleLocation );
 
 // Review
 app.post('/api/reviews', authenticateUser, reviewCtlr.create);
