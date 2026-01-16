@@ -1,5 +1,6 @@
 const express = require('express');
 const http = require("http");
+const path = require("path");
 const cors = require('cors');
 require('dotenv').config();
 require("./app/cron/booking-status-cron");
@@ -17,7 +18,13 @@ configureDB();
 
 const { initSocket } = require("./config/socket.js");
 const server = http.createServer(app);
+app.set("view engine", "ejs");
+app.use(express.static(path.join(__dirname, "public")));
 initSocket(server);
+
+app.get("/", (req, res) => {
+  res.render("index");
+});
 
 const authenticateUser = require('./app/middlewares/authenticateUser');
 const authorizeUser = require('./app/middlewares/authorizeUser');
@@ -47,7 +54,7 @@ app.put('/users/owner/reject/:id', authenticateUser, authorizeUser(['admin']), u
 app.delete('/users/profile/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.remove); //button
 app.get('/users/owners', authenticateUser, authorizeUser(['admin']), usersCtlr.listOwners); //
 app.get('/users/listUsers', authenticateUser, authorizeUser(['admin']), usersCtlr.listUsers);
-app.get('/users/search', authenticateUser, usersCtlr.search); //
+// app.get('/users/search', authenticateUser, usersCtlr.search); //
 
 // Authenticated User Profile
 app.get('/users/profile', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.profile); //
@@ -130,6 +137,6 @@ app.get('/api/earningsAnalytics', authenticateUser, earningAnalyticsCtlr.list);
 app.put('/api/earningsAnalytics/:id', authenticateUser, earningAnalyticsCtlr.update);
 app.delete('/api/earningsAnalytics/:id', authenticateUser, earningAnalyticsCtlr.remove);
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log('server is running on port', port);
 })

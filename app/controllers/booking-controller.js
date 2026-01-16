@@ -304,7 +304,7 @@ bookingsCtlr.startTrip = async (req, res) => {
         if(!booking) {
             return res.status(404).json({ error: 'record not found' });
         }
-        if(booking.bookingStatus !== "Approved") {
+        if(booking.bookingStatus !== "approved") {
            return res.status(400).json({ error: "only approved booking can be started" });
         }
         booking.bookingStatus = "in-progress";
@@ -339,7 +339,7 @@ bookingsCtlr.endTrip = async(req, res) => {
         if(booking.bookingStatus !== "in-progress") {
             return res.status(400).json({ error: "only in-progress bookings can be ended" });
         }
-        booking.bookingStatus = "Completed";
+        booking.bookingStatus = "completed";
         await booking.save();
         const vehicle = await Vehicle.findById(booking.vehicle);
         if(vehicle) {

@@ -1,105 +1,45 @@
-// const { updateVehicleLocation } = require('./controllers/vehicleTrackingController');
+// const app = express();
+// const httpServer = createServer(app);
+// const io = new Server(httpServer, { /* options */ });
 
-// const initSocket = function(io) {
-//     io.on('connection', (socket) => {
-//         console.log('User/Driver Connected:', socket.id);
+// io.on("connection", (socket) => {
+  // ...
+// });
 
-//         // Driver joins a room based on bookingId
-//         socket.on('join_booking', (bookingId) => {
-//             socket.join(bookingId);
-//             console.log(`Socket ${socket.id} joined room: ${bookingId}`);
-//         });
-
-//         // Listen for location updates from driver
-//         socket.on('update_location', async (data) => {
-//             // 1. Save to DB (optional: for historical tracking)
-//             await updateVehicleLocation(data);
-            
-//             // 2. Broadcast to users in the same booking room
-//             io.to(data.bookingId).emit('receive_location', {
-//                 vehicleId: data.vehicleId,
-//                 lat: data.lat,
-//                 lng: data.lng
-//             });
-//         });
-//         socket.on('disconnect', () => {
-//             console.log('User/Driver Disconnected:', socket.id);
-//         });
-//     });
-// };
-
-// module.exports = initSocket;
+// httpServer.listen(3000);
 
 
 
-const { Server } = require('socket.io');
-const {
-  updateVehicleLocation
-} = require('../app/controllers/vehicleTracking-controller');
+// socket.js
+
+const socketio = require("socket.io");
 
 let io;
 
-const initSocket = (httpServer) => {
-  io = new Server(httpServer, {
+function initSocket(server) {
+  io = socketio(server, {
     cors: {
-      origin: '*',
-      methods: ['GET', 'POST']
+      origin: "http://localhost:5173", // your React frontend
+      methods: ["GET", "POST"],
+      credentials: true
     }
   });
 
-  io.on('connection', (socket) => {
-    console.log('Socket Connected:', socket.id);
+  io.on("connection", (socket) => {
+    console.log("New client connected:", socket.id);
 
-    // Join booking room
-    socket.on('join_booking', (bookingId) => {
-      socket.join(bookingId);
-      console.log(`Socket ${socket.id} joined booking ${bookingId}`);
+    // Receive location from driver
+    socket.on("send-location", (data) => {
+      // Broadcast to all admins / dashboards
+      io.emit("receive-location", { id: socket.id, ...data });
     });
 
-    // Receive live location from driver
-    socket.on('update_location', async (data) => {
-      try {
-        /*
-          data = {
-            bookingId,
-            vehicleId,
-            lat,
-            lng,
-            speed
-          }
-        */
-
-        // Save to DB
-        await updateVehicleLocation(
-          { body: data },
-          { status: () => ({ json: () => {} }) } // dummy res
-        );
-
-        // Broadcast to users
-        io.to(data.bookingId).emit('receive_location', {
-          vehicleId: data.vehicleId,
-          lat: data.lat,
-          lng: data.lng,
-          speed: data.speed || 0,
-          updatedAt: Date.now()
-        });
-      } catch (err) {
-        console.error('Socket update error:', err);
-      }
-    });
-
-    socket.on('disconnect', () => {
-      console.log('Socket Disconnected:', socket.id);
+    // Handle disconnect
+    socket.on("disconnect", () => {
+      io.emit("user-disconnected", socket.id);
+      console.log("Client disconnected:", socket.id);
     });
   });
-};
+}
 
-const getIo = () => {
-  if (!io) throw new Error('Socket.io not initialized');
-  return io;
-};
-
-module.exports = {
-  initSocket,
-  getIo
-};
+module.exports = { initSocket, io };
