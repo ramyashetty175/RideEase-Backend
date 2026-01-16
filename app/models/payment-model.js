@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 
 const PaymentSchema = new mongoose.Schema({
+    orderId: String,
+    amount: Number,
+    status: {
+        type: String,
+        enum: ["created", "paid", "failed", "refunded"],
+    },
     booking: {
         type: mongoose.Schema.ObjectId,
         ref: 'Booking'
@@ -8,29 +14,6 @@ const PaymentSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.ObjectId,
         ref: 'User'
-    },
-    amount: Number,
-    paymentMethod: {
-        type: String,
-        enum: ["Card", "UPI", "Wallet", "NetBanking", "Cash"]
-    },
-    transactionId: {
-        type: String,
-        unique: true //
-    },
-    paymentStatus: {
-        type: String,
-        enum: ["Pending", "Completed", "Failed", "Refunded"],
-        default: "Pending"
-    },
-    refundAmount: {
-        type: Number,
-        default: 0
-    },
-    refundStatus: {
-        type: String,
-        enum: ["Not Requested", "Requested", "Processed"],
-        default: "Not Requested"
     }
 }, { timestamps: true });
 

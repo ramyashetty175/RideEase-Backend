@@ -274,7 +274,7 @@ bookingsCtlr.confirm = async (req, res) => {
         if(!booking) {
             return res.status(404).json({ error: 'booking does not exists' });
         }
-        // booking.paymentStatus = "Paid";
+        booking.paymentStatus = "paid";
         booking.bookingStatus = "confirmed";
         const vehicle = await Vehicle.findById(booking.vehicle);
         if(vehicle) {
@@ -304,8 +304,8 @@ bookingsCtlr.startTrip = async (req, res) => {
         if(!booking) {
             return res.status(404).json({ error: 'record not found' });
         }
-        if(booking.bookingStatus !== "approved") {
-           return res.status(400).json({ error: "only approved booking can be started" });
+        if(booking.bookingStatus !== "confirmed") {
+           return res.status(400).json({ error: "only confirmed booking can be started" });
         }
         booking.bookingStatus = "in-progress";
         await booking.save();
