@@ -92,11 +92,11 @@ app.get('/api/bookingCancellation', authenticateUser, authorizeUser(['admin', 'o
 app.put('/api/bookingCancellation/approve/:id', authenticateUser, authorizeUser(['admin','owner']), bookingCancellationCtlr.approveCancel);
 
 // payment
-app.post('/api/payments/createOrder', authenticateUser, paymentCtlr.createOrder);
-app.post('/api/payments/verify', authenticateUser, paymentCtlr.verifyPayment);
-app.get('/api/payments/cancel', authenticateUser, paymentCtlr.cancel);
-app.get('/api/payment/:id', authenticateUser, paymentCtlr.show);
-app.get('/api/payments', authenticateUser, paymentCtlr.list);
+app.post('/api/payments/createOrder', paymentCtlr.createOrder);
+app.post('/api/payments/verify', paymentCtlr.verifyPayment);
+// app.get('/api/payments/cancel', authenticateUser, paymentCtlr.cancel);
+// app.get('/api/payment/:id', authenticateUser, paymentCtlr.show);
+// app.get('/api/payments', authenticateUser, paymentCtlr.list);
 
 // AI ChatBot
 app.post('/api/chat', authenticateUser, chatCtlr.askAI);
