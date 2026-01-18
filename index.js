@@ -70,6 +70,7 @@ app.get('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin', 'use
 app.delete('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesCtlr.remove); // button
 app.get('/api/vehicles/search', authenticateUser, authorizeUser(['admin', 'owner', 'user']), vehiclesCtlr.search);
 app.get('/api/vehicles/:id', authenticateUser, vehiclesCtlr.show);  
+app.get('/api/vehicles/available', authenticateUser, vehiclesCtlr.available);
 
 // Booking
 app.post('/api/bookings', authenticateUser, bookingsCtlr.create);

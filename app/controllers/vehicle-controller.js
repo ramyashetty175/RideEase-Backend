@@ -1,4 +1,5 @@
 const Vehicle = require('../models/vehicle-model');
+const Booking = require('../models/booking-model');
 const cloudinary = require("../../config/cloudinary");
 const { VehicleValidation } = require('../validations/vehicle-validations');
 
@@ -106,35 +107,6 @@ vehiclesCtlr.listVehicles = async (req, res) => {
         res.status(500).json({ error: 'Something went wrong!!!' });
     }
 }
-
-// vehiclesCtlr.update = async (req, res) => { 
-//     const body = req.body;
-//     const id = req.params.id;
-//      const{ error, value } = VehicleValidation.validate(body);
-//     if(error) {
-//         return res.status(400).json({ error: error.details });
-//     }
-//     try {
-//         let vehicle;
-//         if(req.role == "admin") {
-//             vehicle = await Vehicle.findByIdAndUpdate(id, value, { new: true });
-//         } else {
-//             vehicle = await Vehicle.findOneAndUpdate({ _id: id, owner: req.userId }, value, { new: true });
-//             if(!vehicle) {
-//                 return res.status(403).json({ error: 'You are not allowed to update vehicle or vehicle not exists' });
-//             }
-//         }
-//         if(!vehicle) {
-//             return res.status(404).json({ error: 'vehicle not exists' });
-//         }
-//         res.json(vehicle);
-//     } catch(err) {
-//         console.log(err);
-//         res.status(500).json({ error: 'Something went wrong!!!' });
-//     }
-// }
-
-
 
 vehiclesCtlr.update = async (req, res) => { 
     const id = req.params.id;
@@ -278,4 +250,42 @@ vehiclesCtlr.search = async (req, res) => {
         res.status(500).json({ error: 'Something went wrong!!!' });
     }
 }
+
+
+
+
+
+
+vehiclesCtlr.available = async (req, res) => {
+  try {
+    const { pickupDateTime, returnDateTime } = req.query;
+
+    if (!pickupDateTime || !returnDateTime) {
+      return res.status(400).json({ error: "Pickup and return time required" });
+    }
+
+    // Find bookings that overlap with selected time
+    const conflictingBookings = await Booking.find({
+      startDateTime: { $lt: new Date(returnDateTime) },
+      endDateTime: { $gt: new Date(pickupDateTime) },
+    }).select("vehicle");
+
+    // Get booked vehicle IDs
+    const bookedVehicleIds = conflictingBookings.map(
+      (b) => b.vehicle
+    );
+
+    // Find vehicles NOT in booked list
+    const availableVehicles = await Vehicle.find({
+      status: "approved",
+      _id: { $nin: bookedVehicleIds },
+    });
+
+    res.status(200).json(availableVehicles);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+}
+
 module.exports = vehiclesCtlr;
