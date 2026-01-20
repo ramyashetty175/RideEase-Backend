@@ -166,31 +166,65 @@ bookingsCtlr.remove = async(req, res) => {
     }
 }
 
-bookingsCtlr.checkAvailability = async (req, res) => {  
-    const body = req.body; 
-    const { error, value } = BookingAvailabilityValidation.validate(body, { abortEarly: false });
-    if(error) {
-        return res.status(400).json({ error: error.details });
+bookingsCtlr.checkAvailability = async (req, res) => {
+  try {
+    const vehicleId = req.params.id;
+
+    const { error, value } = BookingAvailabilityValidation.validate(
+      req.body,
+      { abortEarly: false }
+    );
+
+    if (error) {
+      return res.status(400).json({
+        available: false,
+        errors: error.details
+      });
     }
-    try {
-        const vehicle = await Vehicle.findById(value.vehicle);
-        if (!vehicle) {
-            return res.status(404).json({ error: 'Vehicle not found' });
-        }
-        const overlappingBooking = await Booking.findOne({
-            vehicle: value.vehicle,
-            bookingStatus: { $in: ["Approved", "in-progress"] },
-            startDateTime: { $lt: new Date(value.endDateTime) },
-            endDateTime: { $gt: new Date(value.startDateTime) }
-        })
-        if (overlappingBooking) {
-            return res.json({available: false,message: "Vehicle already booked for selected dates"});
-        }
-        res.json({ success: true, message: "No bookings for these dates" });
-    } catch(err) {
-        console.log(err);
-        res.status(500).json({ error: 'Something went wrong!!!' });
+
+    const { startDateTime, endDateTime } = value;
+
+    if (!vehicleId) {
+      return res.status(400).json({
+        available: false,
+        message: "Vehicle id is required"
+      });
     }
+
+    const vehicle = await Vehicle.findById(vehicleId);
+    if (!vehicle) {
+      return res.status(404).json({
+        available: false,
+        message: "Vehicle not found"
+      });
+    }
+
+    const overlappingBooking = await Booking.findOne({
+      vehicle: vehicleId,
+      bookingStatus: { $in: ["Approved", "in-progress"] },
+      startDateTime: { $lt: new Date(endDateTime) },
+      endDateTime: { $gt: new Date(startDateTime) }
+    });
+
+    if (overlappingBooking) {
+      return res.json({
+        available: false,
+        message: "Vehicle already booked for selected dates"
+      });
+    }
+
+    return res.json({
+      available: true,
+      message: "Vehicle available for selected dates"
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      available: false,
+      message: "Something went wrong"
+    });
+  }
 }
 
 bookingsCtlr.approve = async (req, res) => {
