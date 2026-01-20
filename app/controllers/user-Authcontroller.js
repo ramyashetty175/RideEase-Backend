@@ -25,7 +25,8 @@ usersCtlr.register = async(req, res) => {
         const userCount = await User.countDocuments();
         if(userCount == 0) {
             user.role = "admin";
-        } else if(userCount > 0 && userCount <= 3) {
+            user.status = "approved";
+        } else if(userCount > 0 && userCount <= 5) {
             user.role = "owner";
             user.status = "pending";
         } else {
@@ -119,14 +120,12 @@ usersCtlr.approveOwner = async (req, res) => {
             return res.status(404).json({ error: 'Owner account not found or does not exist' });
         }
         if(user.insuranceDoc && user.licenceDoc) {
-            user.insuranceVerified = true;
             user.licenceVerified = true;
+            user.insuranceVerified = true;
             user.status = "approved";
-            await user.save();
-        } else {
-            return res.status(400).json({ success: false, message: "Your account is pending approval by admin. Document is not provided by owner" });
         }
-        res.status(200).json(user);
+        await user.save();
+        return res.status(200).json({ success: true, message: "Owner status updated successfully" });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -134,12 +133,7 @@ usersCtlr.approveOwner = async (req, res) => {
 }
 
 usersCtlr.rejectOwner = async (req, res) => {
-    const body = req.body;
     const id = req.params.id;
-    const { error, value } = RejectOwnerValidation.validate(body);
-    if(error) {
-        return res.status(400).json({ error: error.details });
-    }
     try {
         const user = await User.findOne({ _id: id, role: 'owner' });
         if(!user) {
@@ -148,7 +142,6 @@ usersCtlr.rejectOwner = async (req, res) => {
         user.insuranceVerified = false;
         user.licenceVerified = false;
         user.status = "rejected";
-        user.reason = value.reason;
         await user.save();
         res.status(200).json({ success: true, message: "Your account is rejected by admin" });
     } catch(err) {

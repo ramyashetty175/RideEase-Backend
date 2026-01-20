@@ -40,7 +40,6 @@ const vehicleTrackingCtlr = require('./app/controllers/vehicleTracking-controlle
 const notificationCtlr = require('./app/controllers/notification-controller');
 const subscriptionCtlr = require('./app/controllers/subscription-controller');
 const earningAnalyticsCtlr = require('./app/controllers/earningAnalytics-controller');
-const vehiclesTrackingCtlr = require('./app/controllers/vehicleTracking-controller');
 const chatCtlr = require('./app/controllers/chat-Controller');
 
 // Public Route
@@ -62,7 +61,7 @@ app.put('/users/profile', authenticateUser, authorizeUser(['admin', 'owner', 'us
 app.put('/users/password/:id', authenticateUser, authorizeUser(['user']), usersCtlr.changePassword); //
 
 // Vehicle
-app.post('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin']), uploadMiddleware, vehiclesCtlr.create);
+app.post('/api/vehicles', authenticateUser, authorizeUser(['owner']), uploadMiddleware, vehiclesCtlr.create);
 app.put('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), uploadMiddleware, vehiclesCtlr.update);
 app.put('/api/vehicles/approve/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.approveVehicle);  
 app.put('/api/vehicles/reject/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.rejectVehicle);

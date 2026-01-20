@@ -7,10 +7,10 @@ const vehiclesCtlr = {};
 
 vehiclesCtlr.create = async (req, res) => {
     try {
-        if (!req.files.image || !req.files.licenseDoc || !req.files.insuranceDoc) {
+        if (!req.files || !req.files.image || !req.files.licenseDoc || !req.files.insuranceDoc) {
             return res.status(400).json({ success: false, error: "Image, LicenseDoc, InsuranceDoc are required" });
         }
-        const imageRes = await cloudinary.uploader.upload( 
+        const imageRes = await cloudinary.uploader.upload(
             req.files.image.tempFilePath,
             {
                 folder: "vehicles/images",
@@ -54,6 +54,7 @@ vehiclesCtlr.create = async (req, res) => {
         vehicle.brand = value.brand;
         vehicle.type = value.type;
         vehicle.registrationNumber = value.registrationNumber;
+        vehicle.image = value.image;
         vehicle.licenseDoc = value.licenseDoc;
         vehicle.insuranceDoc = value.insuranceDoc;
         vehicle.fuelType = value.fuelType;
@@ -61,13 +62,8 @@ vehiclesCtlr.create = async (req, res) => {
         vehicle.seats = value.seats;
         vehicle.pricePerDay = value.pricePerDay;
         vehicle.location = value.location;
-        vehicle.image = value.image;
         vehicle.availabilityStatus = value.availabilityStatus;
-        if (req.role === 'admin') {
-            vehicle.status = "approved";
-        } else if(req.role == 'owner') {
-            vehicle.status = "pending";
-        }
+        vehicle.status = "pending";
         await vehicle.save();
         res.status(201).json({ success: true, message: "Vehicle added successfully", vehicle });
         } catch (err) {
@@ -94,9 +90,9 @@ vehiclesCtlr.listVehicles = async (req, res) => {
     try {
         let vehicles;
         if(req.role == 'admin'|| req.role == 'user') {
-            vehicles = await Vehicle.find();
+            vehicles = await Vehicle.find().populate('owner', 'username email');;
         } else if (req.role == 'owner') {
-            vehicles = await Vehicle.find({ owner: req.userId });
+            vehicles = await Vehicle.find({ owner: req.userId }).populate('owner', 'username email');
         }
         if(!vehicles) {
             return res.status(404).json({ error: 'No vehicle found' });
@@ -111,17 +107,9 @@ vehiclesCtlr.listVehicles = async (req, res) => {
 vehiclesCtlr.update = async (req, res) => { 
     const id = req.params.id;
     try {
-        let vehicle;
-        if (req.role === "admin") {
-            vehicle = await Vehicle.findById(id);
-        } else {
-            vehicle = await Vehicle.findOne({ _id: id, owner: req.userId });
-            if (!vehicle) {
-                return res.status(403).json({ error: 'You are not allowed to update this vehicle or it does not exist' });
-            }
-        }
+        const vehicle = await Vehicle.findOne({ _id: id, owner: req.userId });
         if (!vehicle) {
-            return res.status(404).json({ error: 'Vehicle not found' });
+            return res.status(403).json({ error: 'You are not allowed to update this vehicle' });
         }
         const { error, value } = VehicleValidation.validate(req.body, { abortEarly: false });
         if (error) {
@@ -184,7 +172,7 @@ vehiclesCtlr.remove = async (req, res) => {
     }
 }
 
-vehiclesCtlr.approveVehicle = async (req, res) => { 
+vehiclesCtlr.approveVehicle = async (req, res) => {
     const id = req.params.id;
     try {
         if(req.role !== 'admin') {
@@ -194,11 +182,7 @@ vehiclesCtlr.approveVehicle = async (req, res) => {
         if (!vehicle) {
             return res.status(404).json({ error: 'Vehicle not found' });
         }
-        if (!vehicle.licenseDoc || !vehicle.insuranceDoc) {
-            return res.status(400).json({ error: "Both license and insurance documents must be uploaded before approval" });
-        }
         vehicle.status = "approved";
-        vehicle.availabilityStatus = "Available";
         await vehicle.save();
         return res.json({ message: "Vehicle approved successfully", vehicle });
     } catch(err) {
@@ -218,7 +202,6 @@ vehiclesCtlr.rejectVehicle = async (req, res) => {
             return res.status(404).json({ error: 'Vehicle not found' });
         }
         vehicle.status = "rejected";
-        vehicle.availabilityStatus = "unAvailable";
         await vehicle.save();
         return res.json({ message: "Vehicle rejected successfully", vehicle }); 
     } catch(err) {
@@ -250,11 +233,6 @@ vehiclesCtlr.search = async (req, res) => {
         res.status(500).json({ error: 'Something went wrong!!!' });
     }
 }
-
-
-
-
-
 
 vehiclesCtlr.available = async (req, res) => {
   try {

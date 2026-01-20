@@ -35,7 +35,8 @@ const ApproveOwnerValidation = Joi.object({
 })
 
 const RejectOwnerValidation = Joi.object({
-    reason: Joi.string().min(8).required()
+    insuranceDoc: Joi.string().uri().optional(),
+    licenceDoc: Joi.string().uri().optional()
 })
 
 const UpdateProfileValidation = Joi.object({
