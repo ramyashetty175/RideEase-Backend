@@ -177,20 +177,16 @@ bookingsCtlr.checkAvailability = async (req, res) => {
         if (!vehicle) {
             return res.status(404).json({ error: 'Vehicle not found' });
         }
-        const startDateTime = new Date(value.startDateTime);
-        startDateTime.setHours(9, 0, 0, 0); 
-        const endDateTime = new Date(value.endDateTime);
-        endDateTime.setHours(23, 59, 59, 999);
         const overlappingBooking = await Booking.findOne({
             vehicle: value.vehicle,
             bookingStatus: { $in: ["Approved", "in-progress"] },
-            startDateTime: { $lt: endDateTime },
-            endDateTime: { $gt: startDateTime }
-        });
-        if(overlappingBooking) {
-            return res.json({ available: false, message: 'Vehicle is not available for the selected date/time' });
+            startDateTime: { $lt: new Date(value.endDateTime) },
+            endDateTime: { $gt: new Date(value.startDateTime) }
+        })
+        if (overlappingBooking) {
+            return res.json({available: false,message: "Vehicle already booked for selected dates"});
         }
-        res.json({ available: true, message: 'Vehicle is available for booking' });
+        res.json({ success: true, message: "No bookings for these dates" });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
