@@ -75,11 +75,10 @@ app.get('/api/vehicles/available', authenticateUser, vehiclesCtlr.available);
 app.post('/api/bookings', authenticateUser, authorizeUser(['user']), bookingsCtlr.create);
 app.get('/api/bookings/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.show);
 app.get('/api/bookings', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.listBookings);
-app.put('/api/bookings/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.update);
 app.delete('/api/bookings/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.remove);
 app.put('/api/bookings/approve/:id', authenticateUser, authorizeUser(['admin', 'owner']), bookingsCtlr.approve);
 app.put('/api/bookings/cancel/:id', authenticateUser, authorizeUser(['admin', 'owner']), bookingsCtlr.cancel);
-app.post('/api/bookings/check/:id', authenticateUser,bookingsCtlr.checkAvailability);
+app.post('/api/bookings/check/:id', authenticateUser,authorizeUser(['user']), bookingsCtlr.checkAvailability);
 app.put('/api/bookings/confirm/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.confirm);   
 app.put('/api/bookings/start/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.startTrip);  
 app.put('/api/bookings/end/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.endTrip);     
@@ -92,8 +91,8 @@ app.get('/api/bookingCancellation', authenticateUser, authorizeUser(['admin', 'o
 app.put('/api/bookingCancellation/approve/:id', authenticateUser, authorizeUser(['admin','owner']), bookingCancellationCtlr.approveCancel);
 
 // payment
-app.post('/api/payments/createOrder', paymentCtlr.createOrder);
-app.post('/api/payments/verify', paymentCtlr.verifyPayment);
+app.post('/api/payments/createOrder', authenticateUser, paymentCtlr.createOrder);
+app.post('/api/payments/verify', authenticateUser, paymentCtlr.verifyPayment);
 // app.get('/api/payments/cancel', authenticateUser, paymentCtlr.cancel);
 // app.get('/api/payment/:id', authenticateUser, paymentCtlr.show);
 // app.get('/api/payments', authenticateUser, paymentCtlr.list);

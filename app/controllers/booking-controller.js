@@ -16,11 +16,14 @@ bookingsCtlr.create = async(req, res) => {
         if(!vehicle) {
             return res.status(404).json({ error: 'Vehicle not found' });
         }
+        const newStart = new Date(value.startDateTime);
+        const newEnd   = new Date(value.endDateTime);
         const userDuplicate = await Booking.findOne({
             user: req.userId,
             vehicle: value.vehicle,
-            startDateTime: { $lt: new Date(value.endDateTime) },
-            endDateTime: { $gt: new Date(value.startDateTime) }
+            bookingStatus: { $in: ["pending", "approved", "confirmed", "in-progress"] },
+            startDateTime: { $lt: newEnd },
+            endDateTime: { $gt: newStart }
         });
         if (userDuplicate) {
             return res.status(400).json({ error: 'You already booked this vehicle for these dates or Time' });
@@ -28,8 +31,8 @@ bookingsCtlr.create = async(req, res) => {
         const overlappingBooking = await Booking.findOne({
             vehicle: value.vehicle,
             bookingStatus: { $in: ["approved", "confirmed", "in-progress"] },
-            startDateTime: { $lt: new Date(value.endDateTime) },
-            endDateTime: { $gt: new Date(value.startDateTime) }
+            startDateTime: { $lt: newEnd  },
+            endDateTime: { $gt: newStart }
         });
         if (overlappingBooking) {
             return res.status(400).json({ error: 'Vehicle is not available for the selected dates' });
@@ -38,11 +41,10 @@ bookingsCtlr.create = async(req, res) => {
         booking.user = req.userId;
         booking.vehicle = value.vehicle;
         booking.owner = vehicle.owner;
-        booking.startDateTime = value.startDateTime;
-        booking.endDateTime = value.endDateTime;
+        booking.startDateTime = newStart;
+        booking.endDateTime = newEnd;
         booking.pickupLocation = value.pickupLocation;
         booking.returnLocation = value.returnLocation;
-        // booking.totalAmount = value.totalAmount;
         await booking.save();
         res.status(201).json({ message: "booking created successfully", booking });
     } catch(err) {
@@ -106,38 +108,6 @@ bookingsCtlr.listBookings = async(req, res) => {
     }
 }
 
-bookingsCtlr.update = async(req, res) => {
-    const body = req.body;
-    const id = req.params.id;
-    const { error, value } = BookingUpdateValidation.validate(body);
-    if(error) {
-        return res.status(400).json({ error: error.details });
-    }
-    try {
-        let booking;
-        if(req.role == "admin") {
-            booking = await Booking.findByIdAndUpdate(id, value, { new: true });
-        } else if(req.role == "owner") {
-            booking = await Booking.findOneAndUpdate({ _id: id, owner: req.userId }, value, { new: true });
-            if(!booking) {
-               return res.status(403).json({ error: 'You are not allowed to update this booking or booking not exists' });
-            }
-        } else {
-            booking = await Booking.findOneAndUpdate({ _id: id, user: req.userId }, value, { new: true });
-            if(!booking) {
-               return res.status(403).json({ error: 'You are not allowed to update this booking or booking not exists' });
-            }
-        }
-        if(!booking) {
-           return res.status(404).json({ error: 'booking not found' });
-        }
-        res.json(booking);
-    } catch(err) {
-        console.log(err);
-        res.status(500).json({ error: 'Something went wrong!!!' });
-    }
-}
-
 bookingsCtlr.remove = async(req, res) => {
     const id = req.params.id;
     try {
@@ -167,64 +137,33 @@ bookingsCtlr.remove = async(req, res) => {
 }
 
 bookingsCtlr.checkAvailability = async (req, res) => {
-  try {
-    const vehicleId = req.params.id;
-
-    const { error, value } = BookingAvailabilityValidation.validate(
-      req.body,
-      { abortEarly: false }
-    );
-
-    if (error) {
-      return res.status(400).json({
-        available: false,
-        errors: error.details
-      });
+    const body = req.body;
+    const id = req.params.id;
+    const { error, value } = BookingUpdateValidation.validate(body);
+    if(error) {
+        return res.status(400).json({ error: error.details });
     }
-
     const { startDateTime, endDateTime } = value;
-
-    if (!vehicleId) {
-      return res.status(400).json({
-        available: false,
-        message: "Vehicle id is required"
-      });
+    const vehicleId = req.params.id;
+    try {
+        const vehicle = await Vehicle.findById(vehicleId);
+        if (!vehicle) {
+            return res.status(404).json({ error: "Vehicle not found" });
+        }
+        const overlappingBooking = await Booking.findOne({
+            vehicle: id,
+            bookingStatus: { $in: ["Approved", "in-progress"] },
+            startDateTime: { $lt: new Date(endDateTime) },
+            endDateTime: { $gt: new Date(startDateTime) }
+        })
+        if (overlappingBooking) {
+            return res.status(400).json({ message: "Vehicle already booked for selected dates" });
+        }
+        res.status(200).json({ message: 'Vehicle is available for selected dates' });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Something went wrong!!!' });
     }
-
-    const vehicle = await Vehicle.findById(vehicleId);
-    if (!vehicle) {
-      return res.status(404).json({
-        available: false,
-        message: "Vehicle not found"
-      });
-    }
-
-    const overlappingBooking = await Booking.findOne({
-      vehicle: vehicleId,
-      bookingStatus: { $in: ["Approved", "in-progress"] },
-      startDateTime: { $lt: new Date(endDateTime) },
-      endDateTime: { $gt: new Date(startDateTime) }
-    });
-
-    if (overlappingBooking) {
-      return res.json({
-        available: false,
-        message: "Vehicle already booked for selected dates"
-      });
-    }
-
-    return res.json({
-      available: true,
-      message: "Vehicle available for selected dates"
-    });
-
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({
-      available: false,
-      message: "Something went wrong"
-    });
-  }
 }
 
 bookingsCtlr.approve = async (req, res) => {
@@ -249,7 +188,9 @@ bookingsCtlr.approve = async (req, res) => {
         if(!user.licenceDoc || !user.insuranceDoc) {
             return res.status(400).json({ error: "User has not uploaded Licence or Insurance documents" });
         }
-        booking.bookingStatus = "approved";
+        if(booking.paymentStatus == 'paid') {
+           booking.bookingStatus = "confirmed";
+        }
         await booking.save();
         res.json({ message: "booking Approved successfully", booking });
     } catch(err) {
