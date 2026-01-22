@@ -14,7 +14,11 @@ const PaymentSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.ObjectId,
         ref: 'User'
-    }
+    },
+    transactionId: {
+    type: String,
+    unique: true,
+    },
 }, { timestamps: true });
 
 const Payment = mongoose.model('Payment', PaymentSchema);

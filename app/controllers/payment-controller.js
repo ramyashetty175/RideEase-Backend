@@ -51,39 +51,94 @@ paymentCtlr.createOrder = async (req, res) => {
     }
 }
 
+// paymentCtlr.verifyPayment = async (req, res) => {
+//     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+
+//     try {
+//         const generated_signature = crypto
+//             .createHmac("sha256", process.env.RAZOPAY_KEY_SECRET)
+//             .update(razorpay_order_id + "|" + razorpay_payment_id)
+//             .digest("hex");
+
+//         const payment = await Payment.findOne({ orderId: razorpay_order_id }).populate("booking");
+
+//         if (!payment) {
+//             return res.status(404).json({ error: "Payment not found!" });
+//         }
+//         const booking = await Booking.findById(payment.booking);
+//             if (!booking) {
+//                 return res.status(404).json({ error: 'Booking not found' });
+//             }
+//         if (generated_signature === razorpay_signature) {
+//             payment.status = "paid";
+//             await payment.save();
+//             booking.paymentStatus = "paid";
+//             await booking.save();
+//             return res.status(200).json({ success: true, message: "Payment verified!" });
+//         } else {
+//             payment.status = "failed";
+//             await payment.save();
+//             booking.paymentStatus = "failed";
+//             await booking.save();
+//             return res.status(200).json({ success: false, message: "Payment verification failed!" });
+//         }
+//     } catch (err) {
+//         console.log(err);
+//         res.status(500).json({ error: "Something went wrong while verifying payment" });
+//     }
+// }
+
+
 paymentCtlr.verifyPayment = async (req, res) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
     try {
+        // Generate signature locally
         const generated_signature = crypto
             .createHmac("sha256", process.env.RAZOPAY_KEY_SECRET)
             .update(razorpay_order_id + "|" + razorpay_payment_id)
             .digest("hex");
 
-        const payment = await Payment.findOne({ orderId: razorpay_order_id }).populate("booking");
+        // Find the Payment document in your DB
+        const payment = await Payment.findOne({ orderId: razorpay_order_id });
 
         if (!payment) {
-            return res.status(404).json({ error: "Payment not found!" });
+            return res.status(404).json({ success: false, message: "Payment not found!" });
         }
-        const booking = await Booking.findById(payment.booking);
-            if (!booking) {
-                return res.status(404).json({ error: 'Booking not found' });
-            }
+
+        // Verify signature
         if (generated_signature === razorpay_signature) {
-            payment.status = "paid";
+            payment.transactionId = razorpay_payment_id;  
+            payment.status = "paid";    
             await payment.save();
-            booking.paymentStatus = "paid";
-            await booking.save();
-            res.status(200).json({ success: true, message: "Payment verified!" });
+
+            // Optional: also update booking payment status if linked
+            if (payment.booking) {
+                const booking = await Booking.findById(payment.booking);
+                if (booking) {
+                    booking.paymentStatus = "paid";
+                    await booking.save();
+                }
+            }
+
+            return res.status(200).json({ success: true, message: "Payment verified!" });
+        } else {
+            payment.status = "failed";  
+            await payment.save();
+
+            if (payment.booking) {
+                const booking = await Booking.findById(payment.booking);
+                if (booking) {
+                    booking.paymentStatus = "failed";
+                    await booking.save();
+                }
+            }
+
+            return res.status(400).json({ success: false, message: "Payment verification failed!" });
         }
-            payment.status = "failed";
-            await payment.save();
-            booking.paymentStatus = "failed";
-            await booking.save();
-            res.status(200).json({ success: false, message: "Payment verification failed!" });
     } catch (err) {
         console.log(err);
-        res.status(500).json({ error: "Something went wrong while verifying payment" });
+        res.status(500).json({ success: false, message: "Something went wrong while verifying payment" });
     }
 }
 

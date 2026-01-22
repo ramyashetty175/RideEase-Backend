@@ -221,8 +221,10 @@ bookingsCtlr.cancel = async (req, res) => {
         if(!user.licenceDoc || !user.insuranceDoc) {
             return res.status(400).json({ error: "User has not uploaded Licence or Insurance documents" });
         }
-        booking.bookingStatus = "canceled";
-        await booking.save();
+        if(booking.paymentStatus == 'failed') {
+           booking.bookingStatus = "canceled";
+           await booking.save();
+        }
         res.json({ message: "booking Canceled successfully", booking });
     } catch(err) {
         console.log(err);
