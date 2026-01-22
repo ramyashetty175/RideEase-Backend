@@ -142,4 +142,16 @@ paymentCtlr.verifyPayment = async (req, res) => {
     }
 }
 
+// GET /api/payments
+paymentCtlr.list = async (req, res) => {
+  try {
+    // Fetch all payments, optionally populate booking or user info if needed
+    const payments = await Payment.find()
+      .populate("user", "username email");
+    res.status(200).json(payments);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Something went wrong while fetching payments" });
+  }
+}
 module.exports = paymentCtlr;

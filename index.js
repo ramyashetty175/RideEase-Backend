@@ -78,11 +78,11 @@ app.get('/api/bookings', authenticateUser, authorizeUser(['admin', 'owner', 'use
 app.delete('/api/bookings/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.remove);
 app.put('/api/bookings/approve/:id', authenticateUser, authorizeUser(['admin', 'owner']), bookingsCtlr.approve);
 app.put('/api/bookings/cancel/:id', authenticateUser, authorizeUser(['admin', 'owner']), bookingsCtlr.cancel);
-app.post('/api/bookings/check/:id', authenticateUser,authorizeUser(['user']), bookingsCtlr.checkAvailability);
-app.put('/api/bookings/confirm/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.confirm);   
+// app.post('/api/bookings/check/:id', authenticateUser,authorizeUser(['user']), bookingsCtlr.checkAvailability);
+// app.put('/api/bookings/confirm/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.confirm);   
 app.put('/api/bookings/start/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.startTrip);  
 app.put('/api/bookings/end/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.endTrip);     
-app.put('/api/bookings/extend/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.extend); 
+// app.put('/api/bookings/extend/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.extend); 
 
 // BookingCancellation
 app.post('/api/bookingCancellation/request/:id', authenticateUser, authorizeUser(['user']), bookingCancellationCtlr.requestCancel);
@@ -95,7 +95,7 @@ app.post('/api/payments/createOrder', authenticateUser, paymentCtlr.createOrder)
 app.post('/api/payments/verify', authenticateUser, paymentCtlr.verifyPayment);
 // app.get('/api/payments/cancel', authenticateUser, paymentCtlr.cancel);
 // app.get('/api/payment/:id', authenticateUser, paymentCtlr.show);
-// app.get('/api/payments', authenticateUser, paymentCtlr.list);
+app.get('/api/payments', authenticateUser, paymentCtlr.list);
 
 // AI ChatBot
 app.post('/api/chat', authenticateUser, chatCtlr.askAI);

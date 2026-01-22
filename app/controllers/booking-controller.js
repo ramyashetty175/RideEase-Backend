@@ -85,7 +85,7 @@ bookingsCtlr.listBookings = async(req, res) => {
     try {
         let bookings;
         if(req.role == "admin") {
-            bookings = await Booking.find();
+            bookings = await Booking.find().populate("user", "username licenceDoc insuranceDoc");
         } else if(req.role == "owner") {
             bookings = await Booking.find({ owner: req.userId });
             if(bookings.length == 0) {
@@ -93,7 +93,7 @@ bookingsCtlr.listBookings = async(req, res) => {
             }
         }
         else {
-            bookings = await Booking.find({ user: req.userId });
+            bookings = await Booking.find({ user: req.userId }).populate("user", "name licenceDoc insuranceDoc");
             if(bookings.length == 0) {
                return res.status(403).json({ error: 'You are not allowed to see this bookings or bookings not exists' });
             }
