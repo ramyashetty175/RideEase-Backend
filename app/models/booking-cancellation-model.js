@@ -32,14 +32,6 @@ const bookingCancellationSchema = new mongoose.Schema({
         enum: ["pending", "approved", "rejected"],
         default: "pending"
     },
-    refundAmount: {
-        type: Number,
-        default: 0
-    }, 
-    penaltyAmount: {
-        type: Number,
-        default: 0
-    },
     paymentStatus: {
         type: String,
         enum: ["not_processed", "refunded", "failed"],

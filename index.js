@@ -77,24 +77,19 @@ app.get('/api/bookings/:id', authenticateUser, authorizeUser(['admin', 'owner', 
 app.get('/api/bookings', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.listBookings);
 app.delete('/api/bookings/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.remove);
 app.put('/api/bookings/approve/:id', authenticateUser, authorizeUser(['admin', 'owner']), bookingsCtlr.approve);
-app.put('/api/bookings/cancel/:id', authenticateUser, authorizeUser(['admin', 'owner']), bookingsCtlr.cancel);
-// app.post('/api/bookings/check/:id', authenticateUser,authorizeUser(['user']), bookingsCtlr.checkAvailability);
-// app.put('/api/bookings/confirm/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.confirm);   
+app.put('/api/bookings/cancel/:id', authenticateUser, authorizeUser(['admin', 'owner']), bookingsCtlr.cancel);  
 app.put('/api/bookings/start/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.startTrip);  
 app.put('/api/bookings/end/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.endTrip);     
-// app.put('/api/bookings/extend/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.extend); 
 
 // BookingCancellation
 app.post('/api/bookingCancellation/request/:id', authenticateUser, authorizeUser(['user']), bookingCancellationCtlr.requestCancel);
-app.get('/api/bookingCancellation/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingCancellationCtlr.show);
-app.get('/api/bookingCancellation', authenticateUser, authorizeUser(['admin', 'owner', 'user'], bookingCancellationCtlr.list));
+app.get('/api/bookingCancellation', authenticateUser, authorizeUser(['admin', 'owner']), bookingCancellationCtlr.list);
 app.put('/api/bookingCancellation/approve/:id', authenticateUser, authorizeUser(['admin','owner']), bookingCancellationCtlr.approveCancel);
+app.put('/api/bookingCancellation/reject/:id', authenticateUser, authorizeUser(['admin','owner']), bookingCancellationCtlr.rejectCancel);
 
 // payment
 app.post('/api/payments/createOrder', authenticateUser, paymentCtlr.createOrder);
 app.post('/api/payments/verify', authenticateUser, paymentCtlr.verifyPayment);
-// app.get('/api/payments/cancel', authenticateUser, paymentCtlr.cancel);
-// app.get('/api/payment/:id', authenticateUser, paymentCtlr.show);
 app.get('/api/payments', authenticateUser, paymentCtlr.list);
 
 // AI ChatBot
@@ -104,10 +99,6 @@ app.post('/api/chat', authenticateUser, chatCtlr.askAI);
 app.post('/api/upload/user/avatar', authenticateUser, authorizeUser(['admin', 'owner', 'user']), uploadMiddleware, imageUpload.avatar);
 app.post('/api/upload/user/licence', authenticateUser, authorizeUser(['owner', 'user']), uploadMiddleware, imageUpload.licence);
 app.post('/api/upload/user/insurance', authenticateUser, authorizeUser(['owner', 'user']), uploadMiddleware, imageUpload.insurance);
-
-// VehicleTracking
-// app.post('/api/vehicleTrackings', authenticateUser, vehiclesTrackingCtlr.create);
-// app.post('/api/vehicleTrackings/live', authenticateUser, authorizeUser(['admin', 'owner']), vehiclesTrackingCtlr.updateVehicleLocation );
 
 // Review
 app.post('/api/reviews', authenticateUser, reviewCtlr.create);

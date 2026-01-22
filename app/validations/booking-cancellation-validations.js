@@ -1,7 +1,6 @@
 const Joi = require('joi');
 
 const BookingCancellationValidation = Joi.object({
-    reason: Joi.string().required(),
     remarks: Joi.string().optional(),
     refundAmount: Joi.number().min(0).optional(),
     penaltyAmount: Joi.number().min(0).optional(),
