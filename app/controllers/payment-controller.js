@@ -65,28 +65,22 @@ paymentCtlr.verifyPayment = async (req, res) => {
         if (!payment) {
             return res.status(404).json({ error: "Payment not found!" });
         }
-        if (generated_signature === razorpay_signature) {
-            payment.status = "paid";
-            payment.razorpayPaymentId = razorpay_payment_id;
-            await payment.save();
-            const booking = await Booking.findById(payment.booking);
+        const booking = await Booking.findById(payment.booking);
             if (!booking) {
                 return res.status(404).json({ error: 'Booking not found' });
             }
+        if (generated_signature === razorpay_signature) {
+            payment.status = "paid";
+            await payment.save();
             booking.paymentStatus = "paid";
             await booking.save();
             res.status(200).json({ success: true, message: "Payment verified!" });
-        } else {
+        }
             payment.status = "failed";
             await payment.save();
-            const booking = await Booking.findById(payment.booking);
-            if (!booking) {
-                return res.status(404).json({ error: 'Booking not found' });
-            }
             booking.paymentStatus = "failed";
             await booking.save();
             res.status(200).json({ success: false, message: "Payment verification failed!" });
-        }
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: "Something went wrong while verifying payment" });

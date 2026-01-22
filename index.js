@@ -52,7 +52,7 @@ app.put('/users/owner/approve/:id', authenticateUser, authorizeUser(['admin']), 
 app.put('/users/owner/reject/:id', authenticateUser, authorizeUser(['admin']), usersCtlr.rejectOwner); 
 app.delete('/users/profile/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), usersCtlr.remove); //button
 app.get('/users/owners', authenticateUser, authorizeUser(['admin']), usersCtlr.listOwners); //
-app.get('/users/listUsers', authenticateUser, authorizeUser(['admin']), usersCtlr.listUsers);
+app.get('/users/listUsers', authenticateUser, authorizeUser(['admin', 'owner']), usersCtlr.listUsers);
 // app.get('/users/search', authenticateUser, usersCtlr.search); //
 
 // Authenticated User Profile
