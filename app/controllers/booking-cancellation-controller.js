@@ -4,6 +4,7 @@ const Booking = require('../models/booking-model');
 
 const bookingCancellationCtlr = {};
 
+// BookingCancel Request
 bookingCancellationCtlr.requestCancel = async(req, res) => {
     const id = req.params.id;
     try {
@@ -40,6 +41,7 @@ bookingCancellationCtlr.requestCancel = async(req, res) => {
     }
 }
 
+// BookingCancel List
 bookingCancellationCtlr.list = async (req, res) => {
     try {
         let bookingcancellation;
@@ -66,6 +68,7 @@ bookingCancellationCtlr.list = async (req, res) => {
     }
 }
 
+// BookingCancel Approve
 bookingCancellationCtlr.approveCancel = async (req, res) => {
     const id = req.params.id;
     try {
@@ -103,12 +106,11 @@ bookingCancellationCtlr.approveCancel = async (req, res) => {
     }
 }
 
+// BookingCancel Reject
 bookingCancellationCtlr.rejectCancel = async (req, res) => {
     const id = req.params.id;
     try {
         let bookingcancellation;
-
-        // Admin can reject any request, owner can reject only their vehicle's bookings
         if(req.role === 'admin') {
             bookingcancellation = await BookingCancellation.findById(id);
         } else {
@@ -117,32 +119,20 @@ bookingCancellationCtlr.rejectCancel = async (req, res) => {
                 return res.status(403).json({ error: 'You cannot reject this cancellation request or request not found' });
             }
         }
-
-        // Check if request exists
         if(!bookingcancellation) {
             return res.status(404).json({ error: 'Cancellation request not found' });
         }
-
-        // Only pending requests can be rejected
         if(bookingcancellation.status !== "pending") {
             return res.status(400).json({ error: "This request has already been processed" });
         }
-
-        // Update the booking status back to approved/active (not canceled)
         const booking = await Booking.findById(bookingcancellation.bookingId);
         if(booking) {
-            booking.bookingStatus = "approved"; // or "active" depending on your booking flow
+            booking.bookingStatus = "approved";
             await booking.save();
         }
-
-        // Vehicle remains unavailable since booking was not canceled
-        // Optional: you can skip changing vehicle.availabilityStatus
-
-        // Update cancellation request
         bookingcancellation.status = "rejected";
         bookingcancellation.paymentStatus = "not_processed";
         await bookingcancellation.save();
-
         res.json({ message: 'Cancellation request rejected successfully', bookingcancellation });
 
     } catch(err) {

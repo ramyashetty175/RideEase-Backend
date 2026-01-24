@@ -6,13 +6,6 @@ const BookingValidation = Joi.object({
     endDateTime: Joi.date().greater(Joi.ref("startDateTime")).required(),
     pickupLocation: Joi.string().trim().required(),
     returnLocation: Joi.string().trim().required()
-    // returnLocation: Joi.string().trim().valid(Joi.ref("pickupLocation")).required()
-    // totalAmount: Joi.number().min(1).required()
-})
-
-const BookingAvailabilityValidation = Joi.object({
-    startDateTime: Joi.date().iso().required(),
-    endDateTime: Joi.date().iso().min(Joi.ref('startDateTime')).required()
 })
 
 const BookingUpdateValidation = Joi.object({
@@ -20,10 +13,6 @@ const BookingUpdateValidation = Joi.object({
     endDateTime: Joi.date().greater(Joi.ref("startDateTime")).optional(),
     pickupLocation: Joi.string().trim().optional(),
     returnLocation: Joi.string().trim().invalid(Joi.ref("pickupLocation")).optional()
-});
-
-const BookingExtendValidation = Joi.object({
-    endDateTime: Joi.date().greater("now").required()
 })
 
-module.exports = { BookingValidation, BookingUpdateValidation, BookingAvailabilityValidation, BookingExtendValidation };
+module.exports = { BookingValidation, BookingUpdateValidation };

@@ -34,11 +34,6 @@ const ApproveOwnerValidation = Joi.object({
     licenceDoc: Joi.string().uri().required()
 })
 
-const RejectOwnerValidation = Joi.object({
-    insuranceDoc: Joi.string().uri().optional(),
-    licenceDoc: Joi.string().uri().optional()
-})
-
 const UpdateProfileValidation = Joi.object({
     username: Joi.string().trim().min(5).max(25).optional(),
     bio: Joi.string().trim().min(10).max(128).optional(),
@@ -52,6 +47,5 @@ module.exports = {
     UserLoginValidation,
     ChangePasswordValidation,
     ApproveOwnerValidation,
-    RejectOwnerValidation,
     UpdateProfileValidation
 }

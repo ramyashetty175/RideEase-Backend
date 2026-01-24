@@ -16,8 +16,8 @@ const PaymentSchema = new mongoose.Schema({
         ref: 'User'
     },
     transactionId: {
-    type: String,
-    unique: true,
+        type: String,
+        unique: true,
     },
 }, { timestamps: true });
 

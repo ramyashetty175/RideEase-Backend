@@ -3,6 +3,7 @@ const User = require('../models/user-Authmodel');
 
 const imageUpload = {};
 
+// Upload Image
 imageUpload.avatar = async (req, res) => {
     try {
         if(!req.files || !req.files.avatar) {
@@ -30,6 +31,7 @@ imageUpload.avatar = async (req, res) => {
     } 
 }
 
+// Upload Licence
 imageUpload.licence = async (req, res) => {
     try {
         if (!req.files || !req.files.licenceDoc) {
@@ -55,6 +57,7 @@ imageUpload.licence = async (req, res) => {
     }
 }
 
+// Upload Insurance
 imageUpload.insurance = async (req, res) => {
     try {
         if (!req.files || !req.files.insuranceDoc) {

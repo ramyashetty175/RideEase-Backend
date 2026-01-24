@@ -1,10 +1,10 @@
 const Vehicle = require('../models/vehicle-model');
-const Booking = require('../models/booking-model');
 const cloudinary = require("../../config/cloudinary");
 const { VehicleValidation } = require('../validations/vehicle-validations');
 
 const vehiclesCtlr = {};
 
+// Vehicle Create
 vehiclesCtlr.create = async (req, res) => {
     try {
         if (!req.files || !req.files.image || !req.files.licenseDoc || !req.files.insuranceDoc) {
@@ -72,20 +72,7 @@ vehiclesCtlr.create = async (req, res) => {
         }
 }
 
-vehiclesCtlr.show = async (req, res) => {
-    const id = req.params.id;
-    try {
-        const vehicle = await Vehicle.findOne({ _id: id, isApproved: true });
-        if(!vehicle) {
-            return res.status(404).json({ error: 'vehicle not found or pending approval' });
-        }
-        res.json(vehicle);
-    } catch(err) {
-        console.log(err);
-        res.status(500).json({ error: 'Something went wrong!!!' });
-    }
-}
-
+// Vehicles List
 vehiclesCtlr.listVehicles = async (req, res) => {
     try {
         let vehicles;
@@ -104,6 +91,7 @@ vehiclesCtlr.listVehicles = async (req, res) => {
     }
 }
 
+// Vehicle Update
 vehiclesCtlr.update = async (req, res) => { 
     const id = req.params.id;
     try {
@@ -150,6 +138,7 @@ vehiclesCtlr.update = async (req, res) => {
     }
 }
 
+// Vehicle Remove
 vehiclesCtlr.remove = async (req, res) => {
     const id = req.params.id;
     try {
@@ -172,6 +161,7 @@ vehiclesCtlr.remove = async (req, res) => {
     }
 }
 
+// Vehicle Approve
 vehiclesCtlr.approveVehicle = async (req, res) => {
     const id = req.params.id;
     try {
@@ -191,6 +181,7 @@ vehiclesCtlr.approveVehicle = async (req, res) => {
     }
 }
 
+// Vehicle Reject
 vehiclesCtlr.rejectVehicle = async (req, res) => { 
     const id = req.params.id;
     try {
@@ -210,9 +201,10 @@ vehiclesCtlr.rejectVehicle = async (req, res) => {
     }
 }
 
+// Vehicle Search
 vehiclesCtlr.search = async (req, res) => {
     try {
-        const { keyword } = req.body;
+        const { keyword } = req.query;
         if(!keyword || keyword.trim() == "") {
           return res.status(400).json({ error: "keyword is required" });
         }
@@ -232,38 +224,6 @@ vehiclesCtlr.search = async (req, res) => {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
     }
-}
-
-vehiclesCtlr.available = async (req, res) => {
-  try {
-    const { pickupDateTime, returnDateTime } = req.query;
-
-    if (!pickupDateTime || !returnDateTime) {
-      return res.status(400).json({ error: "Pickup and return time required" });
-    }
-
-    // Find bookings that overlap with selected time
-    const conflictingBookings = await Booking.find({
-      startDateTime: { $lt: new Date(returnDateTime) },
-      endDateTime: { $gt: new Date(pickupDateTime) },
-    }).select("vehicle");
-
-    // Get booked vehicle IDs
-    const bookedVehicleIds = conflictingBookings.map(
-      (b) => b.vehicle
-    );
-
-    // Find vehicles NOT in booked list
-    const availableVehicles = await Vehicle.find({
-      status: "approved",
-      _id: { $nin: bookedVehicleIds },
-    });
-
-    res.status(200).json(availableVehicles);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Something went wrong" });
-  }
 }
 
 module.exports = vehiclesCtlr;

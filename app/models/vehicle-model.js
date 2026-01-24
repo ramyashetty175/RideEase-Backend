@@ -47,10 +47,6 @@ const VehicleSchema = new mongoose.Schema({
         type: String,
         enum: ["Available", "Booked", "Maintainance", "unAvailable"],
         default: "unAvailable"
-    },
-    averageRating: {
-        type: Number,
-        default: 0
     }
 }, { timestamps: true });
 

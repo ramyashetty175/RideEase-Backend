@@ -1,10 +1,11 @@
 const User = require('../models/user-Authmodel');
-const { UserRegisterValidation, UserLoginValidation, ChangePasswordValidation, ApproveOwnerValidation, RejectOwnerValidation, UpdateProfileValidation } = require('../validations/user-Authvalidations');
+const { UserRegisterValidation, UserLoginValidation, ChangePasswordValidation, ApproveOwnerValidation, UpdateProfileValidation } = require('../validations/user-Authvalidations');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const usersCtlr = {};
 
+// User Registartion
 usersCtlr.register = async(req, res) => {
     const body = req.body;
     const { error, value } = UserRegisterValidation.validate(body, { abortEarly: false });
@@ -41,6 +42,7 @@ usersCtlr.register = async(req, res) => {
     }
 }
 
+// User Login
 usersCtlr.login = async (req, res) => {
     const body = req.body;
     const { error, value } = UserLoginValidation.validate(body, { abortEarly: false });
@@ -67,6 +69,7 @@ usersCtlr.login = async (req, res) => {
     }
 }
 
+// Users List
 usersCtlr.list = async (req, res) => {
     try {
         let users;
@@ -85,6 +88,7 @@ usersCtlr.list = async (req, res) => {
     }
 }
 
+// User Remove
 usersCtlr.remove = async (req, res) => {
     const id = req.params.id;
     try {
@@ -107,6 +111,7 @@ usersCtlr.remove = async (req, res) => {
     }
 }
 
+// Owner Approve
 usersCtlr.approveOwner = async (req, res) => { 
     const body = req.body;
     const id = req.params.id;
@@ -132,6 +137,7 @@ usersCtlr.approveOwner = async (req, res) => {
     }
 }
 
+// Owner Reject
 usersCtlr.rejectOwner = async (req, res) => {
     const id = req.params.id;
     try {
@@ -150,6 +156,7 @@ usersCtlr.rejectOwner = async (req, res) => {
     }
 }
 
+// List Owners
 usersCtlr.listOwners = async (req, res) => {
     try {
         const owners = await User.find({ role: 'owner' });
@@ -160,6 +167,7 @@ usersCtlr.listOwners = async (req, res) => {
     }
 }
 
+// List All Users
 usersCtlr.listUsers = async (req, res) => {
     try {
         const users = await User.find({ role: 'user' });
@@ -170,6 +178,7 @@ usersCtlr.listUsers = async (req, res) => {
     }
 }
 
+// User Profile
 usersCtlr.profile = async (req, res) => {
     try {
         const user = await User.findById(req.userId);
@@ -183,6 +192,7 @@ usersCtlr.profile = async (req, res) => {
     }
 };
 
+// Update Profile
 usersCtlr.updateProfile = async (req, res) => {
     const body = req.body;
     const { error, value } = UpdateProfileValidation.validate(body);
@@ -201,6 +211,7 @@ usersCtlr.updateProfile = async (req, res) => {
     }
 }
 
+// Change Password
 usersCtlr.changePassword = async (req, res) => {  
     const id = req.params.id;
     const body = req.body;

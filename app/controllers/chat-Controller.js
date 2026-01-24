@@ -1,11 +1,11 @@
-const Booking = require("../models/booking-model");
-const Vehicle = require("../models/vehicle-model");
-const Payment = require("../models/payment-model");
-const BookingCancellation = require("../models/booking-cancellation-model");
-const VehicleTracking = require("../models/vehicleTracking-model");
+// const Booking = require("../models/booking-model");
+// const Vehicle = require("../models/vehicle-model");
+// const Payment = require("../models/payment-model");
+// const BookingCancellation = require("../models/booking-cancellation-model");
 
 const chatCtlr = {};
 
+// AI Chatbot
 chatCtlr.askAI = async (req, res) => {
     const userMessage = req.body;
     try {

@@ -1,10 +1,11 @@
 const Booking = require('../models/booking-model');
 const Vehicle = require('../models/vehicle-model');
 const User = require('../models/user-Authmodel');
-const { BookingValidation, BookingUpdateValidation, BookingAvailabilityValidation, BookingExtendValidation } = require('../validations/booking-validations');
+const { BookingValidation, BookingUpdateValidation } = require('../validations/booking-validations');
 
 const bookingsCtlr = {};
 
+// Booking Create
 bookingsCtlr.create = async(req, res) => {
     const body = req.body;
     const { error, value } = BookingValidation.validate(body, { abortEarly: false });
@@ -53,34 +54,22 @@ bookingsCtlr.create = async(req, res) => {
     }
 }
 
-bookingsCtlr.show = async(req, res) => { 
-    const id = req.params.id;
+// Booking Update
+bookingsCtlr.update = async(req, res) => {
+    const body = req.body;
+    const { error, value } = BookingUpdateValidation.validate(body, { abortEarly: false });
+    if(error) {
+        return res.status(400).json({ error: error.details });
+    }
     try {
-        let booking;
-        if(req.role == "admin") {
-           booking = await Booking.findById(id);
-        } else if(req.role == "owner") {
-           booking = await Booking.findOne({ _id: id, owner: req.userId });
-            if(!booking) {
-               return res.status(403).json({ error: 'You are not authorized to see this booking or booking not exists' });
-            }
-        }
-        else {
-            booking = await Booking.findOne({ _id: id, user: req.userId });
-            if(!booking) {
-               return res.status(403).json({ error: 'You are not authorized to see this booking or booking not exists' });
-            }
-        }
-        if(!booking) {
-            return res.status(404).json({ error: 'booking  not found' });
-        }
-        res.json(booking);
+
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
     }
 }
 
+// Bookings List
 bookingsCtlr.listBookings = async(req, res) => { 
     try {
         let bookings;
@@ -108,6 +97,7 @@ bookingsCtlr.listBookings = async(req, res) => {
     }
 }
 
+// Booking Remove
 bookingsCtlr.remove = async(req, res) => {
     const id = req.params.id;
     try {
@@ -136,36 +126,7 @@ bookingsCtlr.remove = async(req, res) => {
     }
 }
 
-bookingsCtlr.checkAvailability = async (req, res) => {
-    const body = req.body;
-    const id = req.params.id;
-    const { error, value } = BookingUpdateValidation.validate(body);
-    if(error) {
-        return res.status(400).json({ error: error.details });
-    }
-    const { startDateTime, endDateTime } = value;
-    const vehicleId = req.params.id;
-    try {
-        const vehicle = await Vehicle.findById(vehicleId);
-        if (!vehicle) {
-            return res.status(404).json({ error: "Vehicle not found" });
-        }
-        const overlappingBooking = await Booking.findOne({
-            vehicle: id,
-            bookingStatus: { $in: ["Approved", "in-progress"] },
-            startDateTime: { $lt: new Date(endDateTime) },
-            endDateTime: { $gt: new Date(startDateTime) }
-        })
-        if (overlappingBooking) {
-            return res.status(400).json({ message: "Vehicle already booked for selected dates" });
-        }
-        res.status(200).json({ message: 'Vehicle is available for selected dates' });
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({ error: 'Something went wrong!!!' });
-    }
-}
-
+// Booking Approve
 bookingsCtlr.approve = async (req, res) => {
     const id = req.params.id;
     try {
@@ -199,6 +160,7 @@ bookingsCtlr.approve = async (req, res) => {
     }
 }
 
+// Booking Cancel
 bookingsCtlr.cancel = async (req, res) => {
     const id = req.params.id;
     try {
@@ -232,36 +194,7 @@ bookingsCtlr.cancel = async (req, res) => {
     }
 }
 
-bookingsCtlr.confirm = async (req, res) => {
-    const id = req.params.id;
-    try {
-        let booking;
-        if(req.role == 'admin') {
-            booking = await Booking.findById(id);
-        } else {
-            booking = await Booking.findOne({ _id: id, user: req.userId });
-            if(!booking) {
-                return res.status(403).json({ error: 'you are not allowed to see this booking details or record not found' });
-            }
-        }
-        if(!booking) {
-            return res.status(404).json({ error: 'booking does not exists' });
-        }
-        booking.paymentStatus = "paid";
-        booking.bookingStatus = "confirmed";
-        const vehicle = await Vehicle.findById(booking.vehicle);
-        if(vehicle) {
-            vehicle.availabilityStatus = "Booked";
-            await vehicle.save();
-        }
-        await booking.save();
-        res.json({ message: "Booking confirmed successfully", booking });
-    } catch(err) {
-        console.log(err);
-        res.status(500).json({ error: 'Something went wrong!!!' });
-    }
-}
-
+// Booking StartTrip
 bookingsCtlr.startTrip = async (req, res) => {
     const id = req.params.id;
     try {
@@ -294,6 +227,7 @@ bookingsCtlr.startTrip = async (req, res) => {
     }
 }
 
+// Booking EndTrip
 bookingsCtlr.endTrip = async(req, res) => {
     const id = req.params.id;
     try {
@@ -320,41 +254,6 @@ bookingsCtlr.endTrip = async(req, res) => {
             await vehicle.save();
         }
         res.json({ message: "trip ended successfully", booking });
-    } catch(err) {
-        console.log(err);
-        res.status(500).json({ error: 'Something went wrong!!!' });
-    }
-}
-
-bookingsCtlr.extend = async (req, res) => {
-    const body = req.body;
-    const id = req.params.id;
-    const { error, value } = BookingExtendValidation.validate(body);
-    if(error) {
-        return res.status(400).json({ error: error.details });
-    }
-    try {
-        let booking;
-        if(req.role == 'admin') {
-            booking = await Booking.findById(id);
-        } else {
-            booking = await Booking.findOne({ _id: id, user: req.userId });
-            if(!booking) {
-               return res.status(404).json({ error: 'You are not allowed to see details of this booking or booking does not exists' });
-            }
-        }
-        if(booking.bookingStatus !== "in-progress") {
-           return res.status(400).json({ message: "Only in-progress booking can be extended" });
-        }
-        booking.endDateTime = value.endDateTime;
-        booking.bookingStatus = "in-progress";
-        await booking.save();
-        const vehicle = await Vehicle.findById(booking.vehicle);
-        if(vehicle) {
-            vehicle.availabilityStatus = "unAvailable";
-            await vehicle.save();
-        }
-        res.json({ message: "Booking extended successfullly", booking });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });

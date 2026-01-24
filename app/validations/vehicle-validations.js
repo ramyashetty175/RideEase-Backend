@@ -17,6 +17,4 @@ const VehicleValidation = Joi.object({
     averageRating: Joi.number().min(0).max(5).optional()
 })
 
-module.exports = {
-    VehicleValidation
-}
+module.exports = { VehicleValidation }
