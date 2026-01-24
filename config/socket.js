@@ -14,18 +14,18 @@ function initSocket(server) {
     io.on("connection", (socket) => {
         console.log("New client connected: ", socket.id);
 
-    // Receive location from driver
-    socket.on("send-location", (data) => {
-        // Broadcast to all admins / dashboards
-        io.emit("receive-location", { id: socket.id, ...data });
-    });
+        // Receive location from driver
+        socket.on("send-location", (data) => {
+            // Broadcast to all admins / dashboards
+            io.emit("receive-location", { id: socket.id, ...data });
+        });
 
-    // Handle disconnect
-    socket.on("disconnect", () => {
-        io.emit("user-disconnected", socket.id);
-        console.log("Client disconnected:", socket.id);
+        // Handle disconnect
+        socket.on("disconnect", () => {
+            io.emit("user-disconnected", socket.id);
+            console.log("Client disconnected:", socket.id);
+        });
     });
-  });
 }
 
 module.exports = { initSocket, io };

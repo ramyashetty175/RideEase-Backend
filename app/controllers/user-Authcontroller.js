@@ -113,12 +113,7 @@ usersCtlr.remove = async (req, res) => {
 
 // Owner Approve
 usersCtlr.approveOwner = async (req, res) => { 
-    const body = req.body;
     const id = req.params.id;
-    const { error } = ApproveOwnerValidation.validate(body);
-    if(error) {
-        return res.status(400).json({ error: error.details });
-    }
     try {
         const user = await User.findOne({ _id: id, role: 'owner' });
         if(!user) {
@@ -128,9 +123,11 @@ usersCtlr.approveOwner = async (req, res) => {
             user.licenceVerified = true;
             user.insuranceVerified = true;
             user.status = "approved";
+        } else {
+            return res.status(400).json({ success: true, message: "Your account is not approved by Admin" });
         }
         await user.save();
-        return res.status(200).json({ success: true, message: "Owner status updated successfully" });
+        res.status(200).json({ success: true, message: "Your account is approved by Admin" });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -145,9 +142,13 @@ usersCtlr.rejectOwner = async (req, res) => {
         if(!user) {
             return res.status(404).json({ error: 'Owner account not found or does not exist' });
         }
-        user.insuranceVerified = false;
-        user.licenceVerified = false;
-        user.status = "rejected";
+        if(!user.licenceDoc && !user.insuranceDoc) {
+           user.insuranceVerified = false;
+           user.licenceVerified = false;
+           user.status = "rejected";
+        } else {
+            return res.status(200).json({ success: true, message: "Your account is not rejected by Admin" });
+        }
         await user.save();
         res.status(200).json({ success: true, message: "Your account is rejected by admin" });
     } catch(err) {
