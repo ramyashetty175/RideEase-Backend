@@ -1,5 +1,5 @@
 const User = require('../models/user-Authmodel');
-const { UserRegisterValidation, UserLoginValidation, ChangePasswordValidation, ApproveOwnerValidation, UpdateProfileValidation } = require('../validations/user-Authvalidations');
+const { UserRegisterValidation, UserLoginValidation, ChangePasswordValidation, UpdateProfileValidation } = require('../validations/user-Authvalidations');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -25,14 +25,16 @@ usersCtlr.register = async(req, res) => {
         user.password = hash;
         const userCount = await User.countDocuments();
         if(userCount == 0) {
-            user.role = "admin";
+            user.role = 'admin';
             user.status = "approved";
-        } else if(userCount > 0 && userCount <= 5) {
-            user.role = "owner";
-            user.status = "pending";
         } else {
-            user.role = "user";
-            user.status = "approved";
+            if(value.role == 'owner') {
+                user.role = 'owner';
+                user.status = "pending";
+            } else if(value.role == 'user') {
+                user.role = 'user';
+                user.status = "approved";
+            }
         }
         await user.save();
         res.status(201).json(user);
@@ -88,6 +90,54 @@ usersCtlr.list = async (req, res) => {
     }
 }
 
+// usersCtlr.list = async (req, res) => {
+//   try {
+//     const {
+//       page = 1,
+//       limit = 10,
+//       sort,
+//       ...filters
+//     } = req.query;
+
+//     const skip = (page - 1) * limit;
+
+//     // role-based filter
+//     if (req.role === "owner") {
+//       filters.role = "user";
+//     }
+
+//     // sort example: sort=-name,email → "-name email"
+//     const sortCriteria = sort
+//       ? sort.split(",").join(" ")
+//       : "";
+
+//     const users = await User.find(filters)
+//       .skip(skip)
+//       .limit(parseInt(limit))
+//       .sort(sortCriteria);
+
+//     const total = await User.countDocuments(filters);
+
+//     if (users.length === 0) {
+//       return res.status(404).json({ error: "Users not found" });
+//     }
+
+//     res.json({
+//       data: users,
+//       metadata: {
+//         total,
+//         page: parseInt(page),
+//         limit: parseInt(limit),
+//         totalPages: Math.ceil(total / limit),
+//       },
+//     });
+
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).json({ error: "Something went wrong!!!" });
+//   }
+// };
+
 // User Remove
 usersCtlr.remove = async (req, res) => {
     const id = req.params.id;
@@ -120,8 +170,8 @@ usersCtlr.approveOwner = async (req, res) => {
             return res.status(404).json({ error: 'Owner account not found or does not exist' });
         }
         if(user.insuranceDoc && user.licenceDoc) {
-            user.licenceVerified = true;
-            user.insuranceVerified = true;
+            // user.licenceVerified = true;
+            // user.insuranceVerified = true;
             user.status = "approved";
         } else {
             return res.status(400).json({ success: true, message: "Your account is not approved by Admin" });
@@ -142,13 +192,9 @@ usersCtlr.rejectOwner = async (req, res) => {
         if(!user) {
             return res.status(404).json({ error: 'Owner account not found or does not exist' });
         }
-        if(!user.licenceDoc && !user.insuranceDoc) {
-           user.insuranceVerified = false;
-           user.licenceVerified = false;
-           user.status = "rejected";
-        } else {
-            return res.status(200).json({ success: true, message: "Your account is not rejected by Admin" });
-        }
+        // user.licenceVerified = false;
+        // user.insuranceVerified = false;
+        user.status = "rejected";
         await user.save();
         res.status(200).json({ success: true, message: "Your account is rejected by admin" });
     } catch(err) {

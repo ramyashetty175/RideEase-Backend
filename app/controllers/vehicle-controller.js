@@ -215,11 +215,8 @@ vehiclesCtlr.search = async (req, res) => {
             status: "approved",
             $or: [{ vehicleName: { $regex: regex } }, { registrationNumber: { $regex: regex } }]
         }
-        const vehicle = await Vehicle.find(vehicleFilter);
-        if(vehicle.length == 0) {
-            return res.status(400).json({ message: "No match vehicle found" });
-        }
-        res.json(vehicle);
+        const vehicles = await Vehicle.find(vehicleFilter);
+        res.json({ vehicles });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });

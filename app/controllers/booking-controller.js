@@ -54,35 +54,20 @@ bookingsCtlr.create = async(req, res) => {
     }
 }
 
-// Booking Update
-bookingsCtlr.update = async(req, res) => {
-    const body = req.body;
-    const { error, value } = BookingUpdateValidation.validate(body, { abortEarly: false });
-    if(error) {
-        return res.status(400).json({ error: error.details });
-    }
-    try {
-
-    } catch(err) {
-        console.log(err);
-        res.status(500).json({ error: 'Something went wrong!!!' });
-    }
-}
-
 // Bookings List
 bookingsCtlr.listBookings = async(req, res) => { 
     try {
         let bookings;
         if(req.role == "admin") {
-            bookings = await Booking.find().populate("user", "username licenceDoc insuranceDoc");
+            bookings = await Booking.find().populate("user", "username licenceDoc insuranceDoc").populate("vehicle", "image");
         } else if(req.role == "owner") {
-            bookings = await Booking.find({ owner: req.userId });
+            bookings = await Booking.find({ owner: req.userId }).populate("user", "username licenceDoc insuranceDoc").populate("vehicle", "image");
             if(bookings.length == 0) {
                 return res.status(403).json({ error: 'You are not allowed to see this bookings or bookings not exists' });
             }
         }
         else {
-            bookings = await Booking.find({ user: req.userId }).populate("user", "name licenceDoc insuranceDoc");
+            bookings = await Booking.find({ user: req.userId }).populate("user", "name licenceDoc insuranceDoc").populate("vehicle", "image");
             if(bookings.length == 0) {
                return res.status(403).json({ error: 'You are not allowed to see this bookings or bookings not exists' });
             }
@@ -179,9 +164,6 @@ bookingsCtlr.cancel = async (req, res) => {
         const user = await User.findById(booking.user);
         if(!user) {
             return res.status(404).json({ error: "User not found" });
-        }
-        if(!user.licenceDoc || !user.insuranceDoc) {
-            return res.status(400).json({ error: "User has not uploaded Licence or Insurance documents" });
         }
         if(booking.paymentStatus == 'failed') {
            booking.bookingStatus = "canceled";

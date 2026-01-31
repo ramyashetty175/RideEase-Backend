@@ -38,7 +38,7 @@ paymentCtlr.verifyPayment = async (req, res) => {
         }
         if (generated_signature === razorpay_signature) {
             payment.transactionId = razorpay_payment_id;  
-            payment.status = "paid";    
+            payment.status = "paid";  
             await payment.save();
             if (payment.booking) {
                 const booking = await Booking.findById(payment.booking);
@@ -66,10 +66,33 @@ paymentCtlr.verifyPayment = async (req, res) => {
     }
 }
 
+paymentCtlr.cancel = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    const payment = await Payment.findOne({ orderId });
+    if (!payment) return res.status(404).json({ message: "Payment not found!" });
+
+    payment.status = "failed"; // mark as failed
+    await payment.save();
+
+    if (payment.booking) {
+      const booking = await Booking.findById(payment.booking);
+      if (booking) {
+        booking.paymentStatus = "failed"; // mark booking as failed
+        await booking.save();
+      }
+    }
+    res.status(200).json({ success: true, message: "Payment marked as failed." });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ success: false, message: "Error marking payment failed." });
+  }
+}
+
 // Payment List
 paymentCtlr.list = async (req, res) => {
     try {
-        const payments = await Payment.find().populate("user", "username email");
+        const payments = await Payment.find({ user: req.userId }).populate("user", "username email");
         res.status(200).json(payments);
     } catch (err) {
         console.log(err);

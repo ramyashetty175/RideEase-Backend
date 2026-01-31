@@ -3,7 +3,6 @@ const http = require("http");
 const path = require("path");
 const cors = require('cors');
 require('dotenv').config();
-require("./app/cron/booking-status-cron");
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -68,7 +67,6 @@ app.get('/api/vehicles/search', authenticateUser, vehiclesCtlr.search);
 
 // Booking
 app.post('/api/bookings', authenticateUser, authorizeUser(['user']), bookingsCtlr.create);
-app.put('/api/bookings', authenticateUser, authorizeUser(['owner']), bookingsCtlr.update);
 app.get('/api/bookings', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.listBookings);
 app.delete('/api/bookings/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.remove);
 app.put('/api/bookings/approve/:id', authenticateUser, authorizeUser(['admin', 'owner']), bookingsCtlr.approve);
@@ -85,10 +83,11 @@ app.put('/api/bookingCancellation/reject/:id', authenticateUser, authorizeUser([
 // payment
 app.post('/api/payments/createOrder', authenticateUser, paymentCtlr.createOrder);
 app.post('/api/payments/verify', authenticateUser, paymentCtlr.verifyPayment);
-app.get('/api/payments', authenticateUser, paymentCtlr.list);
+app.get('/api/payments', authenticateUser, authorizeUser(['user']), paymentCtlr.list);
+app.get('/api/payments/cancel', authenticateUser, paymentCtlr.cancel);
 
 // AI ChatBot
-app.post('/api/chat', authenticateUser, chatCtlr.askAI);
+// app.post('/api/chat', authenticateUser, chatCtlr.askAI);
 
 server.listen(port, () => {
     console.log('server is running on port', port);

@@ -1,39 +1,37 @@
-// const Booking = require("../models/booking-model");
-// const Vehicle = require("../models/vehicle-model");
-// const Payment = require("../models/payment-model");
-// const BookingCancellation = require("../models/booking-cancellation-model");
+// const openAI = require('../../config/openai');
 
-const chatCtlr = {};
+// const chatCtlr = {};
 
-// AI Chatbot
-chatCtlr.askAI = async (req, res) => {
-    const userMessage = req.body;
-    try {
-        // Build a prompt
-        const prompt = `
-        You are an AI assistant for a Vehicle Rental App.
-        VERY IMPORTANT RULES:
-        - Only answer using the database data given.
-        - If user asks for an ID (bookingId, PaymentId, vehicleId, bookingCancellationId) not present in data -> Tell them "Invalid ID".
-        - Do not guess any information that is not provided.
-        - If user has no data politely tell them.
-        DATABASE:
-        BOOKING
-        VEHICLE
-        PAYMENT
-        BOOKINGCANCELLATION
-        `;
-        // call gpt-5.1
-        const response = await client.responses.create({
-           model: "gpt-5.1",
-           input: prompt
-        });
-        const aiResponse = response.output_text;
-        res.json({ reply: aiResponse });
-    } catch(err) {
-       console.log(err);
-       res.status(500).json({ error: 'AI request failed' });
-    }
-}
+// // AI Chatbot
+// chatCtlr.askAI = async (req, res) => {
+//     const userMessage = req.body;
+//     try {
+//         // Build a prompt
+//         const prompt = `
+//         You are a tourism assistant.
+//         Rules:
+//           - Answer ONLY using the nearby places data provided below.
+//           - For each place, explain its information and historical significance based on the given data.
+//           - Do NOT add or guess any details that are not present in the data.
+//           - If no nearby places are provided, politely say that no nearby tourist places are available.
+//         `;
+//         // call gpt-4o-mini
+//         const response = await axios.post(
+//             "https://api.openai.com/v1/chat/completions",
+//             {
+//                 model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+//                 Messages: [{ role: "user", content: prompt }],
+//             },
+//             {
+//                 headers: 
+//             },
+//         )
+//         const aiResponse = response.output_text;
+//         res.json({ reply: aiResponse });
+//     } catch(err) {
+//        console.log(err);
+//        res.status(500).json({ error: 'AI request failed' });
+//     }
+// }
 
-module.exports = chatCtlr;
+// module.exports = chatCtlr;
