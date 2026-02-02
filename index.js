@@ -31,7 +31,6 @@ const usersCtlr = require('./app/controllers/user-Authcontroller');
 const vehiclesCtlr = require('./app/controllers/vehicle-controller');
 const bookingsCtlr = require('./app/controllers/booking-controller');
 const paymentCtlr = require('./app/controllers/payment-controller');
-const bookingCancellationCtlr = require('./app/controllers/booking-cancellation-controller');
 const chatCtlr = require('./app/controllers/chat-Controller');
 
 // Public Route
@@ -58,7 +57,6 @@ app.post('/api/upload/user/insurance', authenticateUser, authorizeUser(['owner',
 
 // Vehicle
 app.post('/api/vehicles', authenticateUser, authorizeUser(['owner']), uploadMiddleware, vehiclesCtlr.create);
-app.put('/api/vehicles/:id', authenticateUser, authorizeUser(['admin', 'owner']), uploadMiddleware, vehiclesCtlr.update);
 app.put('/api/vehicles/approve/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.approveVehicle);  
 app.put('/api/vehicles/reject/:id', authenticateUser, authorizeUser(['admin']), vehiclesCtlr.rejectVehicle);
 app.get('/api/vehicles', authenticateUser, authorizeUser(['owner', 'admin', 'user']), vehiclesCtlr.listVehicles); 
@@ -68,17 +66,9 @@ app.get('/api/vehicles/search', authenticateUser, vehiclesCtlr.search);
 // Booking
 app.post('/api/bookings', authenticateUser, authorizeUser(['user']), bookingsCtlr.create);
 app.get('/api/bookings', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.listBookings);
-app.delete('/api/bookings/:id', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.remove);
+app.get('/api/bookings/:id', authenticateUser, bookingsCtlr.show);
 app.put('/api/bookings/approve/:id', authenticateUser, authorizeUser(['admin', 'owner']), bookingsCtlr.approve);
 app.put('/api/bookings/cancel/:id', authenticateUser, authorizeUser(['admin', 'owner']), bookingsCtlr.cancel);  
-app.put('/api/bookings/start/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.startTrip);  
-app.put('/api/bookings/end/:id', authenticateUser, authorizeUser(['admin', 'user']), bookingsCtlr.endTrip);     
-
-// BookingCancellation
-app.post('/api/bookingCancellation/request/:id', authenticateUser, authorizeUser(['user']), bookingCancellationCtlr.requestCancel);
-app.get('/api/bookingCancellation', authenticateUser, authorizeUser(['admin', 'owner']), bookingCancellationCtlr.list);
-app.put('/api/bookingCancellation/approve/:id', authenticateUser, authorizeUser(['admin','owner']), bookingCancellationCtlr.approveCancel);
-app.put('/api/bookingCancellation/reject/:id', authenticateUser, authorizeUser(['admin','owner']), bookingCancellationCtlr.rejectCancel);
 
 // payment
 app.post('/api/payments/createOrder', authenticateUser, paymentCtlr.createOrder);
@@ -87,7 +77,7 @@ app.get('/api/payments', authenticateUser, authorizeUser(['user']), paymentCtlr.
 app.get('/api/payments/cancel', authenticateUser, paymentCtlr.cancel);
 
 // AI ChatBot
-// app.post('/api/chat', authenticateUser, chatCtlr.askAI);
+app.post('/api/chat', authenticateUser, chatCtlr.getNearbyTourismSuggestions);
 
 server.listen(port, () => {
     console.log('server is running on port', port);

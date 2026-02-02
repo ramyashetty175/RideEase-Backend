@@ -1,5 +1,5 @@
 const User = require('../models/user-Authmodel');
-const { UserRegisterValidation, UserLoginValidation, ChangePasswordValidation, UpdateProfileValidation } = require('../validations/user-Authvalidations');
+const { UserRegisterValidation, UserLoginValidation, ChangePasswordValidation, UpdateProfileValidation, OwnerReject } = require('../validations/user-Authvalidations');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -54,11 +54,11 @@ usersCtlr.login = async (req, res) => {
     try {
         const user = await User.findOne({ email: value.email });
         if(!user) {
-            return res.status(401).json({ error: 'user not found' });
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
         const passwordMatch = await bcryptjs.compare(value.password, user.password);
         if(!passwordMatch) {
-            return res.status(401).json({ error: 'Invalid email/password' });
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
         user.loginCount += 1;
         await user.save();
@@ -89,54 +89,6 @@ usersCtlr.list = async (req, res) => {
         res.status(500).json({ error: 'Something went wrong!!!' });
     }
 }
-
-// usersCtlr.list = async (req, res) => {
-//   try {
-//     const {
-//       page = 1,
-//       limit = 10,
-//       sort,
-//       ...filters
-//     } = req.query;
-
-//     const skip = (page - 1) * limit;
-
-//     // role-based filter
-//     if (req.role === "owner") {
-//       filters.role = "user";
-//     }
-
-//     // sort example: sort=-name,email → "-name email"
-//     const sortCriteria = sort
-//       ? sort.split(",").join(" ")
-//       : "";
-
-//     const users = await User.find(filters)
-//       .skip(skip)
-//       .limit(parseInt(limit))
-//       .sort(sortCriteria);
-
-//     const total = await User.countDocuments(filters);
-
-//     if (users.length === 0) {
-//       return res.status(404).json({ error: "Users not found" });
-//     }
-
-//     res.json({
-//       data: users,
-//       metadata: {
-//         total,
-//         page: parseInt(page),
-//         limit: parseInt(limit),
-//         totalPages: Math.ceil(total / limit),
-//       },
-//     });
-
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({ error: "Something went wrong!!!" });
-//   }
-// };
 
 // User Remove
 usersCtlr.remove = async (req, res) => {
@@ -170,8 +122,6 @@ usersCtlr.approveOwner = async (req, res) => {
             return res.status(404).json({ error: 'Owner account not found or does not exist' });
         }
         if(user.insuranceDoc && user.licenceDoc) {
-            // user.licenceVerified = true;
-            // user.insuranceVerified = true;
             user.status = "approved";
         } else {
             return res.status(400).json({ success: true, message: "Your account is not approved by Admin" });
@@ -186,15 +136,19 @@ usersCtlr.approveOwner = async (req, res) => {
 
 // Owner Reject
 usersCtlr.rejectOwner = async (req, res) => {
+    const body = req.body;
     const id = req.params.id;
+    const { error, value } = OwnerReject.validate(body, { abortEarly: false });
+    if(error) {
+        return res.status(400).json({ error: error.details });
+    }
     try {
         const user = await User.findOne({ _id: id, role: 'owner' });
         if(!user) {
             return res.status(404).json({ error: 'Owner account not found or does not exist' });
         }
-        // user.licenceVerified = false;
-        // user.insuranceVerified = false;
         user.status = "rejected";
+        user.rejectReason = value.rejectReason;
         await user.save();
         res.status(200).json({ success: true, message: "Your account is rejected by admin" });
     } catch(err) {

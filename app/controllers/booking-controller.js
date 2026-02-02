@@ -82,29 +82,28 @@ bookingsCtlr.listBookings = async(req, res) => {
     }
 }
 
-// Booking Remove
-bookingsCtlr.remove = async(req, res) => {
+bookingsCtlr.show = async(req, res) => { 
     const id = req.params.id;
     try {
         let booking;
         if(req.role == "admin") {
-           booking = await Booking.findByIdAndDelete(id);
+           booking = await Booking.findById(id);
         } else if(req.role == "owner") {
-            booking = await Booking.findOneAndDelete({ _id: id, owner: req.userId });
+           booking = await Booking.findOne({ _id: id, owner: req.userId });
             if(!booking) {
-               return res.status(403).json({ error: 'You are not allowed to remove this booking or booking does not exists' });
+               return res.status(403).json({ error: 'You are not authorized to see this booking or booking not exists' });
             }
         }
         else {
-            booking = await Booking.findOneAndDelete({ _id: id, user: req.userId });
+            booking = await Booking.findOne({ _id: id, user: req.userId });
             if(!booking) {
-               return res.status(403).json({ error: 'You are not allowed to remove this booking or booking does not exists' });
+               return res.status(403).json({ error: 'You are not authorized to see this booking or booking not exists' });
             }
         }
         if(!booking) {
-            return res.status(404).json({ error: 'booking does not exists' });
+            return res.status(404).json({ error: 'booking  not found' });
         }
-        res.json({ message: "booking deleted successfully", booking });
+        res.json(booking);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
@@ -170,72 +169,6 @@ bookingsCtlr.cancel = async (req, res) => {
            await booking.save();
         }
         res.json({ message: "booking Canceled successfully", booking });
-    } catch(err) {
-        console.log(err);
-        res.status(500).json({ error: 'Something went wrong!!!' });
-    }
-}
-
-// Booking StartTrip
-bookingsCtlr.startTrip = async (req, res) => {
-    const id = req.params.id;
-    try {
-        let booking;
-        if(req.role == 'admin') {
-           booking = await Booking.findById(id);
-        } else {
-            booking = await Booking.findOne({ _id: id, user: req.userId });
-            if(!booking) {
-               return res.status(403).json({ error: 'You are not allowed to see this booking details or booking does not exists' });
-            }
-        }
-        if(!booking) {
-            return res.status(404).json({ error: 'record not found' });
-        }
-        if(booking.bookingStatus !== "confirmed") {
-           return res.status(400).json({ error: "only confirmed booking can be started" });
-        }
-        booking.bookingStatus = "in-progress";
-        await booking.save();
-        const vehicle = await Vehicle.findById(booking.vehicle);
-        if(vehicle) {
-            vehicle.availabilityStatus = "unAvailable";
-            await vehicle.save();
-        }
-        res.json({ message: "trip started successfully", booking });
-    } catch(err) {
-        console.log(err);
-        res.status(500).json({ error: 'Something went wrong!!!' });
-    }
-}
-
-// Booking EndTrip
-bookingsCtlr.endTrip = async(req, res) => {
-    const id = req.params.id;
-    try {
-        let booking;
-        if(req.role == 'admin') {
-           booking = await Booking.findById(id);
-        } else {
-            booking = await Booking.findOne({ _id: id, user: req.userId });
-            if(!booking) {
-               return res.status(403).json({ error: 'You are not allowed to see this booking details or booking does not exists' });
-            }
-        }
-        if(!booking) {
-           return res.status(404).json({ error: 'record not found' });
-        }
-        if(booking.bookingStatus !== "in-progress") {
-            return res.status(400).json({ error: "only in-progress bookings can be ended" });
-        }
-        booking.bookingStatus = "completed";
-        await booking.save();
-        const vehicle = await Vehicle.findById(booking.vehicle);
-        if(vehicle) {
-            vehicle.availabilityStatus = "Available";
-            await vehicle.save();
-        }
-        res.json({ message: "trip ended successfully", booking });
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });

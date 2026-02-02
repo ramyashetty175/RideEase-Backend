@@ -38,9 +38,14 @@ const UpdateProfileValidation = Joi.object({
     licenceDoc: Joi.string().uri().optional()
 })
 
+const OwnerReject = Joi.object({
+    rejectReason: Joi.string().trim().min(5).required()
+})
+
 module.exports = {
     UserRegisterValidation,
     UserLoginValidation,
     ChangePasswordValidation,
-    UpdateProfileValidation
+    UpdateProfileValidation,
+    OwnerReject
 };

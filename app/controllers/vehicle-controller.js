@@ -38,7 +38,7 @@ vehiclesCtlr.create = async (req, res) => {
             ...req.body,
             image: imageRes.secure_url,
             licenseDoc: licenseRes.secure_url,
-            insuranceDoc: insuranceRes.secure_url
+            insuranceDoc: insuranceRes.secure_url,
         }
         const { error, value } = VehicleValidation.validate(body, { abortEarly: false });
         if (error) {
@@ -48,22 +48,17 @@ vehiclesCtlr.create = async (req, res) => {
         if (vehicleInDB) {
             return res.status(400).json({ success: false, error: "Vehicle already exists" });
         }
-        const vehicle = new Vehicle();
-        vehicle.vehicleName = value.vehicleName;
-        vehicle.owner = req.userId;
-        vehicle.brand = value.brand;
-        vehicle.type = value.type;
-        vehicle.registrationNumber = value.registrationNumber;
-        vehicle.image = value.image;
-        vehicle.licenseDoc = value.licenseDoc;
-        vehicle.insuranceDoc = value.insuranceDoc;
-        vehicle.fuelType = value.fuelType;
-        vehicle.transmission = value.transmission;
-        vehicle.seats = value.seats;
-        vehicle.pricePerDay = value.pricePerDay;
-        vehicle.location = value.location;
-        vehicle.availabilityStatus = value.availabilityStatus;
-        vehicle.status = "pending";
+        const vehicle = new Vehicle({
+  ...value,
+  owner: req.userId,
+  location: {
+    type: "Point",
+    coordinates: [
+      Number(value.lng),
+      Number(value.lat)
+    ]
+  }
+});
         await vehicle.save();
         res.status(201).json({ success: true, message: "Vehicle added successfully", vehicle });
         } catch (err) {
@@ -76,10 +71,12 @@ vehiclesCtlr.create = async (req, res) => {
 vehiclesCtlr.listVehicles = async (req, res) => {
     try {
         let vehicles;
-        if(req.role == 'admin'|| req.role == 'user') {
-            vehicles = await Vehicle.find().populate('owner', 'username email');;
+        if(req.role == 'admin') {
+            vehicles = await Vehicle.find().populate('owner', 'username email');
         } else if (req.role == 'owner') {
             vehicles = await Vehicle.find({ owner: req.userId }).populate('owner', 'username email');
+        } else if(req.role == 'user') {
+            vehicles = await Vehicle.find({ status: 'approved', availabilityStatus: 'Available' }).populate('owner', 'username email');
         }
         if(!vehicles) {
             return res.status(404).json({ error: 'No vehicle found' });
@@ -88,53 +85,6 @@ vehiclesCtlr.listVehicles = async (req, res) => {
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
-    }
-}
-
-// Vehicle Update
-vehiclesCtlr.update = async (req, res) => { 
-    const id = req.params.id;
-    try {
-        const vehicle = await Vehicle.findOne({ _id: id, owner: req.userId });
-        if (!vehicle) {
-            return res.status(403).json({ error: 'You are not allowed to update this vehicle' });
-        }
-        const { error, value } = VehicleValidation.validate(req.body, { abortEarly: false });
-        if (error) {
-            return res.status(400).json({ success: false, errors: error.details });
-        }
-        Object.assign(vehicle, value);
-        if (req.files) {
-            if (req.files.image) {
-                const imageRes = await cloudinary.uploader.upload(req.files.image.tempFilePath, {
-                    folder: "vehicles/images",
-                    public_id: `vehicle_image_${Date.now()}`,
-                    resource_type: "image",
-                });
-                vehicle.image = imageRes.secure_url;
-            }
-            if (req.files.licenseDoc) {
-                const licenseRes = await cloudinary.uploader.upload(req.files.licenseDoc.tempFilePath, {
-                    folder: "vehicles/licenses",
-                    public_id: `vehicle_license_${Date.now()}`,
-                    resource_type: "image",
-                });
-                vehicle.licenseDoc = licenseRes.secure_url;
-            }
-            if (req.files.insuranceDoc) {
-                const insuranceRes = await cloudinary.uploader.upload(req.files.insuranceDoc.tempFilePath, {
-                    folder: "vehicles/insurance",
-                    public_id: `vehicle_insurance_${Date.now()}`,
-                    resource_type: "image",
-                });
-                vehicle.insuranceDoc = insuranceRes.secure_url;
-            }
-        }
-        await vehicle.save();
-        res.json({ success: true, message: "Vehicle updated successfully", vehicle });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, error: 'Something went wrong!!!' });
     }
 }
 

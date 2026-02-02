@@ -38,7 +38,17 @@ const VehicleSchema = new mongoose.Schema({
     },
     seats: Number,
     pricePerDay: Number,
-    location: String,
+    location: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      required: true
+    },
+    coordinates: {
+      type: [Number],
+      required: true
+    }
+    },
     image: {
         type: String,
         required: true
@@ -47,8 +57,17 @@ const VehicleSchema = new mongoose.Schema({
         type: String,
         enum: ["Available", "Booked", "Maintainance", "unAvailable"],
         default: "unAvailable"
+    },
+    ratings: [
+    {
+      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      rating: { type: Number, min: 1, max: 5 },
+      createdAt: { type: Date, default: Date.now }
     }
+    ]
 }, { timestamps: true });
+
+VehicleSchema.index({ location: "2dsphere" });
 
 const Vehicle = mongoose.model('Vehicle', VehicleSchema);
 
