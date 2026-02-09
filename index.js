@@ -32,6 +32,7 @@ const vehiclesCtlr = require('./app/controllers/vehicle-controller');
 const bookingsCtlr = require('./app/controllers/booking-controller');
 const paymentCtlr = require('./app/controllers/payment-controller');
 const chatCtlr = require('./app/controllers/chat-Controller');
+const reviewCtlr = require('./app/controllers/review-controller');
 
 // Public Route
 app.post('/users/register', usersCtlr.register); 
@@ -66,15 +67,17 @@ app.get('/api/vehicles/search', authenticateUser, vehiclesCtlr.search);
 // Booking
 app.post('/api/bookings', authenticateUser, authorizeUser(['user']), bookingsCtlr.create);
 app.get('/api/bookings', authenticateUser, authorizeUser(['admin', 'owner', 'user']), bookingsCtlr.listBookings);
-app.get('/api/bookings/:id', authenticateUser, bookingsCtlr.show);
 app.put('/api/bookings/approve/:id', authenticateUser, authorizeUser(['admin', 'owner']), bookingsCtlr.approve);
-app.put('/api/bookings/cancel/:id', authenticateUser, authorizeUser(['admin', 'owner']), bookingsCtlr.cancel);  
+app.put('/api/bookings/cancel/:id', authenticateUser, authorizeUser(['admin', 'owner']), bookingsCtlr.cancel); 
 
 // payment
 app.post('/api/payments/createOrder', authenticateUser, paymentCtlr.createOrder);
 app.post('/api/payments/verify', authenticateUser, paymentCtlr.verifyPayment);
 app.get('/api/payments', authenticateUser, authorizeUser(['user']), paymentCtlr.list);
 app.get('/api/payments/cancel', authenticateUser, paymentCtlr.cancel);
+
+// Review
+app.put('/api/reviews/add', authenticateUser, reviewCtlr.addReview);
 
 // AI ChatBot
 app.post('/api/chat', authenticateUser, chatCtlr.getNearbyTourismSuggestions);

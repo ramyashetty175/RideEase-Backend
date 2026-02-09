@@ -27,9 +27,7 @@ const BookingSchema = new mongoose.Schema({
         type: String,
         enum: ["pending", "confirmed", "in-progress", "completed", "canceled", "cancelRequested"],
         default: "pending"
-    },
-    tripStartTime: Date,
-    tripEndTime: Date
+    }
 }, { timestamps: true });
 
 const Booking = mongoose.model('Booking', BookingSchema);

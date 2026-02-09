@@ -1,7 +1,7 @@
 const Booking = require('../models/booking-model');
 const Vehicle = require('../models/vehicle-model');
 const User = require('../models/user-Authmodel');
-const { BookingValidation, BookingUpdateValidation } = require('../validations/booking-validations');
+const { BookingValidation } = require('../validations/booking-validations');
 
 const bookingsCtlr = {};
 
@@ -76,34 +76,6 @@ bookingsCtlr.listBookings = async(req, res) => {
             return res.status(404).json({ error: 'You are not allowed to see this bookings or bookings not exists' });
         }
         res.json(bookings);
-    } catch(err) {
-        console.log(err);
-        res.status(500).json({ error: 'Something went wrong!!!' });
-    }
-}
-
-bookingsCtlr.show = async(req, res) => { 
-    const id = req.params.id;
-    try {
-        let booking;
-        if(req.role == "admin") {
-           booking = await Booking.findById(id);
-        } else if(req.role == "owner") {
-           booking = await Booking.findOne({ _id: id, owner: req.userId });
-            if(!booking) {
-               return res.status(403).json({ error: 'You are not authorized to see this booking or booking not exists' });
-            }
-        }
-        else {
-            booking = await Booking.findOne({ _id: id, user: req.userId });
-            if(!booking) {
-               return res.status(403).json({ error: 'You are not authorized to see this booking or booking not exists' });
-            }
-        }
-        if(!booking) {
-            return res.status(404).json({ error: 'booking  not found' });
-        }
-        res.json(booking);
     } catch(err) {
         console.log(err);
         res.status(500).json({ error: 'Something went wrong!!!' });
