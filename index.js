@@ -20,7 +20,8 @@ app.use(express.static(path.join(__dirname, "public")));
 initSocket(server);
 
 app.get("/", (req, res) => {
-  res.render("index");
+  // res.render("index");
+  res.send("RideEase API Running");
 });
 
 const authenticateUser = require('./app/middlewares/authenticateUser');
