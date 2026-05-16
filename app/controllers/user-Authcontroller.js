@@ -10,6 +10,7 @@ usersCtlr.register = async(req, res) => {
     const body = req.body;
     const { error, value } = UserRegisterValidation.validate(body, { abortEarly: false });
     if(error) {
+        console.log("Validation Error:", error.details[0].message);
         return res.status(400).json({ error: error.details });
     }
     try {
@@ -31,7 +32,7 @@ usersCtlr.register = async(req, res) => {
             if(value.role == 'owner') {
                 user.role = 'owner';
                 user.status = "pending";
-            } else if(value.role == 'user') {
+            } else {
                 user.role = 'user';
                 user.status = "approved";
             }
