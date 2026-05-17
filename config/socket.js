@@ -5,7 +5,7 @@ let io;
 function initSocket(server) {
   io = socketio(server, {
     cors: {
-      origin: "http://localhost:5173", // your React frontend
+      origin: "https://ride-ease-frontend-ashy.vercel.app", // your React frontend
       methods: ["GET", "POST"],
       credentials: true
     }
