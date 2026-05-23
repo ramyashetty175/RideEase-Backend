@@ -3,7 +3,7 @@ const http = require("http");
 const path = require("path");
 const cors = require('cors');
 require('dotenv').config();
-require("./app/cron/booking-status-cron");
+require("./app/cron/booking-status-cron.js");
 const app = express();
 app.use(express.json());
 app.use(cors());
