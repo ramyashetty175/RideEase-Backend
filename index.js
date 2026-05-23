@@ -81,7 +81,7 @@ app.get('/api/payments/cancel', authenticateUser, paymentCtlr.cancel);
 app.put('/api/reviews/add', authenticateUser, reviewCtlr.addReview);
 
 // AI ChatBot
-app.post('/api/chat', authenticateUser, chatCtlr.getNearbyTourismSuggestions);
+app.post('/api/ai/chat', authenticateUser, chatCtlr.chat);
 
 server.listen(port, () => {
     console.log('server is running on port', port);
